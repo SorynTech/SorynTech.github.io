@@ -3,115 +3,607 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EmailJS Integration</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.youtube.com; connect-src 'self' https://api.emailjs.com; style-src 'self' 'unsafe-inline'; frame-src https://www.youtube.com; img-src 'self' data: https:;">
+    <title>Soryn's Quiz for Aspen 💜</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-</head>
-<body>
-    <h1>Send Email with EmailJS</h1>
-    <button id="sendEmail">Send Email</button>
-    <div id="status"></div>
-
-    <script>
-        // Check if emailjs loaded
-        console.log('EmailJS loaded:', typeof emailjs !== 'undefined');
-        
-        // Initialize EmailJS with your public key
-        (function() {
-            emailjs.init({
-                publicKey: 'X1Q8ioFNDuAcUEsBr'
-            });
-            console.log('EmailJS initialized');
-        })();
-
-        // Example data structure matching Python output
-        const emailData = {
-            date: "2025-12-08",
-            open_ended_questions: {
-                question1: "Example loving response",
-                question2: "Example favorite thing"
-            },
-            aspen_questions: {
-                favorite_food: "Pizza",
-                favorite_place: "Local Cafe",
-                special_interest: "Photography"
-            },
-            birthday_message: "Not Soryn's birthday yet",
-            compatibility_score: 97,
-            compatibility_text: "WOW the compatibility is off the charts",
-            question_score: 6
-        };
-
-        // Function to format email content
-        function formatEmailContent(data) {
-            return `
-Date: ${data.date}
-
-=== OPEN ENDED QUESTIONS ===
-1. How do you feel about Soryn in a loving way?
-   ${data.open_ended_questions.question1}
-
-2. What is your favorite thing about Soryn?
-   ${data.open_ended_questions.question2}
-
-=== ASPEN'S ANSWERS ===
-Favorite Food: ${data.aspen_questions.favorite_food}
-Favorite Place to Eat: ${data.aspen_questions.favorite_place}
-Special Interest: ${data.aspen_questions.special_interest}
-
-=== BIRTHDAY MESSAGE ===
-${data.birthday_message}
-
-=== SCORES ===
-Question Score: ${data.question_score}
-Compatibility Score: ${data.compatibility_score}
-${data.compatibility_text}
-            `.trim();
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        document.getElementById('sendEmail').addEventListener('click', async function() {
-            const statusDiv = document.getElementById('status');
-            statusDiv.textContent = 'Sending email...';
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #000000 50%, #2d0052 100%);
+            min-height: 100vh;
+            color: #e0d4ff;
+            padding: 20px;
+        }
 
-            // EmailJS template parameters
-            const templateParams = {
-                to_name: 'Soryn',
-                from_name: 'Aspen',
-                message: formatEmailContent(emailData),
-                reply_to: 'noreply@lovequestionnaire.com',
-                // Individual fields for more flexible templates
-                loving_response: emailData.open_ended_questions.question1,
-                favorite_thing: emailData.open_ended_questions.question2,
-                fav_food: emailData.aspen_questions.favorite_food,
-                fav_place: emailData.aspen_questions.favorite_place,
-                special_interest: emailData.aspen_questions.special_interest,
-                birthday_msg: emailData.birthday_message,
-                compatibility: emailData.compatibility_score,
-                compatibility_text: emailData.compatibility_text,
-                quiz_score: emailData.question_score
-            };
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(20, 0, 40, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.5);
+            border: 2px solid #8a2be2;
+        }
 
-            try {
-                console.log('Attempting to send email with EmailJS...');
-                console.log('Service ID: service_3zj1j9l');
-                console.log('Template ID: template_pzha7vq');
-                console.log('Template Params:', templateParams);
-                
-                const response = await emailjs.send('service_3zj1j9l', 'template_pzha7vq', templateParams);
-                
-                console.log('SUCCESS!', response.status, response.text);
-                statusDiv.textContent = 'Email sent successfully! ✅';
-                statusDiv.style.color = 'green';
-            } catch (error) {
-                console.error('FAILED...', error);
-                console.error('Error message:', error.text || error.message);
-                console.error('Error status:', error.status);
-                console.error('Full error:', JSON.stringify(error, null, 2));
-                
-                const errorMsg = error.text || error.message || 'Unknown error';
-                statusDiv.textContent = `Failed to send email ❌ Error: ${errorMsg}`;
-                statusDiv.style.color = 'red';
+        h1 {
+            text-align: center;
+            color: #d8b4fe;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #8a2be2;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #c4b5fd;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .question-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .question-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            background: rgba(138, 43, 226, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #8a2be2;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .question h2 {
+            color: #d8b4fe;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .hint {
+            color: #c4b5fd;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #8a2be2;
+            border-radius: 10px;
+            color: #e0d4ff;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #d8b4fe;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .char-counter {
+            text-align: right;
+            color: #c4b5fd;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .char-counter.warning {
+            color: #ff6b6b;
+        }
+
+        button {
+            background: linear-gradient(135deg, #8a2be2 0%, #6a1bb8 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #9d3ef0 0%, #7a28c9 100%);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.6);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .success {
+            color: #51cf66;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .progress {
+            background: rgba(138, 43, 226, 0.2);
+            height: 8px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #8a2be2, #d8b4fe);
+            height: 100%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+        }
+
+        .final-section {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .score-display {
+            background: rgba(138, 43, 226, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid #8a2be2;
+        }
+
+        .score-display h2 {
+            color: #d8b4fe;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .score-display p {
+            font-size: 1.2em;
+            color: #c4b5fd;
+            margin: 10px 0;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #8a2be2;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
             }
-        });
-    </script>
-</body>
-</html>
+        }
+
+        .video-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .video-container iframe {
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.4);
+            max-width: 100%;
+        }
+
+        .heart-container {
+            text-align: center;
+            font-size: 3em;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .compatibility-section {
+            background: rgba(138, 43, 226, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid #8a2be2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💜 Soryn's Quiz for Aspen 💜</h1>
+        <p class="subtitle">Made with love by SorynTech</p>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="question-section active" id="section-login">
+            <div class="question">
+                <h2>Welcome! Please Login</h2>
+                <input type="text" id="username" placeholder="Enter username">
+                <input type="password" id="password" placeholder="Enter password" style="margin-top: 15px;">
+                <p class="error" id="login-error"></p>
+                <button onclick="checkLogin()">Login</button>
+            </div>
+        </div>
+
+        <!-- Open Ended Questions -->
+        <div class="question-section" id="section-open1">
+            <div class="question">
+                <h2>How do you feel about Soryn in a loving way?</h2>
+                <p class="hint">Be honest and speak from the heart 💜</p>
+                <textarea id="open1" maxlength="500" oninput="updateCharCount('open1', 'open1-count')"></textarea>
+                <p class="char-counter" id="open1-count">0/500 characters</p>
+                <p class="error" id="open1-error"></p>
+                <button onclick="nextSection('section-open1', 'section-open2')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-open2">
+            <div class="question">
+                <h2>What is your favorite thing about Soryn?</h2>
+                <p class="hint">Think about what makes Soryn special to you</p>
+                <textarea id="open2" maxlength="500" oninput="updateCharCount('open2', 'open2-count')"></textarea>
+                <p class="char-counter" id="open2-count">0/500 characters</p>
+                <p class="error" id="open2-error"></p>
+                <button onclick="nextSection('section-open2', 'section-soryn1')">Next</button>
+            </div>
+        </div>
+
+        <!-- Soryn Questions -->
+        <div class="question-section" id="section-soryn1">
+            <div class="question">
+                <h2>What is Soryn's favorite animal?</h2>
+                <p class="hint">Hint: It swims in the ocean and has sharp teeth 🦈</p>
+                <input type="text" id="soryn1">
+                <p class="error" id="soryn1-error"></p>
+                <button onclick="checkAnswer('soryn1', 'Shark', 'section-soryn1', 'section-soryn2')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn2">
+            <div class="question">
+                <h2>What is Soryn's favorite pastime?</h2>
+                <p class="hint">Hint: It involves computers or video games</p>
+                <input type="text" id="soryn2">
+                <p class="error" id="soryn2-error"></p>
+                <button onclick="checkMultipleAnswer('soryn2', ['Coding', 'Gaming'], 'section-soryn2', 'section-soryn3')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn3">
+            <div class="question">
+                <h2>What is Soryn's special interest (we have RPed it before)?</h2>
+                <p class="hint">Hint: It's a form of losing control</p>
+                <input type="text" id="soryn3">
+                <p class="error" id="soryn3-error"></p>
+                <button onclick="checkAnswer('soryn3', 'Hypnosis', 'section-soryn3', 'section-soryn4')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn4">
+            <div class="question">
+                <h2>Soryn has 2 ferrets, what are their names?</h2>
+                <p class="hint">Hint: Oz** and Oll**</p>
+                <input type="text" id="soryn4">
+                <p class="error" id="soryn4-error"></p>
+                <button onclick="checkMultipleAnswer('soryn4', ['Ozzy and Ollie', 'Ozzie and Ollie', 'Ozzy and Olly', 'Ozzie and Olly'], 'section-soryn4', 'section-soryn5')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn5">
+            <div class="question">
+                <h2>What type of colorblindness does Soryn have?</h2>
+                <p class="hint">Hint: D*u*t*a*n*p*a</p>
+                <input type="text" id="soryn5">
+                <p class="error" id="soryn5-error"></p>
+                <button onclick="checkAnswer('soryn5', 'Deuteranopia', 'section-soryn5', 'section-soryn6')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn6">
+            <div class="question">
+                <h2>What is Soryn's current Rivals main?</h2>
+                <p class="hint">Hint: Jeff, Shark, Gambit, or Luna</p>
+                <input type="text" id="soryn6">
+                <p class="error" id="soryn6-error"></p>
+                <button onclick="checkMultipleAnswer('soryn6', ['Jeff', 'Shark', 'Gambit', 'Luna'], 'section-soryn6', 'section-soryn7')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn7">
+            <div class="question">
+                <h2>What is the main role Soryn will always play?</h2>
+                <p class="hint">Hint: Helps and heals the team</p>
+                <input type="text" id="soryn7">
+                <p class="error" id="soryn7-error"></p>
+                <button onclick="checkAnswer('soryn7', 'Support', 'section-soryn7', 'section-soryn8')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn8">
+            <div class="question">
+                <h2>What is Soryn's favorite food?</h2>
+                <p class="hint">Hint: Italian dish with cheese and toppings 🍕</p>
+                <input type="text" id="soryn8">
+                <p class="error" id="soryn8-error"></p>
+                <button onclick="checkAnswer('soryn8', 'Pizza', 'section-soryn8', 'section-soryn9')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn9">
+            <div class="question">
+                <h2>How often is Soryn sleepy?</h2>
+                <p class="hint">Hint: Pretty much constantly 😴</p>
+                <input type="text" id="soryn9">
+                <p class="error" id="soryn9-error"></p>
+                <button onclick="checkMultipleAnswer('soryn9', ['All the time', 'A lot', 'Very Often'], 'section-soryn9', 'section-soryn10')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn10">
+            <div class="question">
+                <h2>How deeply do you think Soryn cares and feels for you?</h2>
+                <p class="hint">Hint: Think logically about how much Soryn loves you</p>
+                <input type="text" id="soryn10">
+                <p class="error" id="soryn10-error"></p>
+                <button onclick="checkMultipleAnswer('soryn10', ['Very much', 'A Lot', 'Very Deeply'], 'section-soryn10', 'section-soryn11')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn11">
+            <div class="question">
+                <h2>Name the song that Soryn thinks about you when they hear</h2>
+                <p class="hint">Hint: Never *** at *** by Aimee Carty</p>
+                <input type="text" id="soryn11">
+                <p class="error" id="soryn11-error"></p>
+                <button onclick="checkAnswer('soryn11', 'Never met at all', 'section-soryn11', 'section-soryn12')">Submit</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-soryn12">
+            <div class="question">
+                <h2>Why do you feel that Soryn spent this much time on the quiz for you?</h2>
+                <p class="hint">Message from Soryn: The answer isn't very obvious so here's a hint - I'm too awkward to say something (The answer uses He/Him pronouns). It's something about showing off his skills and you.</p>
+                <input type="text" id="soryn12">
+                <p class="error" id="soryn12-error"></p>
+                <button onclick="checkMultipleAnswer('soryn12', ['That he likes me', 'He wants to show his skills off and Say that he likes me using them', 'He Is too scared and awkward to tell me he likes me'], 'section-soryn12', 'section-aspen1')">Submit</button>
+            </div>
+        </div>
+
+        <!-- Aspen Questions -->
+        <div class="question-section" id="section-aspen1">
+            <div class="question">
+                <h2>These are questions about you, Aspen!</h2>
+                <h2>What's your favorite food?</h2>
+                <p class="hint">Tell us about your favorite meal or snack</p>
+                <textarea id="aspen1" maxlength="500" oninput="updateCharCount('aspen1', 'aspen1-count')"></textarea>
+                <p class="char-counter" id="aspen1-count">0/500 characters</p>
+                <p class="error" id="aspen1-error"></p>
+                <button onclick="nextSection('section-aspen1', 'section-aspen2')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen2">
+            <div class="question">
+                <h2>What's your favorite place to eat at?</h2>
+                <p class="hint">Like a restaurant or cafe you love</p>
+                <textarea id="aspen2" maxlength="500" oninput="updateCharCount('aspen2', 'aspen2-count')"></textarea>
+                <p class="char-counter" id="aspen2-count">0/500 characters</p>
+                <p class="error" id="aspen2-error"></p>
+                <button onclick="nextSection('section-aspen2', 'section-aspen3')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen3">
+            <div class="question">
+                <h2>What is your special interest?</h2>
+                <p class="hint">What are you passionate about?</p>
+                <textarea id="aspen3" maxlength="500" oninput="updateCharCount('aspen3', 'aspen3-count')"></textarea>
+                <p class="char-counter" id="aspen3-count">0/500 characters</p>
+                <p class="error" id="aspen3-error"></p>
+                <button onclick="nextSection('section-aspen3', 'section-aspen4')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen4">
+            <div class="question">
+                <h2>What's your favorite song right now?</h2>
+                <p class="hint">The song you can't stop listening to</p>
+                <textarea id="aspen4" maxlength="500" oninput="updateCharCount('aspen4', 'aspen4-count')"></textarea>
+                <p class="char-counter" id="aspen4-count">0/500 characters</p>
+                <p class="error" id="aspen4-error"></p>
+                <button onclick="nextSection('section-aspen4', 'section-aspen5')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen5">
+            <div class="question">
+                <h2>What's your favorite drink?</h2>
+                <p class="hint">Any beverage you enjoy</p>
+                <textarea id="aspen5" maxlength="500" oninput="updateCharCount('aspen5', 'aspen5-count')"></textarea>
+                <p class="char-counter" id="aspen5-count">0/500 characters</p>
+                <p class="error" id="aspen5-error"></p>
+                <button onclick="nextSection('section-aspen5', 'section-aspen6')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen6">
+            <div class="question">
+                <h2>What's your favorite film to watch?</h2>
+                <p class="hint">The movie you could watch over and over</p>
+                <textarea id="aspen6" maxlength="500" oninput="updateCharCount('aspen6', 'aspen6-count')"></textarea>
+                <p class="char-counter" id="aspen6-count">0/500 characters</p>
+                <p class="error" id="aspen6-error"></p>
+                <button onclick="nextSection('section-aspen6', 'section-aspen7')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen7">
+            <div class="question">
+                <h2>What's your favorite Pokémon?</h2>
+                <p class="hint">Which Pokémon is your absolute favorite?</p>
+                <textarea id="aspen7" maxlength="500" oninput="updateCharCount('aspen7', 'aspen7-count')"></textarea>
+                <p class="char-counter" id="aspen7-count">0/500 characters</p>
+                <p class="error" id="aspen7-error"></p>
+                <button onclick="nextSection('section-aspen7', 'section-aspen8')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen8">
+            <div class="question">
+                <h2>What's something that always makes you happy?</h2>
+                <p class="hint">That thing that never fails to bring a smile</p>
+                <textarea id="aspen8" maxlength="500" oninput="updateCharCount('aspen8', 'aspen8-count')"></textarea>
+                <p class="char-counter" id="aspen8-count">0/500 characters</p>
+                <p class="error" id="aspen8-error"></p>
+                <button onclick="nextSection('section-aspen8', 'section-aspen9')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen9">
+            <div class="question">
+                <h2>Why is your OC a Xolotl?</h2>
+                <p class="hint">Tell us the story behind your character choice (max 500 characters)</p>
+                <textarea id="aspen9" maxlength="500" oninput="updateCharCount('aspen9', 'aspen9-count')"></textarea>
+                <p class="char-counter" id="aspen9-count">0/500 characters</p>
+                <p class="error" id="aspen9-error"></p>
+                <button onclick="nextSection('section-aspen9', 'section-aspen10')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen10">
+            <div class="question">
+                <h2>What is your ideal day out?</h2>
+                <p class="hint">Describe your perfect day</p>
+                <textarea id="aspen10" maxlength="500" oninput="updateCharCount('aspen10', 'aspen10-count')"></textarea>
+                <p class="char-counter" id="aspen10-count">0/500 characters</p>
+                <p class="error" id="aspen10-error"></p>
+                <button onclick="nextSection('section-aspen10', 'section-aspen11')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen11">
+            <div class="question">
+                <h2>Out of every game you have played, what is your favorite?</h2>
+                <p class="hint">The game that means the most to you</p>
+                <textarea id="aspen11" maxlength="500" oninput="updateCharCount('aspen11', 'aspen11-count')"></textarea>
+                <p class="char-counter" id="aspen11-count">0/500 characters</p>
+                <p class="error" id="aspen11-error"></p>
+                <button onclick="nextSection('section-aspen11', 'section-aspen12')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen12">
+            <div class="question">
+                <h2>In Marvel Rivals, what is your favorite role to play?</h2>
+                <p class="hint">DPS, Tank, or Support?</p>
+                <textarea id="aspen12" maxlength="500" oninput="updateCharCount('aspen12', 'aspen12-count')"></textarea>
+                <p class="char-counter" id="aspen12-count">0/500 characters</p>
+                <p class="error" id="aspen12-error"></p>
+                <button onclick="nextSection('section-aspen12', 'section-aspen13')">Next</button>
+            </div>
+        </div>
+
+        <div class="question-section" id="section-aspen13">
+            <div class="question">
+                <h2>Final question about you: Do you enjoy seeing Soryn every Tuesday?</h2>
+                <p class="hint">Be honest! 💜</p>
+                <textarea id="aspen13" maxlength="500" oninput="updateCharCount('aspen13', 'aspen13-count')"></textarea>
+                <p class="char-counter" id="aspen13-count">0/500 characters</p>
+                <p class="error" id="aspen13-error"></p>
+                <button onclick="nextSection('section-aspen13', 'section-final1')">Next</button>
+            </div>
+        </div>
+
+        <!-- Final Question -->
+        <div class="question-section" id="section-final1">
+            <div class="question">
+                <h2>After all this, with all the effort Soryn has put in for you, what do you think he wants to tell you?</h2>
+                <p class="hint">Hint: Think about all the questions he gave you. It's something about his feelings for you 💜</p>
+                <input type="text" id="final1">
+                <p class="error" id="final1-error"></p>
+                <button onclick="checkFinalAnswer()">Submit</button>
+            </div>
+        </div>
+
+        <!-- Compatibility Check -->
+        <div class="question-section" id="section-compatibility">
+            <div class="compatibility-section">
+                <h2>Do you want to see your and Soryn's compatibility?</h2>
+                <input type="password" id="compat-password" placeholder="Enter password">
+                <p class="error" id="compat-error"></p>
+                <button onclick="checkCompatibility()">Check Compatibility</button>
+                <button onclick="skipCompatibility()" style="background: rgba(138, 43, 226, 0.5);">Skip</button>
+            </div>
+        </div>
+
+        <!-- Big Question -->
+        <div class="question-section" id="section-big-question">
+            <div class="question" style="text-align: center;">
+                <div class="heart-container">💜</div>
+                <h2 style="font-size: 1.5em; margin: 30px 0;">Aspen, would you be with me and make me the happiest ferret ever? :3</h2>
+                <p style="font-style: italic; color: #c4b5fd; margin-bottom: 30px;">- SorynTech</p>
+                <input type="text" id="big-answer" placeholder="Yes or No" style="text-align: center; font-size: 1.2em;">
+                <p class="error" id="big-error"></p>
+                <button onclick="checkBigAnswer()" style="font-size: 1.2em; padding: 20px 50px;">Submit Answer</button>
+            </div>
+        </div>
+
+        <!-- Final Results -->
+        <div class="question-section" id="section-results">
+            <div class="final-section">
+                <h1>🎉 Quiz Complete! 🎉</h1>
+                <div class="score-display">
+                    <h2>Your Score</h2>
+                    <p id="final-score"></p>
+                    <p id="compatibility-display"></p>
+                </div>
+                
+                <div class="video-container">
+                    <h2 style="color: #d8b4fe; margin-bottom: 20px;">This song makes me think of you 💜</h2>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                            title="What If We Never Met At All - Aimee Carty" 
+                            frameborder="0" 
+                            allow="acceler
