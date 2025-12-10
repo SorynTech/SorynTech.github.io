@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmailJS Integration</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <h1>Send Email with EmailJS</h1>
+    <button id="sendEmail">Send Email</button>
+    <div id="status"></div>
+
+    <script>
+        // Check if emailjs loaded
+        console.log('EmailJS loaded:', typeof emailjs !== 'undefined');
+        
+        // Initialize EmailJS with your public key
+        (function() {
+            emailjs.init({
+                publicKey: 'X1Q8ioFNDuAcUEsBr'
+            });
+            console.log('EmailJS initialized');
+        })();
+
+        // Example data structure matching Python output
+        const emailData = {
+            date: "2025-12-08",
+            open_ended_questions: {
+                question1: "Example loving response",
+                question2: "Example favorite thing"
+            },
+            aspen_questions: {
+                favorite_food: "Pizza",
+                favorite_place: "Local Cafe",
+                special_interest: "Photography"
+            },
+            birthday_message: "Not Soryn's birthday yet",
+            compatibility_score: 97,
+            compatibility_text: "WOW the compatibility is off the charts",
+            question_score: 6
+        };
+
+        // Function to format email content
+        function formatEmailContent(data) {
+            return `
+Date: ${data.date}
+
+=== OPEN ENDED QUESTIONS ===
+1. How do you feel about Soryn in a loving way?
+   ${data.open_ended_questions.question1}
+
+2. What is your favorite thing about Soryn?
+   ${data.open_ended_questions.question2}
+
+=== ASPEN'S ANSWERS ===
+Favorite Food: ${data.aspen_questions.favorite_food}
+Favorite Place to Eat: ${data.aspen_questions.favorite_place}
+Special Interest: ${data.aspen_questions.special_interest}
+
+=== BIRTHDAY MESSAGE ===
+${data.birthday_message}
+
+=== SCORES ===
+Question Score: ${data.question_score}
+Compatibility Score: ${data.compatibility_score}
+${data.compatibility_text}
+            `.trim();
+        }
+
+        document.getElementById('sendEmail').addEventListener('click', async function() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = 'Sending email...';
+
+            // EmailJS template parameters
+            const templateParams = {
+                to_name: 'Soryn',
+                from_name: 'Aspen',
+                message: formatEmailContent(emailData),
+                reply_to: 'noreply@lovequestionnaire.com',
+                // Individual fields for more flexible templates
+                loving_response: emailData.open_ended_questions.question1,
+                favorite_thing: emailData.open_ended_questions.question2,
+                fav_food: emailData.aspen_questions.favorite_food,
+                fav_place: emailData.aspen_questions.favorite_place,
+                special_interest: emailData.aspen_questions.special_interest,
+                birthday_msg: emailData.birthday_message,
+                compatibility: emailData.compatibility_score,
+                compatibility_text: emailData.compatibility_text,
+                quiz_score: emailData.question_score
+            };
+
+            try {
+                console.log('Attempting to send email with EmailJS...');
+                console.log('Service ID: service_3zj1j9l');
+                console.log('Template ID: template_pzha7vq');
+                console.log('Template Params:', templateParams);
+                
+                const response = await emailjs.send('service_3zj1j9l', 'template_pzha7vq', templateParams);
+                
+                console.log('SUCCESS!', response.status, response.text);
+                statusDiv.textContent = 'Email sent successfully! ✅';
+                statusDiv.style.color = 'green';
+            } catch (error) {
+                console.error('FAILED...', error);
+                console.error('Error message:', error.text || error.message);
+                console.error('Error status:', error.status);
+                console.error('Full error:', JSON.stringify(error, null, 2));
+                
+                const errorMsg = error.text || error.message || 'Unknown error';
+                statusDiv.textContent = `Failed to send email ❌ Error: ${errorMsg}`;
+                statusDiv.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>
