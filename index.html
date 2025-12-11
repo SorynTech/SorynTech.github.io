@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.youtube.com; connect-src 'self' https://api.emailjs.com; style-src 'self' 'unsafe-inline'; frame-src https://www.youtube.com; img-src 'self' data: https:;">
     <title>Soryn's Quiz for Aspen 💜</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
@@ -200,22 +199,6 @@
             margin: 10px 0;
         }
 
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #8a2be2;
-            position: absolute;
-            animation: confetti-fall 3s linear;
-        }
-
-        @keyframes confetti-fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
         .video-container {
             margin: 30px 0;
             text-align: center;
@@ -257,19 +240,8 @@
             <div class="progress-bar" id="progressBar" style="width: 0%"></div>
         </div>
 
-        <!-- Login Section -->
-        <div class="question-section active" id="section-login">
-            <div class="question">
-                <h2>Welcome! Please Login</h2>
-                <input type="text" id="username" placeholder="Enter username">
-                <input type="password" id="password" placeholder="Enter password" style="margin-top: 15px;">
-                <p class="error" id="login-error"></p>
-                <button onclick="checkLogin()">Login</button>
-            </div>
-        </div>
-
         <!-- Open Ended Questions -->
-        <div class="question-section" id="section-open1">
+        <div class="question-section active" id="section-open1">
             <div class="question">
                 <h2>How do you feel about Soryn in a loving way?</h2>
                 <p class="hint">Be honest and speak from the heart 💜</p>
@@ -603,7 +575,269 @@
                 
                 <div class="video-container">
                     <h2 style="color: #d8b4fe; margin-bottom: 20px;">This song makes me think of you 💜</h2>
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/gCb5wjPWTLQ" 
                             title="What If We Never Met At All - Aimee Carty" 
                             frameborder="0" 
-                            allow="acceler
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                </div>
+
+                <input type="text" id="user-name" placeholder="Enter your name" style="margin: 30px 0; text-align: center;">
+                <p class="hint">We need your name for the email</p>
+                <button onclick="sendEmail()" id="send-email-btn" style="font-size: 1.2em;">Send Results to Soryn 📧</button>
+                <p id="email-status"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questionScore = 0;
+        let compatAttempts = 0;
+        let totalQuestions = 37;
+        let currentQuestion = 0;
+        let compatibilityScore = Math.floor(Math.random() * 11) + 90;
+        let compatibilityText = compatibilityScore < 95 ? 
+            "The compatibility is close to a good state, Soryn is working to make it better" :
+            "WOW the compatibility is off the charts";
+        let bigAnswerGiven = "";
+
+        // EmailJS initialization - REPLACE YOUR_PUBLIC_KEY with your actual key
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY");
+        })();
+
+        function updateProgress() {
+            currentQuestion++;
+            let progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function nextSection(currentId, nextId) {
+            let currentSection = document.getElementById(currentId);
+            let nextSectionEl = document.getElementById(nextId);
+            
+            // Validate current section has content for textareas
+            let textarea = currentSection.querySelector('textarea');
+            if (textarea) {
+                let value = textarea.value.trim();
+                let errorId = textarea.id + '-error';
+                if (value === '' || value === ':3') {
+                    document.getElementById(errorId).textContent = 'Please enter a valid answer';
+                    return;
+                }
+                document.getElementById(errorId).textContent = '';
+            }
+            
+            currentSection.classList.remove('active');
+            nextSectionEl.classList.add('active');
+            updateProgress();
+            window.scrollTo(0, 0);
+        }
+
+        function updateCharCount(textareaId, counterId) {
+            let textarea = document.getElementById(textareaId);
+            let counter = document.getElementById(counterId);
+            let length = textarea.value.length;
+            counter.textContent = length + '/500 characters';
+            
+            if (length > 450) {
+                counter.classList.add('warning');
+            } else {
+                counter.classList.remove('warning');
+            }
+        }
+
+        function checkAnswer(inputId, correctAnswer, currentSectionId, nextSectionId) {
+            let input = document.getElementById(inputId);
+            let answer = input.value.trim();
+            let errorEl = document.getElementById(inputId + '-error');
+            
+            if (answer.toLowerCase() === correctAnswer.toLowerCase()) {
+                errorEl.textContent = '';
+                errorEl.className = 'success';
+                errorEl.textContent = 'Correct! ✓';
+                questionScore++;
+                setTimeout(() => {
+                    nextSection(currentSectionId, nextSectionId);
+                }, 800);
+            } else {
+                errorEl.className = 'error';
+                errorEl.textContent = 'Incorrect answer, try again!';
+            }
+        }
+
+        function checkMultipleAnswer(inputId, correctAnswers, currentSectionId, nextSectionId) {
+            let input = document.getElementById(inputId);
+            let answer = input.value.trim();
+            let errorEl = document.getElementById(inputId + '-error');
+            
+            let isCorrect = correctAnswers.some(correct => 
+                answer.toLowerCase() === correct.toLowerCase()
+            );
+            
+            if (isCorrect) {
+                errorEl.textContent = '';
+                errorEl.className = 'success';
+                errorEl.textContent = 'Correct! ✓';
+                questionScore++;
+                setTimeout(() => {
+                    nextSection(currentSectionId, nextSectionId);
+                }, 800);
+            } else {
+                errorEl.className = 'error';
+                errorEl.textContent = 'Incorrect answer, try again!';
+            }
+        }
+
+        function checkFinalAnswer() {
+            let input = document.getElementById('final1');
+            let answer = input.value.trim();
+            let errorEl = document.getElementById('final1-error');
+            let correctAnswers = ['That he likes me', 'He wants to show his skills off and Say that he likes me using them', 'He Is too scared and awkward to tell me he likes me'];
+            
+            let isCorrect = correctAnswers.some(correct => 
+                answer.toLowerCase().includes('like') || answer.toLowerCase().includes('love')
+            );
+            
+            if (isCorrect) {
+                errorEl.className = 'success';
+                errorEl.textContent = 'Yes! I do like you ❤️';
+                questionScore++;
+                setTimeout(() => {
+                    nextSection('section-final1', 'section-compatibility');
+                }, 1500);
+            } else {
+                errorEl.className = 'error';
+                errorEl.textContent = 'Think about all the questions... what could it mean? 💜';
+            }
+        }
+
+        function checkCompatibility() {
+            let password = document.getElementById('compat-password').value;
+            let errorEl = document.getElementById('compat-error');
+            
+            if (password === 'Shark321') {
+                errorEl.className = 'success';
+                errorEl.textContent = 'Calculating compatibility...';
+                setTimeout(() => {
+                    alert(`Your compatibility: ${compatibilityScore}%\n\n${compatibilityText}`);
+                    nextSection('section-compatibility', 'section-big-question');
+                }, 1000);
+            } else {
+                compatAttempts++;
+                if (compatAttempts >= 3) {
+                    errorEl.textContent = 'Access denied';
+                    document.querySelector('#section-compatibility button').disabled = true;
+                    return;
+                }
+                errorEl.textContent = 'Incorrect password (Attempt ' + compatAttempts + '/3)';
+            }
+        }
+
+        function skipCompatibility() {
+            nextSection('section-compatibility', 'section-big-question');
+        }
+
+        function checkBigAnswer() {
+            let input = document.getElementById('big-answer');
+            let answer = input.value.trim().toLowerCase();
+            let errorEl = document.getElementById('big-error');
+            bigAnswerGiven = answer;
+            
+            let yesAnswers = ['yes', 'y', 'yeah', 'yep', 'yeps', 'yeh'];
+            let noAnswers = ['no', 'n', 'nah'];
+            
+            if (yesAnswers.includes(answer)) {
+                errorEl.className = 'success';
+                errorEl.textContent = 'YIPPIEEEEEEE! You don\'t know how happy I am right now! 💜✨';
+                setTimeout(() => {
+                    nextSection('section-big-question', 'section-results');
+                    displayResults();
+                }, 2000);
+            } else if (noAnswers.includes(answer)) {
+                errorEl.className = 'error';
+                errorEl.textContent = 'Awhhhh :c';
+                setTimeout(() => {
+                    nextSection('section-big-question', 'section-results');
+                    displayResults();
+                }, 2000);
+            } else if (answer === '' || answer === ':3') {
+                errorEl.className = 'error';
+                errorEl.textContent = 'Please enter Yes or No';
+            } else {
+                errorEl.className = 'error';
+                errorEl.textContent = 'Please enter Yes or No';
+            }
+        }
+
+        function displayResults() {
+            document.getElementById('final-score').textContent = 
+                `You got ${questionScore} out of ${totalQuestions - 14} Soryn questions correct!`;
+            document.getElementById('compatibility-display').textContent = 
+                `Compatibility Score: ${compatibilityScore}% - ${compatibilityText}`;
+        }
+
+        function sendEmail() {
+            let userName = document.getElementById('user-name').value.trim();
+            let statusEl = document.getElementById('email-status');
+            let btn = document.getElementById('send-email-btn');
+            
+            if (userName === '' || userName === ':3' || userName === 'Admin') {
+                statusEl.className = 'error';
+                statusEl.textContent = 'Please enter a valid name';
+                return;
+            }
+            
+            btn.disabled = true;
+            statusEl.textContent = 'Sending...';
+            
+            // Collect all answers
+            let emailData = {
+                from_name: userName,
+                score: questionScore,
+                compatibility: compatibilityScore,
+                big_answer: bigAnswerGiven,
+                open1: document.getElementById('open1').value,
+                open2: document.getElementById('open2').value,
+                aspen1: document.getElementById('aspen1').value,
+                aspen2: document.getElementById('aspen2').value,
+                aspen3: document.getElementById('aspen3').value,
+                aspen4: document.getElementById('aspen4').value,
+                aspen5: document.getElementById('aspen5').value,
+                aspen6: document.getElementById('aspen6').value,
+                aspen7: document.getElementById('aspen7').value,
+                aspen8: document.getElementById('aspen8').value,
+                aspen9: document.getElementById('aspen9').value,
+                aspen10: document.getElementById('aspen10').value,
+                aspen11: document.getElementById('aspen11').value,
+                aspen12: document.getElementById('aspen12').value,
+                aspen13: document.getElementById('aspen13').value
+            };
+            
+            // REPLACE YOUR_SERVICE_ID and YOUR_TEMPLATE_ID with your actual EmailJS IDs
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', emailData)
+                .then(function(response) {
+                    statusEl.className = 'success';
+                    statusEl.textContent = '✓ Results sent successfully to Soryn!';
+                    btn.disabled = false;
+                }, function(error) {
+                    statusEl.className = 'error';
+                    statusEl.textContent = 'Failed to send email. Please try again.';
+                    btn.disabled = false;
+                    console.error('EmailJS error:', error);
+                });
+        }
+
+        // Allow Enter key on password fields
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('compat-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkCompatibility();
+            });
+            
+            document.getElementById('big-answer').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkBigAnswer();
+            });
+        });
+    </script>
+</body>
+</html>
