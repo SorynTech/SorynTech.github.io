@@ -1,0 +1,14 @@
+{
+  "bots": [
+    {
+      "icon": "🤖",
+      "name": "Example Bot",
+      "description": "A helpful Discord bot that does amazing things. This is an example entry - edit this file to add your own bots!",
+      "servers": "1.2K",
+      "users": "50K",
+      "inviteLink": "https://discord.com/invite/your-bot",
+      "githubRepo": "https://github.com/sorynTech/example-bot",
+      "botFolder": "./bots/example-bot/"
+    }
+  ]
+}
