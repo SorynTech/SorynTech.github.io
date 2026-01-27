@@ -5,6 +5,12 @@
       "title": "Example Artwork",
       "description": "This is an example image. Upload your artwork to the /images folder and add entries here!",
       "timestamp": 1704067200000
+    },
+    {
+      "src": "./images/test.jpg",
+      "title": "Test",
+      "description": "Test",
+      "timestamp": 1769542960089
     }
   ]
 }
