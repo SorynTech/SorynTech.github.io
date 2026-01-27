@@ -4,7 +4,10 @@ const CONFIG = (() => {
         SORYN_USER: window.ENV?.SORYN_USER || "soryn",
         SORYN_PASS: window.ENV?.SORYN_PASS || "ratking123",
         GUEST_USER: window.ENV?.GUEST_USER || "guest",
-        GUEST_PASS: window.ENV?.GUEST_PASS || "cheese456"
+        GUEST_PASS: window.ENV?.GUEST_PASS || "cheese456",
+        JSONBIN_API_KEY: window.ENV?.JSONBIN_API_KEY || "",
+        JSONBIN_BIN_ID: window.ENV?.JSONBIN_BIN_ID || "",
+        IMGBB_API_KEY: window.ENV?.IMGBB_API_KEY || ""
     };
     
     if (window.ENV) {
@@ -14,20 +17,8 @@ const CONFIG = (() => {
     return Object.freeze(config);
 })();
 
-// GitHub-based storage paths
-const GITHUB_PATHS = {
-    bots: './data/bots.json',
-    profile: './data/profile.json',
-    galleryManifest: './data/gallery.json',
-    imagesFolder: './images/',
-    botsFolder: './bots/'
-};
-
-// Fallback storage keys for offline mode
-const STORAGE_KEYS = {
-    currentUser: 'currentUser',
-    userRole: 'userRole'
-};
+// JSONBin API Endpoints
+const JSONBIN_BASE_URL = "https://api.jsonbin.io/v3";
 
 // Current user state
 let currentUser = {
@@ -52,9 +43,229 @@ document.addEventListener('DOMContentLoaded', async function() {
     initGallery();
     checkAuthState();
     
-    // Load all data from GitHub
+    // Check API configuration
+    if (!CONFIG.JSONBIN_API_KEY || CONFIG.JSONBIN_API_KEY === "YOUR_JSONBIN_API_KEY_HERE") {
+        showNotification('⚠️ JSONBin API key not configured! Check env.js', 'warning');
+    }
+    
+    // Load all data from JSONBin
     await loadAllData();
 });
+
+// ===========================
+// JSONBIN API FUNCTIONS
+// ===========================
+
+async function initializeJSONBin() {
+    if (!CONFIG.JSONBIN_API_KEY) {
+        console.error('JSONBin API key is missing!');
+        return null;
+    }
+    
+    // Check if bin ID exists
+    if (!CONFIG.JSONBIN_BIN_ID || CONFIG.JSONBIN_BIN_ID === "YOUR_BIN_ID_HERE") {
+        // Create initial bin
+        return await createInitialBin();
+    }
+    
+    return CONFIG.JSONBIN_BIN_ID;
+}
+
+async function createInitialBin() {
+    const initialData = {
+        bots: [],
+        profile: {
+            name: "SorynTech",
+            role: "Backend Developer",
+            image: "profile.jpg",
+            socials: {
+                twitter: "https://x.com/ZippyDrawz_",
+                instagram: "https://www.instagram.com/zippydrawz.offical__/",
+                github: "https://github.com/sorynTech",
+                discord: "https://Discord.gg/users/447812883158532106",
+                kofi: "https://Ko-fi.com/soryntech"
+            }
+        },
+        gallery: []
+    };
+    
+    try {
+        const response = await fetch(`${JSONBIN_BASE_URL}/b`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': CONFIG.JSONBIN_API_KEY,
+                'X-Bin-Name': 'portfolio-data'
+            },
+            body: JSON.stringify(initialData)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            const binId = result.metadata.id;
+            
+            showNotification(`✅ Bin created! Add this to env.js: ${binId}`, 'success');
+            console.log('🎉 Your Bin ID:', binId);
+            console.log('Add this to env.js as JSONBIN_BIN_ID');
+            
+            return binId;
+        }
+    } catch (error) {
+        console.error('Error creating bin:', error);
+        showNotification('❌ Failed to create JSONBin. Check console.', 'error');
+    }
+    
+    return null;
+}
+
+async function loadFromJSONBin() {
+    const binId = await initializeJSONBin();
+    if (!binId) return null;
+    
+    try {
+        const response = await fetch(`${JSONBIN_BASE_URL}/b/${binId}/latest`, {
+            headers: {
+                'X-Master-Key': CONFIG.JSONBIN_API_KEY
+            }
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            return result.record;
+        } else {
+            console.error('Failed to load from JSONBin:', response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error loading from JSONBin:', error);
+        showNotification('⚠️ Could not connect to JSONBin', 'warning');
+        return null;
+    }
+}
+
+async function saveToJSONBin(data) {
+    const binId = await initializeJSONBin();
+    if (!binId) {
+        showNotification('❌ JSONBin not configured!', 'error');
+        return false;
+    }
+    
+    try {
+        const response = await fetch(`${JSONBIN_BASE_URL}/b/${binId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': CONFIG.JSONBIN_API_KEY
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            showNotification('✅ Saved to cloud!', 'success');
+            return true;
+        } else {
+            console.error('Failed to save to JSONBin:', response.status);
+            showNotification('❌ Failed to save to cloud', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error saving to JSONBin:', error);
+        showNotification('❌ Network error while saving', 'error');
+        return false;
+    }
+}
+
+// ===========================
+// IMGBB API FUNCTIONS
+// ===========================
+
+async function uploadToImgBB(file) {
+    if (!CONFIG.IMGBB_API_KEY || CONFIG.IMGBB_API_KEY === "YOUR_IMGBB_API_KEY_HERE") {
+        showNotification('⚠️ ImgBB API key not configured! Check env.js', 'warning');
+        return null;
+    }
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+        showNotification('⏳ Uploading image to ImgBB...', 'info');
+        
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showNotification('✅ Image uploaded successfully!', 'success');
+            return result.data.url;
+        } else {
+            const error = await response.json();
+            console.error('ImgBB upload failed:', error);
+            showNotification('❌ Image upload failed', 'error');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error uploading to ImgBB:', error);
+        showNotification('❌ Network error during upload', 'error');
+        return null;
+    }
+}
+
+// ===========================
+// DATA LOADING
+// ===========================
+
+async function loadAllData() {
+    try {
+        const data = await loadFromJSONBin();
+        
+        if (data) {
+            dataCache.bots = data.bots || [];
+            dataCache.profile = data.profile || null;
+            dataCache.gallery = data.gallery || [];
+            
+            if (dataCache.profile) applyProfileData(dataCache.profile);
+            renderBots();
+            renderGallery();
+        } else {
+            // Use defaults if no data loaded
+            dataCache.bots = [];
+            dataCache.profile = null;
+            dataCache.gallery = [];
+            renderBots();
+            renderGallery();
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showNotification('⚠️ Could not load data from cloud', 'warning');
+    }
+}
+
+async function saveAllData() {
+    const data = {
+        bots: dataCache.bots,
+        profile: dataCache.profile,
+        gallery: dataCache.gallery
+    };
+    
+    return await saveToJSONBin(data);
+}
+
+function applyProfileData(data) {
+    if (data.name) document.getElementById('lanyardName').textContent = data.name;
+    if (data.role) document.getElementById('lanyardRole').textContent = data.role;
+    if (data.image) document.getElementById('lanyardImage').src = data.image;
+    
+    if (data.socials) {
+        if (data.socials.twitter) document.getElementById('twitterLink').setAttribute('href', data.socials.twitter);
+        if (data.socials.instagram) document.getElementById('instagramLink').setAttribute('href', data.socials.instagram);
+        if (data.socials.github) document.getElementById('githubLink').setAttribute('href', data.socials.github);
+        if (data.socials.discord) document.getElementById('discordLink').setAttribute('href', data.socials.discord);
+        if (data.socials.kofi) document.getElementById('kofiLink').setAttribute('href', data.socials.kofi);
+    }
+}
 
 // Navigation
 function initNavigation() {
@@ -134,8 +345,8 @@ function login(role, username) {
         isLoggedIn: true
     };
 
-    sessionStorage.setItem(STORAGE_KEYS.currentUser, username);
-    sessionStorage.setItem(STORAGE_KEYS.userRole, role);
+    sessionStorage.setItem('currentUser', username);
+    sessionStorage.setItem('userRole', role);
 
     updateUIForRole();
     unlockGallery();
@@ -148,16 +359,16 @@ function logout() {
         isLoggedIn: false
     };
 
-    sessionStorage.removeItem(STORAGE_KEYS.currentUser);
-    sessionStorage.removeItem(STORAGE_KEYS.userRole);
+    sessionStorage.removeItem('currentUser');
+    sessionStorage.removeItem('userRole');
 
     updateUIForRole();
     location.reload();
 }
 
 function checkAuthState() {
-    const savedUser = sessionStorage.getItem(STORAGE_KEYS.currentUser);
-    const savedRole = sessionStorage.getItem(STORAGE_KEYS.userRole);
+    const savedUser = sessionStorage.getItem('currentUser');
+    const savedRole = sessionStorage.getItem('userRole');
 
     if (savedUser && savedRole) {
         currentUser = {
@@ -199,89 +410,10 @@ function updateUIForRole() {
     });
 }
 
-// Data Loading Functions
-async function loadAllData() {
-    try {
-        // Load bots data
-        await loadBotsData();
-        
-        // Load profile data
-        await loadProfileData();
-        
-        // Load gallery data
-        await loadGalleryData();
-        
-    } catch (error) {
-        console.error('Error loading data:', error);
-        showNotification('⚠️ Some data failed to load. Using defaults.', 'warning');
-    }
-}
+// ===========================
+// GALLERY FUNCTIONS
+// ===========================
 
-async function loadBotsData() {
-    try {
-        const response = await fetch(GITHUB_PATHS.bots);
-        if (response.ok) {
-            const data = await response.json();
-            dataCache.bots = data.bots || [];
-            renderBots();
-        } else {
-            console.log('No bots.json found, using empty array');
-            dataCache.bots = [];
-            renderBots();
-        }
-    } catch (error) {
-        console.error('Error loading bots:', error);
-        dataCache.bots = [];
-        renderBots();
-    }
-}
-
-async function loadProfileData() {
-    try {
-        const response = await fetch(GITHUB_PATHS.profile);
-        if (response.ok) {
-            const data = await response.json();
-            dataCache.profile = data;
-            applyProfileData(data);
-        }
-    } catch (error) {
-        console.error('Error loading profile:', error);
-    }
-}
-
-async function loadGalleryData() {
-    try {
-        const response = await fetch(GITHUB_PATHS.galleryManifest);
-        if (response.ok) {
-            const data = await response.json();
-            dataCache.gallery = data.images || [];
-            renderGallery();
-        } else {
-            dataCache.gallery = [];
-            renderGallery();
-        }
-    } catch (error) {
-        console.error('Error loading gallery:', error);
-        dataCache.gallery = [];
-        renderGallery();
-    }
-}
-
-function applyProfileData(data) {
-    if (data.name) document.getElementById('lanyardName').textContent = data.name;
-    if (data.role) document.getElementById('lanyardRole').textContent = data.role;
-    if (data.image) document.getElementById('lanyardImage').src = data.image;
-    
-    if (data.socials) {
-        if (data.socials.twitter) document.getElementById('twitterLink').setAttribute('href', data.socials.twitter);
-        if (data.socials.instagram) document.getElementById('instagramLink').setAttribute('href', data.socials.instagram);
-        if (data.socials.github) document.getElementById('githubLink').setAttribute('href', data.socials.github);
-        if (data.socials.discord) document.getElementById('discordLink').setAttribute('href', data.socials.discord);
-        if (data.socials.kofi) document.getElementById('kofiLink').setAttribute('href', data.socials.kofi);
-    }
-}
-
-// Gallery Functions
 function initGallery() {
     const uploadBtn = document.getElementById('uploadBtn');
     const addUrlBtn = document.getElementById('addUrlBtn');
@@ -289,9 +421,11 @@ function initGallery() {
     const unlockBtn = document.getElementById('unlockBtn');
     const artUsername = document.getElementById('artUsername');
     const artPassword = document.getElementById('artPassword');
+    const imageUpload = document.getElementById('imageUpload');
 
-    if (uploadBtn) uploadBtn.addEventListener('click', showUploadInstructions);
-    if (addUrlBtn) addUrlBtn.addEventListener('click', addImageToManifest);
+    if (uploadBtn) uploadBtn.addEventListener('click', () => imageUpload.click());
+    if (imageUpload) imageUpload.addEventListener('change', handleImageUpload);
+    if (addUrlBtn) addUrlBtn.addEventListener('click', addImageUrlModal);
     if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
     if (unlockBtn) unlockBtn.addEventListener('click', checkGalleryPassword);
 
@@ -307,54 +441,43 @@ function initGallery() {
     }
 }
 
-function showUploadInstructions() {
-    const modal = document.getElementById('editModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
+async function handleImageUpload(event) {
+    if (currentUser.role !== 'owner') {
+        alert('❌ Only the owner can upload images!');
+        return;
+    }
 
-    modal.classList.add('active');
-    modalTitle.textContent = '📤 Upload Images to Gallery';
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    for (let file of files) {
+        if (!file.type.startsWith('image/')) {
+            showNotification(`⚠️ ${file.name} is not an image`, 'warning');
+            continue;
+        }
+
+        const imageUrl = await uploadToImgBB(file);
+        
+        if (imageUrl) {
+            const newImage = {
+                src: imageUrl,
+                title: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+                description: `Uploaded ${new Date().toLocaleDateString()}`,
+                timestamp: Date.now()
+            };
+            
+            dataCache.gallery.push(newImage);
+        }
+    }
     
-    modalBody.innerHTML = `
-        <div style="text-align: left; line-height: 1.8;">
-            <h4 style="color: var(--accent-primary); margin-bottom: 1rem;">📁 Step-by-Step Upload Guide:</h4>
-            
-            <p><strong>1. Add images to your GitHub repository:</strong></p>
-            <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary);">
-                <li>Go to your repository on GitHub</li>
-                <li>Create an <code>/images</code> folder if it doesn't exist</li>
-                <li>Click "Add file" → "Upload files"</li>
-                <li>Drag and drop your artwork images</li>
-                <li>Commit the changes</li>
-            </ul>
-            
-            <p><strong>2. Add image to gallery manifest:</strong></p>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Click "Add Image URL" button and enter the relative path:
-            </p>
-            <code style="background: var(--bg-secondary); padding: 0.5rem; display: block; margin-bottom: 1rem; border-radius: 5px;">
-                ./images/your-artwork.jpg
-            </code>
-            
-            <p><strong>3. Supported formats:</strong></p>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                .jpg, .jpeg, .png, .gif, .webp
-            </p>
-            
-            <div style="background: rgba(125, 211, 252, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid var(--accent-primary);">
-                <strong>💡 Pro Tip:</strong> Images in the <code>/images</code> folder are public and will load on any device/browser!
-            </div>
-        </div>
-        <button onclick="document.getElementById('editModal').classList.remove('active')" style="margin-top: 1.5rem;">Got it! 🐀</button>
-    `;
-
-    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-    };
+    renderGallery();
+    await saveAllData();
+    
+    // Reset file input
+    event.target.value = '';
 }
 
-function addImageToManifest() {
+function addImageUrlModal() {
     if (currentUser.role !== 'owner') {
         alert('❌ Only the owner can add images!');
         return;
@@ -368,17 +491,19 @@ function addImageToManifest() {
     modalTitle.textContent = '🖼️ Add Image to Gallery';
     
     modalBody.innerHTML = `
-        <label>Image Path or URL</label>
-        <input type="text" id="imagePathInput" placeholder="./images/artwork1.jpg" value="./images/">
+        <label>Image URL</label>
+        <input type="text" id="imagePathInput" placeholder="https://i.ibb.co/xxxxx/image.jpg">
         
         <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-                <strong>📁 For images in your repo:</strong><br>
-                <code>./images/filename.jpg</code>
+                <strong>📸 Upload to ImgBB first:</strong><br>
+                1. Go to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">imgbb.com</a><br>
+                2. Upload your image<br>
+                3. Copy the direct link<br>
+                4. Paste it above
             </p>
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
-                <strong>🔗 For external URLs:</strong><br>
-                <code>https://i.ibb.co/xxxxx/image.jpg</code>
+                <strong>💡 Or use the Upload button to auto-upload!</strong>
             </p>
         </div>
         
@@ -388,7 +513,7 @@ function addImageToManifest() {
         <label>Image Description (optional)</label>
         <textarea id="imageDescInput" rows="2" placeholder="Description of the artwork"></textarea>
         
-        <button onclick="saveImageToManifest()">Add to Gallery 🐀</button>
+        <button onclick="saveImageUrl()">Add to Gallery 🐀</button>
     `;
 
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
@@ -397,19 +522,18 @@ function addImageToManifest() {
     };
 }
 
-function saveImageToManifest() {
-    const path = document.getElementById('imagePathInput').value.trim();
+async function saveImageUrl() {
+    const url = document.getElementById('imagePathInput').value.trim();
     const title = document.getElementById('imageTitleInput').value.trim();
     const description = document.getElementById('imageDescInput').value.trim();
     
-    if (!path) {
-        alert('❌ Please enter an image path or URL!');
+    if (!url) {
+        alert('❌ Please enter an image URL!');
         return;
     }
 
-    // Add to cache
     const newImage = {
-        src: path,
+        src: url,
         title: title || `Artwork ${dataCache.gallery.length + 1}`,
         description: description,
         timestamp: Date.now()
@@ -420,88 +544,7 @@ function saveImageToManifest() {
     
     document.getElementById('editModal').classList.remove('active');
     
-    // Show instructions to update JSON
-    showJsonUpdateInstructions('gallery', dataCache.gallery);
-}
-
-function showJsonUpdateInstructions(type, data) {
-    const modal = document.getElementById('editModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    let jsonPath, jsonContent;
-    
-    if (type === 'gallery') {
-        jsonPath = 'data/gallery.json';
-        jsonContent = JSON.stringify({ images: data }, null, 2);
-    } else if (type === 'bots') {
-        jsonPath = 'data/bots.json';
-        jsonContent = JSON.stringify({ bots: data }, null, 2);
-    } else if (type === 'profile') {
-        jsonPath = 'data/profile.json';
-        jsonContent = JSON.stringify(data, null, 2);
-    }
-
-    modal.classList.add('active');
-    modalTitle.textContent = '💾 Update JSON File';
-    
-    modalBody.innerHTML = `
-        <div style="text-align: left;">
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Copy this JSON and update <code>${jsonPath}</code> in your GitHub repo:
-            </p>
-            
-            <div style="position: relative;">
-                <textarea id="jsonOutput" readonly style="
-                    width: 100%;
-                    height: 300px;
-                    font-family: 'Courier New', monospace;
-                    font-size: 0.85rem;
-                    background: var(--bg-secondary);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    border-radius: 8px;
-                    padding: 1rem;
-                    color: var(--text-primary);
-                    resize: vertical;
-                ">${jsonContent}</textarea>
-                <button onclick="copyJsonToClipboard()" style="
-                    position: absolute;
-                    top: 0.5rem;
-                    right: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    background: var(--accent-primary);
-                    border: none;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-size: 0.9rem;
-                ">📋 Copy JSON</button>
-            </div>
-            
-            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(168, 85, 247, 0.1); border-radius: 10px; border-left: 4px solid var(--purple-dark);">
-                <h4 style="margin-bottom: 0.5rem; color: var(--accent-primary);">📝 How to Update:</h4>
-                <ol style="margin-left: 1.5rem; color: var(--text-secondary); line-height: 1.8;">
-                    <li>Copy the JSON above</li>
-                    <li>Go to your GitHub repository</li>
-                    <li>Navigate to <code>${jsonPath}</code></li>
-                    <li>Click the pencil icon to edit</li>
-                    <li>Paste the new JSON</li>
-                    <li>Scroll down and click "Commit changes"</li>
-                    <li>Wait 1-2 minutes, then refresh this page</li>
-                </ol>
-            </div>
-        </div>
-        <button onclick="document.getElementById('editModal').classList.remove('active')" style="margin-top: 1rem;">Close</button>
-    `;
-
-    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
-}
-
-function copyJsonToClipboard() {
-    const textarea = document.getElementById('jsonOutput');
-    textarea.select();
-    document.execCommand('copy');
-    
-    showNotification('✅ JSON copied to clipboard!', 'success');
+    await saveAllData();
 }
 
 function checkGalleryPassword() {
@@ -583,7 +626,7 @@ function handleImageError(index) {
     }
 }
 
-function deleteImage(index) {
+async function deleteImage(index) {
     if (currentUser.role !== 'owner') {
         alert('❌ Only the owner can delete art!');
         return;
@@ -592,24 +635,27 @@ function deleteImage(index) {
     if (confirm('🐀 Delete this image from the gallery?')) {
         dataCache.gallery.splice(index, 1);
         renderGallery();
-        showJsonUpdateInstructions('gallery', dataCache.gallery);
+        await saveAllData();
     }
 }
 
-function clearGallery() {
+async function clearGallery() {
     if (currentUser.role !== 'owner') {
         alert('❌ Only the owner can clear the gallery!');
         return;
     }
 
-    if (confirm('🐀 Clear the entire gallery? You\'ll need to update the JSON file.')) {
+    if (confirm('🐀 Clear the entire gallery? This cannot be undone!')) {
         dataCache.gallery = [];
         renderGallery();
-        showJsonUpdateInstructions('gallery', dataCache.gallery);
+        await saveAllData();
     }
 }
 
-// Bots Section
+// ===========================
+// BOTS SECTION
+// ===========================
+
 function initBotsSection() {
     const addBotBtn = document.getElementById('addBotBtn');
     if (addBotBtn) {
@@ -682,7 +728,7 @@ function openBotModal(botData = null, index = null) {
     };
 }
 
-function saveBot(index = null) {
+async function saveBot(index = null) {
     if (currentUser.role !== 'owner') {
         alert('❌ Only the owner can save bots!');
         return;
@@ -708,11 +754,10 @@ function saveBot(index = null) {
     renderBots();
     document.getElementById('editModal').classList.remove('active');
     
-    // Show JSON update instructions
-    showJsonUpdateInstructions('bots', dataCache.bots);
+    await saveAllData();
 }
 
-function deleteBot(index) {
+async function deleteBot(index) {
     if (currentUser.role !== 'owner') {
         alert('❌ Only the owner can delete bots!');
         return;
@@ -722,7 +767,7 @@ function deleteBot(index) {
         dataCache.bots.splice(index, 1);
         renderBots();
         document.getElementById('editModal').classList.remove('active');
-        showJsonUpdateInstructions('bots', dataCache.bots);
+        await saveAllData();
     }
 }
 
@@ -789,7 +834,10 @@ function renderBots() {
     }).join('');
 }
 
-// Profile Editing
+// ===========================
+// PROFILE EDITING
+// ===========================
+
 function initProfileEditing() {
     const lanyardName = document.getElementById('lanyardName');
     const lanyardRole = document.getElementById('lanyardRole');
@@ -858,10 +906,10 @@ function openEditModal(type, platform = null) {
         case 'image':
             modalTitle.textContent = '✏️ Change Profile Picture';
             modalBody.innerHTML = `
-                <label>Image Path</label>
-                <input type="text" id="editInput" placeholder="./images/profile.jpg" value="./images/">
+                <label>Image URL (from ImgBB)</label>
+                <input type="text" id="editInput" placeholder="https://i.ibb.co/xxxxx/profile.jpg">
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
-                    Upload image to /images folder in GitHub, then enter the path here
+                    Upload your profile image to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">ImgBB</a> and paste the URL here
                 </p>
                 <button onclick="saveEdit('image')">Save 🐀</button>
             `;
@@ -883,7 +931,7 @@ function openEditModal(type, platform = null) {
     };
 }
 
-function saveEdit(type, platform = null) {
+async function saveEdit(type, platform = null) {
     const input = document.getElementById('editInput').value;
     const modal = document.getElementById('editModal');
 
@@ -918,10 +966,13 @@ function saveEdit(type, platform = null) {
         }
     };
     
-    showJsonUpdateInstructions('profile', dataCache.profile);
+    await saveAllData();
 }
 
-// Utility Functions
+// ===========================
+// UTILITY FUNCTIONS
+// ===========================
+
 function showNotification(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = 'copy-toast';
@@ -930,6 +981,7 @@ function showNotification(message, type = 'info') {
     if (type === 'success') toast.style.background = 'linear-gradient(135deg, #7bed9f, #7dd3fc)';
     if (type === 'warning') toast.style.background = 'linear-gradient(135deg, #ffa502, #ff6348)';
     if (type === 'error') toast.style.background = 'linear-gradient(135deg, #ff006e, #ff0080)';
+    if (type === 'info') toast.style.background = 'linear-gradient(135deg, #7dd3fc, #a855f7)';
     
     document.body.appendChild(toast);
     
@@ -1011,8 +1063,7 @@ window.saveBot = saveBot;
 window.deleteBot = deleteBot;
 window.deleteImage = deleteImage;
 window.openBotModal = openBotModal;
-window.saveImageToManifest = saveImageToManifest;
+window.saveImageUrl = saveImageUrl;
 window.copyToClipboard = copyToClipboard;
 window.handleImageLoad = handleImageLoad;
 window.handleImageError = handleImageError;
-window.copyJsonToClipboard = copyJsonToClipboard;
