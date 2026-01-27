@@ -1,0 +1,48 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Generate env.js from secrets
+        run: |
+          cat > env.js << 'EOF'
+          // ⚠️ WARNING: This file is auto-generated from GitHub Secrets
+          // Do NOT commit credentials to the repository!
+          
+          window.ENV = {
+              // Owner credentials - full access to edit everything
+              SORYN_USER: "${{ secrets.SORYN_USER }}",
+              SORYN_PASS: "${{ secrets.SORYN_PASS }}",
+              
+              // Guest credentials - view-only access
+              GUEST_USER: "${{ secrets.GUEST_USER }}",
+              GUEST_PASS: "${{ secrets.GUEST_PASS }}"
+          };
+          EOF
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'.
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
