@@ -673,7 +673,7 @@ function openBotModal(botData = null, index = null) {
         </p>
         
         <button onclick="saveBot(${index})">Save Bot/Project 🐀</button>
-        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete ðŸ—'ï¸</button>` : ''}
+        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete 🗑️</button>` : ''}
     `;
 
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
