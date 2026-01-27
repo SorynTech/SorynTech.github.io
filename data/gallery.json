@@ -1,3 +1,10 @@
 {
-  "images": []
+  "images": [
+    {
+      "src": "./images/test.jpg",
+      "title": "Artwork 1",
+      "description": "",
+      "timestamp": 1769543157994
+    }
+  ]
 }
