@@ -1,17 +1,30 @@
-// Environment Configuration
-// These will be replaced by your actual environment variables
-const CONFIG = {
-    SORYN_USER: window.ENV?.SORYN_USER || "soryn",
-    SORYN_PASS: window.ENV?.SORYN_PASS || "ratking123",
-    GUEST_USER: window.ENV?.GUEST_USER || "guest",
-    GUEST_PASS: window.ENV?.GUEST_PASS || "cheese456"
+// Environment Configuration - Hide from console
+const CONFIG = (() => {
+    const config = {
+        SORYN_USER: window.ENV?.SORYN_USER || "soryn",
+        SORYN_PASS: window.ENV?.SORYN_PASS || "ratking123",
+        GUEST_USER: window.ENV?.GUEST_USER || "guest",
+        GUEST_PASS: window.ENV?.GUEST_PASS || "cheese456"
+    };
+    
+    if (window.ENV) {
+        delete window.ENV;
+    }
+    
+    return Object.freeze(config);
+})();
+
+// GitHub-based storage paths
+const GITHUB_PATHS = {
+    bots: './data/bots.json',
+    profile: './data/profile.json',
+    galleryManifest: './data/gallery.json',
+    imagesFolder: './images/',
+    botsFolder: './bots/'
 };
 
-// Storage keys
+// Fallback storage keys for offline mode
 const STORAGE_KEYS = {
-    gallery: 'ratGallery',
-    bots: 'ratBots',
-    profile: 'ratProfile',
     currentUser: 'currentUser',
     userRole: 'userRole'
 };
@@ -19,19 +32,28 @@ const STORAGE_KEYS = {
 // Current user state
 let currentUser = {
     username: null,
-    role: 'guest', // 'owner' or 'guest'
+    role: 'guest',
     isLoggedIn: false
 };
 
+// Cache for loaded data
+let dataCache = {
+    bots: [],
+    profile: null,
+    gallery: []
+};
+
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     initNavigation();
     initAuth();
     initProfileEditing();
     initBotsSection();
     initGallery();
-    loadFromStorage();
     checkAuthState();
+    
+    // Load all data from GitHub
+    await loadAllData();
 });
 
 // Navigation
@@ -79,7 +101,6 @@ function initAuth() {
         }
     });
 
-    // Add Enter key support for login
     document.getElementById('loginUsername').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') document.getElementById('loginPassword').focus();
     });
@@ -117,8 +138,6 @@ function login(role, username) {
     sessionStorage.setItem(STORAGE_KEYS.userRole, role);
 
     updateUIForRole();
-    
-    // Auto-unlock gallery for logged-in users
     unlockGallery();
 }
 
@@ -133,7 +152,7 @@ function logout() {
     sessionStorage.removeItem(STORAGE_KEYS.userRole);
 
     updateUIForRole();
-    location.reload(); // Refresh to reset state
+    location.reload();
 }
 
 function checkAuthState() {
@@ -147,12 +166,7 @@ function checkAuthState() {
             isLoggedIn: true
         };
         updateUIForRole();
-        
-        // Auto-unlock gallery
-        const passwordOverlay = document.getElementById('passwordOverlay');
-        if (passwordOverlay) {
-            unlockGallery();
-        }
+        unlockGallery();
     }
 }
 
@@ -171,7 +185,6 @@ function updateUIForRole() {
         userBadge.title = 'Click to login';
     }
 
-    // Enable/disable owner-only elements
     const ownerOnlyElements = document.querySelectorAll('.owner-only');
     ownerOnlyElements.forEach(el => {
         if (currentUser.role === 'owner') {
@@ -186,23 +199,102 @@ function updateUIForRole() {
     });
 }
 
-// Gallery Password Protection
+// Data Loading Functions
+async function loadAllData() {
+    try {
+        // Load bots data
+        await loadBotsData();
+        
+        // Load profile data
+        await loadProfileData();
+        
+        // Load gallery data
+        await loadGalleryData();
+        
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showNotification('⚠️ Some data failed to load. Using defaults.', 'warning');
+    }
+}
+
+async function loadBotsData() {
+    try {
+        const response = await fetch(GITHUB_PATHS.bots);
+        if (response.ok) {
+            const data = await response.json();
+            dataCache.bots = data.bots || [];
+            renderBots();
+        } else {
+            console.log('No bots.json found, using empty array');
+            dataCache.bots = [];
+            renderBots();
+        }
+    } catch (error) {
+        console.error('Error loading bots:', error);
+        dataCache.bots = [];
+        renderBots();
+    }
+}
+
+async function loadProfileData() {
+    try {
+        const response = await fetch(GITHUB_PATHS.profile);
+        if (response.ok) {
+            const data = await response.json();
+            dataCache.profile = data;
+            applyProfileData(data);
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+    }
+}
+
+async function loadGalleryData() {
+    try {
+        const response = await fetch(GITHUB_PATHS.galleryManifest);
+        if (response.ok) {
+            const data = await response.json();
+            dataCache.gallery = data.images || [];
+            renderGallery();
+        } else {
+            dataCache.gallery = [];
+            renderGallery();
+        }
+    } catch (error) {
+        console.error('Error loading gallery:', error);
+        dataCache.gallery = [];
+        renderGallery();
+    }
+}
+
+function applyProfileData(data) {
+    if (data.name) document.getElementById('lanyardName').textContent = data.name;
+    if (data.role) document.getElementById('lanyardRole').textContent = data.role;
+    if (data.image) document.getElementById('lanyardImage').src = data.image;
+    
+    if (data.socials) {
+        if (data.socials.twitter) document.getElementById('twitterLink').setAttribute('href', data.socials.twitter);
+        if (data.socials.instagram) document.getElementById('instagramLink').setAttribute('href', data.socials.instagram);
+        if (data.socials.github) document.getElementById('githubLink').setAttribute('href', data.socials.github);
+        if (data.socials.discord) document.getElementById('discordLink').setAttribute('href', data.socials.discord);
+        if (data.socials.kofi) document.getElementById('kofiLink').setAttribute('href', data.socials.kofi);
+    }
+}
+
+// Gallery Functions
 function initGallery() {
     const uploadBtn = document.getElementById('uploadBtn');
     const addUrlBtn = document.getElementById('addUrlBtn');
-    const imageUpload = document.getElementById('imageUpload');
     const clearGalleryBtn = document.getElementById('clearGalleryBtn');
     const unlockBtn = document.getElementById('unlockBtn');
     const artUsername = document.getElementById('artUsername');
     const artPassword = document.getElementById('artPassword');
 
-    if (uploadBtn) uploadBtn.addEventListener('click', () => imageUpload.click());
-    if (addUrlBtn) addUrlBtn.addEventListener('click', addImageUrl);
-    if (imageUpload) imageUpload.addEventListener('change', handleGalleryUpload);
+    if (uploadBtn) uploadBtn.addEventListener('click', showUploadInstructions);
+    if (addUrlBtn) addUrlBtn.addEventListener('click', addImageToManifest);
     if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
     if (unlockBtn) unlockBtn.addEventListener('click', checkGalleryPassword);
 
-    // Enter key support
     if (artUsername) {
         artUsername.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') artPassword.focus();
@@ -215,7 +307,54 @@ function initGallery() {
     }
 }
 
-function addImageUrl() {
+function showUploadInstructions() {
+    const modal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    modal.classList.add('active');
+    modalTitle.textContent = '📤 Upload Images to Gallery';
+    
+    modalBody.innerHTML = `
+        <div style="text-align: left; line-height: 1.8;">
+            <h4 style="color: var(--accent-primary); margin-bottom: 1rem;">📁 Step-by-Step Upload Guide:</h4>
+            
+            <p><strong>1. Add images to your GitHub repository:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                <li>Go to your repository on GitHub</li>
+                <li>Create an <code>/images</code> folder if it doesn't exist</li>
+                <li>Click "Add file" → "Upload files"</li>
+                <li>Drag and drop your artwork images</li>
+                <li>Commit the changes</li>
+            </ul>
+            
+            <p><strong>2. Add image to gallery manifest:</strong></p>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Click "Add Image URL" button and enter the relative path:
+            </p>
+            <code style="background: var(--bg-secondary); padding: 0.5rem; display: block; margin-bottom: 1rem; border-radius: 5px;">
+                ./images/your-artwork.jpg
+            </code>
+            
+            <p><strong>3. Supported formats:</strong></p>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                .jpg, .jpeg, .png, .gif, .webp
+            </p>
+            
+            <div style="background: rgba(125, 211, 252, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid var(--accent-primary);">
+                <strong>💡 Pro Tip:</strong> Images in the <code>/images</code> folder are public and will load on any device/browser!
+            </div>
+        </div>
+        <button onclick="document.getElementById('editModal').classList.remove('active')" style="margin-top: 1.5rem;">Got it! 🐀</button>
+    `;
+
+    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    };
+}
+
+function addImageToManifest() {
     if (currentUser.role !== 'owner') {
         alert('❌ Only the owner can add images!');
         return;
@@ -226,15 +365,30 @@ function addImageUrl() {
     const modalBody = document.getElementById('modalBody');
 
     modal.classList.add('active');
-    modalTitle.textContent = '🔗 Add Image URL';
+    modalTitle.textContent = '🖼️ Add Image to Gallery';
     
     modalBody.innerHTML = `
-        <label>Image URL</label>
-        <input type="text" id="imageUrlInput" placeholder="https://example.com/image.jpg">
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0.5rem 0 1rem 0;">
-            📌 Host images on: GitHub, ImgBB, Imgur, or Cloudinary
-        </p>
-        <button onclick="saveImageUrl()">Add Image 🐀</button>
+        <label>Image Path or URL</label>
+        <input type="text" id="imagePathInput" placeholder="./images/artwork1.jpg" value="./images/">
+        
+        <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                <strong>📁 For images in your repo:</strong><br>
+                <code>./images/filename.jpg</code>
+            </p>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+                <strong>🔗 For external URLs:</strong><br>
+                <code>https://i.ibb.co/xxxxx/image.jpg</code>
+            </p>
+        </div>
+        
+        <label>Image Title (optional)</label>
+        <input type="text" id="imageTitleInput" placeholder="My Artwork">
+        
+        <label>Image Description (optional)</label>
+        <textarea id="imageDescInput" rows="2" placeholder="Description of the artwork"></textarea>
+        
+        <button onclick="saveImageToManifest()">Add to Gallery 🐀</button>
     `;
 
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
@@ -243,31 +397,111 @@ function addImageUrl() {
     };
 }
 
-function saveImageUrl() {
-    const url = document.getElementById('imageUrlInput').value.trim();
+function saveImageToManifest() {
+    const path = document.getElementById('imagePathInput').value.trim();
+    const title = document.getElementById('imageTitleInput').value.trim();
+    const description = document.getElementById('imageDescInput').value.trim();
     
-    if (!url) {
-        alert('❌ Please enter an image URL!');
+    if (!path) {
+        alert('❌ Please enter an image path or URL!');
         return;
     }
 
-    // Basic URL validation
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        alert('❌ URL must start with http:// or https://');
-        return;
-    }
-
-    const gallery = JSON.parse(localStorage.getItem(STORAGE_KEYS.gallery) || '[]');
-    gallery.push({
-        src: url,
+    // Add to cache
+    const newImage = {
+        src: path,
+        title: title || `Artwork ${dataCache.gallery.length + 1}`,
+        description: description,
         timestamp: Date.now()
-    });
+    };
     
-    localStorage.setItem(STORAGE_KEYS.gallery, JSON.stringify(gallery));
+    dataCache.gallery.push(newImage);
     renderGallery();
     
     document.getElementById('editModal').classList.remove('active');
-    alert('✅ Image added successfully!');
+    
+    // Show instructions to update JSON
+    showJsonUpdateInstructions('gallery', dataCache.gallery);
+}
+
+function showJsonUpdateInstructions(type, data) {
+    const modal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    let jsonPath, jsonContent;
+    
+    if (type === 'gallery') {
+        jsonPath = 'data/gallery.json';
+        jsonContent = JSON.stringify({ images: data }, null, 2);
+    } else if (type === 'bots') {
+        jsonPath = 'data/bots.json';
+        jsonContent = JSON.stringify({ bots: data }, null, 2);
+    } else if (type === 'profile') {
+        jsonPath = 'data/profile.json';
+        jsonContent = JSON.stringify(data, null, 2);
+    }
+
+    modal.classList.add('active');
+    modalTitle.textContent = '💾 Update JSON File';
+    
+    modalBody.innerHTML = `
+        <div style="text-align: left;">
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Copy this JSON and update <code>${jsonPath}</code> in your GitHub repo:
+            </p>
+            
+            <div style="position: relative;">
+                <textarea id="jsonOutput" readonly style="
+                    width: 100%;
+                    height: 300px;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.85rem;
+                    background: var(--bg-secondary);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    border-radius: 8px;
+                    padding: 1rem;
+                    color: var(--text-primary);
+                    resize: vertical;
+                ">${jsonContent}</textarea>
+                <button onclick="copyJsonToClipboard()" style="
+                    position: absolute;
+                    top: 0.5rem;
+                    right: 0.5rem;
+                    padding: 0.5rem 1rem;
+                    background: var(--accent-primary);
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                ">📋 Copy JSON</button>
+            </div>
+            
+            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(168, 85, 247, 0.1); border-radius: 10px; border-left: 4px solid var(--purple-dark);">
+                <h4 style="margin-bottom: 0.5rem; color: var(--accent-primary);">📝 How to Update:</h4>
+                <ol style="margin-left: 1.5rem; color: var(--text-secondary); line-height: 1.8;">
+                    <li>Copy the JSON above</li>
+                    <li>Go to your GitHub repository</li>
+                    <li>Navigate to <code>${jsonPath}</code></li>
+                    <li>Click the pencil icon to edit</li>
+                    <li>Paste the new JSON</li>
+                    <li>Scroll down and click "Commit changes"</li>
+                    <li>Wait 1-2 minutes, then refresh this page</li>
+                </ol>
+            </div>
+        </div>
+        <button onclick="document.getElementById('editModal').classList.remove('active')" style="margin-top: 1rem;">Close</button>
+    `;
+
+    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
+}
+
+function copyJsonToClipboard() {
+    const textarea = document.getElementById('jsonOutput');
+    textarea.select();
+    document.execCommand('copy');
+    
+    showNotification('✅ JSON copied to clipboard!', 'success');
 }
 
 function checkGalleryPassword() {
@@ -291,40 +525,10 @@ function unlockGallery() {
     if (galleryContent) galleryContent.classList.add('unlocked');
 }
 
-function handleGalleryUpload(e) {
-    if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can upload art!');
-        return;
-    }
-
-    const files = Array.from(e.target.files);
-    const gallery = JSON.parse(localStorage.getItem(STORAGE_KEYS.gallery) || '[]');
-
-    let processed = 0;
-    files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            gallery.push({
-                src: event.target.result,
-                timestamp: Date.now()
-            });
-            processed++;
-            if (processed === files.length) {
-                localStorage.setItem(STORAGE_KEYS.gallery, JSON.stringify(gallery));
-                renderGallery();
-            }
-        };
-        reader.readAsDataURL(file);
-    });
-
-    e.target.value = '';
-}
-
 function renderGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
-    const gallery = JSON.parse(localStorage.getItem(STORAGE_KEYS.gallery) || '[]');
-
-    if (gallery.length === 0) {
+    
+    if (dataCache.gallery.length === 0) {
         galleryGrid.innerHTML = `
             <div class="gallery-placeholder">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -342,12 +546,41 @@ function renderGallery() {
         ? '<button class="delete-btn" onclick="deleteImage(INDEX)">×</button>'
         : '';
 
-    galleryGrid.innerHTML = gallery.map((item, index) => `
-        <div class="gallery-item">
-            <img src="${item.src}" alt="Art ${index + 1}">
+    galleryGrid.innerHTML = dataCache.gallery.map((item, index) => `
+        <div class="gallery-item loading" id="gallery-item-${index}">
+            <img src="${item.src}" 
+                 alt="${item.title || 'Art ' + (index + 1)}"
+                 title="${item.description || item.title || ''}"
+                 onload="handleImageLoad(${index})"
+                 onerror="handleImageError(${index})">
             ${deleteButton.replace('INDEX', index)}
         </div>
     `).join('');
+}
+
+function handleImageLoad(index) {
+    const item = document.getElementById(`gallery-item-${index}`);
+    if (item) {
+        item.classList.remove('loading', 'error');
+    }
+}
+
+function handleImageError(index) {
+    const item = document.getElementById(`gallery-item-${index}`);
+    if (item) {
+        item.classList.remove('loading');
+        item.classList.add('error');
+        
+        if (currentUser.role === 'owner') {
+            const retryBtn = document.createElement('button');
+            retryBtn.className = 'delete-btn';
+            retryBtn.style.cssText = 'opacity: 1; background: rgba(255, 150, 0, 0.9);';
+            retryBtn.textContent = '🔄';
+            retryBtn.title = 'Retry loading or click to delete';
+            retryBtn.onclick = () => deleteImage(index);
+            item.appendChild(retryBtn);
+        }
+    }
 }
 
 function deleteImage(index) {
@@ -356,10 +589,11 @@ function deleteImage(index) {
         return;
     }
 
-    const gallery = JSON.parse(localStorage.getItem(STORAGE_KEYS.gallery) || '[]');
-    gallery.splice(index, 1);
-    localStorage.setItem(STORAGE_KEYS.gallery, JSON.stringify(gallery));
-    renderGallery();
+    if (confirm('🐀 Delete this image from the gallery?')) {
+        dataCache.gallery.splice(index, 1);
+        renderGallery();
+        showJsonUpdateInstructions('gallery', dataCache.gallery);
+    }
 }
 
 function clearGallery() {
@@ -368,10 +602,191 @@ function clearGallery() {
         return;
     }
 
-    if (confirm('🐀 Delete all artwork? This cannot be undone!')) {
-        localStorage.removeItem(STORAGE_KEYS.gallery);
+    if (confirm('🐀 Clear the entire gallery? You\'ll need to update the JSON file.')) {
+        dataCache.gallery = [];
         renderGallery();
+        showJsonUpdateInstructions('gallery', dataCache.gallery);
     }
+}
+
+// Bots Section
+function initBotsSection() {
+    const addBotBtn = document.getElementById('addBotBtn');
+    if (addBotBtn) {
+        addBotBtn.addEventListener('click', () => {
+            if (currentUser.role === 'owner') {
+                openBotModal();
+            }
+        });
+    }
+}
+
+function openBotModal(botData = null, index = null) {
+    if (currentUser.role !== 'owner' && botData) {
+        return;
+    }
+
+    const modal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    modal.classList.add('active');
+    modalTitle.textContent = botData ? '✏️ Edit Bot/Project' : '🐀 Add Bot/Project';
+
+    const bot = botData || {
+        icon: '🤖',
+        name: '',
+        description: '',
+        servers: '',
+        users: '',
+        inviteLink: '',
+        githubRepo: '',
+        botFolder: ''
+    };
+
+    modalBody.innerHTML = `
+        <label>Bot/Project Icon (emoji)</label>
+        <input type="text" id="botIcon" value="${bot.icon}" placeholder="🤖">
+        
+        <label>Bot/Project Name</label>
+        <input type="text" id="botName" value="${bot.name}" placeholder="My Awesome Bot">
+        
+        <label>Description</label>
+        <textarea id="botDescription" rows="3" placeholder="What does your bot/project do?">${bot.description}</textarea>
+        
+        <label>Servers Count (optional)</label>
+        <input type="text" id="botServers" value="${bot.servers}" placeholder="1.2K">
+        
+        <label>Users Count (optional)</label>
+        <input type="text" id="botUsers" value="${bot.users}" placeholder="50K">
+        
+        <label>Invite Link (optional)</label>
+        <input type="text" id="botInviteLink" value="${bot.inviteLink}" placeholder="https://discord.com/invite/...">
+        
+        <label>GitHub Repository (optional)</label>
+        <input type="text" id="botGithubRepo" value="${bot.githubRepo}" placeholder="https://github.com/sorynTech/my-bot">
+        
+        <label>Bot Folder Path (optional)</label>
+        <input type="text" id="botFolder" value="${bot.botFolder}" placeholder="./bots/my-bot/">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
+            If you store bot files in the repo (e.g., /bots/discord-bot/)
+        </p>
+        
+        <button onclick="saveBot(${index})">Save Bot/Project 🐀</button>
+        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete 🗑️</button>` : ''}
+    `;
+
+    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    };
+}
+
+function saveBot(index = null) {
+    if (currentUser.role !== 'owner') {
+        alert('❌ Only the owner can save bots!');
+        return;
+    }
+
+    const botData = {
+        icon: document.getElementById('botIcon').value,
+        name: document.getElementById('botName').value,
+        description: document.getElementById('botDescription').value,
+        servers: document.getElementById('botServers').value,
+        users: document.getElementById('botUsers').value,
+        inviteLink: document.getElementById('botInviteLink').value,
+        githubRepo: document.getElementById('botGithubRepo').value,
+        botFolder: document.getElementById('botFolder').value
+    };
+
+    if (index !== null) {
+        dataCache.bots[index] = botData;
+    } else {
+        dataCache.bots.push(botData);
+    }
+
+    renderBots();
+    document.getElementById('editModal').classList.remove('active');
+    
+    // Show JSON update instructions
+    showJsonUpdateInstructions('bots', dataCache.bots);
+}
+
+function deleteBot(index) {
+    if (currentUser.role !== 'owner') {
+        alert('❌ Only the owner can delete bots!');
+        return;
+    }
+
+    if (confirm('🐀 Delete this bot/project?')) {
+        dataCache.bots.splice(index, 1);
+        renderBots();
+        document.getElementById('editModal').classList.remove('active');
+        showJsonUpdateInstructions('bots', dataCache.bots);
+    }
+}
+
+function renderBots() {
+    const botsGrid = document.getElementById('botsGrid');
+    
+    if (dataCache.bots.length === 0) {
+        botsGrid.innerHTML = `
+            <div class="bot-card">
+                <div class="bot-icon">🤖</div>
+                <h3 class="bot-name">Example Bot</h3>
+                <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to add your own!</p>
+                <div class="bot-stats">
+                    <span class="stat"><strong>1.2K</strong> Servers</span>
+                    <span class="stat"><strong>50K</strong> Users</span>
+                </div>
+                <a href="#" class="bot-link">Invite Bot →</a>
+            </div>
+        `;
+        return;
+    }
+
+    const isOwner = currentUser.role === 'owner';
+    botsGrid.innerHTML = dataCache.bots.map((bot, index) => {
+        const hasLinks = bot.inviteLink || bot.githubRepo || bot.botFolder;
+        
+        return `
+            <div class="bot-card" ${isOwner ? `onclick="openBotModal(${JSON.stringify(bot).replace(/"/g, '&quot;')}, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
+                <div class="bot-icon">${bot.icon}</div>
+                <h3 class="bot-name">${bot.name}</h3>
+                <p class="bot-description">${bot.description}</p>
+                
+                ${bot.servers || bot.users ? `
+                    <div class="bot-stats">
+                        ${bot.servers ? `<span class="stat"><strong>${bot.servers}</strong> Servers</span>` : ''}
+                        ${bot.users ? `<span class="stat"><strong>${bot.users}</strong> Users</span>` : ''}
+                    </div>
+                ` : ''}
+                
+                ${hasLinks ? `
+                    <div class="bot-links" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                        ${bot.inviteLink ? `
+                            <a href="${bot.inviteLink}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
+                                📨 Invite
+                            </a>
+                        ` : ''}
+                        ${bot.githubRepo ? `
+                            <a href="${bot.githubRepo}" class="bot-link-btn bot-link-github" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                                GitHub
+                            </a>
+                        ` : ''}
+                        ${bot.botFolder ? `
+                            <a href="${bot.botFolder}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
+                                📁 Files
+                            </a>
+                        ` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
 }
 
 // Profile Editing
@@ -398,7 +813,6 @@ function initProfileEditing() {
         });
     }
 
-    // Social links editing
     ['twitter', 'instagram', 'github', 'discord', 'kofi'].forEach(platform => {
         const link = document.getElementById(`${platform}Link`);
         if (link) {
@@ -444,13 +858,13 @@ function openEditModal(type, platform = null) {
         case 'image':
             modalTitle.textContent = '✏️ Change Profile Picture';
             modalBody.innerHTML = `
-                <label>Image URL or Upload</label>
-                <input type="text" id="editInput" placeholder="Enter image URL">
-                <p style="text-align: center; margin: 1rem 0; color: var(--text-muted);">or</p>
-                <input type="file" id="imageFileInput" accept="image/*" style="margin-bottom: 1rem;">
+                <label>Image Path</label>
+                <input type="text" id="editInput" placeholder="./images/profile.jpg" value="./images/">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
+                    Upload image to /images folder in GitHub, then enter the path here
+                </p>
                 <button onclick="saveEdit('image')">Save 🐀</button>
             `;
-            document.getElementById('imageFileInput').addEventListener('change', handleImageUpload);
             break;
         case 'social':
             modalTitle.textContent = `✏️ Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
@@ -467,17 +881,6 @@ function openEditModal(type, platform = null) {
     modal.onclick = (e) => {
         if (e.target === modal) modal.classList.remove('active');
     };
-}
-
-function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            document.getElementById('editInput').value = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
 }
 
 function saveEdit(type, platform = null) {
@@ -500,152 +903,9 @@ function saveEdit(type, platform = null) {
     }
 
     modal.classList.remove('active');
-    saveToStorage();
-}
-
-// Bots Section
-function initBotsSection() {
-    const addBotBtn = document.getElementById('addBotBtn');
-    if (addBotBtn) {
-        addBotBtn.addEventListener('click', () => {
-            if (currentUser.role === 'owner') {
-                openBotModal();
-            }
-        });
-    }
-}
-
-function openBotModal(botData = null, index = null) {
-    if (currentUser.role !== 'owner' && botData) {
-        return; // Guests can't edit
-    }
-
-    const modal = document.getElementById('editModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modal.classList.add('active');
-    modalTitle.textContent = botData ? '✏️ Edit Bot' : '🐀 Add Discord Bot';
-
-    const bot = botData || {
-        icon: '🤖',
-        name: '',
-        description: '',
-        servers: '',
-        users: '',
-        inviteLink: ''
-    };
-
-    modalBody.innerHTML = `
-        <label>Bot Icon (emoji)</label>
-        <input type="text" id="botIcon" value="${bot.icon}" placeholder="🤖">
-        
-        <label>Bot Name</label>
-        <input type="text" id="botName" value="${bot.name}" placeholder="My Awesome Bot">
-        
-        <label>Description</label>
-        <textarea id="botDescription" rows="3" placeholder="What does your bot do?">${bot.description}</textarea>
-        
-        <label>Servers Count</label>
-        <input type="text" id="botServers" value="${bot.servers}" placeholder="1.2K">
-        
-        <label>Users Count</label>
-        <input type="text" id="botUsers" value="${bot.users}" placeholder="50K">
-        
-        <label>Invite Link</label>
-        <input type="text" id="botInviteLink" value="${bot.inviteLink}" placeholder="https://discord.com/invite/...">
-        
-        <button onclick="saveBot(${index})">Save Bot 🐀</button>
-        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete Bot 🗑️</button>` : ''}
-    `;
-
-    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-    };
-}
-
-function saveBot(index = null) {
-    if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can save bots!');
-        return;
-    }
-
-    const botData = {
-        icon: document.getElementById('botIcon').value,
-        name: document.getElementById('botName').value,
-        description: document.getElementById('botDescription').value,
-        servers: document.getElementById('botServers').value,
-        users: document.getElementById('botUsers').value,
-        inviteLink: document.getElementById('botInviteLink').value
-    };
-
-    let bots = JSON.parse(localStorage.getItem(STORAGE_KEYS.bots) || '[]');
     
-    if (index !== null) {
-        bots[index] = botData;
-    } else {
-        bots.push(botData);
-    }
-
-    localStorage.setItem(STORAGE_KEYS.bots, JSON.stringify(bots));
-    renderBots();
-    document.getElementById('editModal').classList.remove('active');
-}
-
-function deleteBot(index) {
-    if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can delete bots!');
-        return;
-    }
-
-    if (confirm('🐀 Delete this bot?')) {
-        let bots = JSON.parse(localStorage.getItem(STORAGE_KEYS.bots) || '[]');
-        bots.splice(index, 1);
-        localStorage.setItem(STORAGE_KEYS.bots, JSON.stringify(bots));
-        renderBots();
-        document.getElementById('editModal').classList.remove('active');
-    }
-}
-
-function renderBots() {
-    const botsGrid = document.getElementById('botsGrid');
-    const bots = JSON.parse(localStorage.getItem(STORAGE_KEYS.bots) || '[]');
-
-    if (bots.length === 0) {
-        botsGrid.innerHTML = `
-            <div class="bot-card">
-                <div class="bot-icon">🤖</div>
-                <h3 class="bot-name">Example Bot</h3>
-                <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to customize!</p>
-                <div class="bot-stats">
-                    <span class="stat"><strong>1.2K</strong> Servers</span>
-                    <span class="stat"><strong>50K</strong> Users</span>
-                </div>
-                <a href="#" class="bot-link">Invite Bot →</a>
-            </div>
-        `;
-        return;
-    }
-
-    const isOwner = currentUser.role === 'owner';
-    botsGrid.innerHTML = bots.map((bot, index) => `
-        <div class="bot-card" ${isOwner ? `onclick="openBotModal(${JSON.stringify(bot).replace(/"/g, '&quot;')}, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
-            <div class="bot-icon">${bot.icon}</div>
-            <h3 class="bot-name">${bot.name}</h3>
-            <p class="bot-description">${bot.description}</p>
-            <div class="bot-stats">
-                <span class="stat"><strong>${bot.servers}</strong> Servers</span>
-                <span class="stat"><strong>${bot.users}</strong> Users</span>
-            </div>
-            <a href="${bot.inviteLink}" class="bot-link" onclick="event.stopPropagation()" target="_blank">Invite Bot →</a>
-        </div>
-    `).join('');
-}
-
-// Storage Management
-function saveToStorage() {
-    const profileData = {
+    // Update profile cache
+    dataCache.profile = {
         name: document.getElementById('lanyardName').textContent,
         role: document.getElementById('lanyardRole').textContent,
         image: document.getElementById('lanyardImage').src,
@@ -657,58 +917,37 @@ function saveToStorage() {
             kofi: document.getElementById('kofiLink').getAttribute('href')
         }
     };
-
-    localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profileData));
+    
+    showJsonUpdateInstructions('profile', dataCache.profile);
 }
 
-function loadFromStorage() {
-    // Load profile data
-    const profileData = JSON.parse(localStorage.getItem(STORAGE_KEYS.profile) || 'null');
-    if (profileData) {
-        document.getElementById('lanyardName').textContent = profileData.name;
-        document.getElementById('lanyardRole').textContent = profileData.role;
-        if (profileData.image && !profileData.image.includes('profile.jpg')) {
-            document.getElementById('lanyardImage').src = profileData.image;
-        }
-        if (profileData.socials) {
-            if (profileData.socials.twitter) document.getElementById('twitterLink').setAttribute('href', profileData.socials.twitter);
-            if (profileData.socials.instagram) document.getElementById('instagramLink').setAttribute('href', profileData.socials.instagram);
-            if (profileData.socials.github) document.getElementById('githubLink').setAttribute('href', profileData.socials.github);
-            if (profileData.socials.discord) document.getElementById('discordLink').setAttribute('href', profileData.socials.discord);
-            if (profileData.socials.kofi) document.getElementById('kofiLink').setAttribute('href', profileData.socials.kofi);
-        }
-    }
-
-    // Load bots
-    renderBots();
-
-    // Load gallery
-    renderGallery();
+// Utility Functions
+function showNotification(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = 'copy-toast';
+    toast.textContent = message;
+    
+    if (type === 'success') toast.style.background = 'linear-gradient(135deg, #7bed9f, #7dd3fc)';
+    if (type === 'warning') toast.style.background = 'linear-gradient(135deg, #ffa502, #ff6348)';
+    if (type === 'error') toast.style.background = 'linear-gradient(135deg, #ff006e, #ff0080)';
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 }
 
-// Make functions globally accessible
-window.attemptLogin = attemptLogin;
-window.saveEdit = saveEdit;
-window.saveBot = saveBot;
-window.deleteBot = deleteBot;
-window.deleteImage = deleteImage;
-window.openBotModal = openBotModal;
-window.saveImageUrl = saveImageUrl;
-window.copyToClipboard = copyToClipboard;
-
-// Clipboard copy function
+// Clipboard functions
 function copyToClipboard(text, platform) {
-    // Use the modern Clipboard API
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
             showCopyToast(platform, text);
             animateCopySuccess(event.currentTarget);
         }).catch(err => {
-            // Fallback to older method
             fallbackCopy(text, platform);
         });
     } else {
-        // Fallback for older browsers
         fallbackCopy(text, platform);
     }
 }
@@ -734,13 +973,11 @@ function fallbackCopy(text, platform) {
 }
 
 function showCopyToast(platform, text) {
-    // Remove any existing toast
     const existingToast = document.querySelector('.copy-toast');
     if (existingToast) {
         existingToast.remove();
     }
     
-    // Create new toast
     const toast = document.createElement('div');
     toast.className = 'copy-toast';
     toast.innerHTML = `
@@ -755,7 +992,6 @@ function showCopyToast(platform, text) {
     
     document.body.appendChild(toast);
     
-    // Remove after animation completes
     setTimeout(() => {
         toast.remove();
     }, 3000);
@@ -767,3 +1003,16 @@ function animateCopySuccess(card) {
         card.classList.remove('copied');
     }, 400);
 }
+
+// Make functions globally accessible
+window.attemptLogin = attemptLogin;
+window.saveEdit = saveEdit;
+window.saveBot = saveBot;
+window.deleteBot = deleteBot;
+window.deleteImage = deleteImage;
+window.openBotModal = openBotModal;
+window.saveImageToManifest = saveImageToManifest;
+window.copyToClipboard = copyToClipboard;
+window.handleImageLoad = handleImageLoad;
+window.handleImageError = handleImageError;
+window.copyJsonToClipboard = copyJsonToClipboard;

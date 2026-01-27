@@ -569,6 +569,47 @@ body::before {
     gap: 1rem;
 }
 
+.bot-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.bot-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    background: rgba(125, 211, 252, 0.1);
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    border-radius: 8px;
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.bot-link-btn:hover {
+    background: rgba(125, 211, 252, 0.2);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+}
+
+.bot-link-github {
+    background: rgba(50, 50, 50, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
+.bot-link-github:hover {
+    background: rgba(50, 50, 50, 0.5);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
 .add-btn {
     display: block;
     margin: 0 auto;
@@ -698,6 +739,7 @@ body::before {
     justify-content: center;
     gap: 1rem;
     margin-bottom: 3rem;
+    flex-wrap: wrap;
 }
 
 .upload-btn,
@@ -819,6 +861,36 @@ body::before {
     transform: scale(1.1);
 }
 
+/* Image loading state */
+.gallery-item.loading {
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-item.loading::after {
+    content: '⏳ Loading...';
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.gallery-item.error {
+    background: rgba(255, 0, 110, 0.1);
+    border-color: rgba(255, 0, 110, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-item.error::after {
+    content: '❌ Failed to load';
+    color: var(--accent-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem;
+}
+
 /* Modal */
 .modal {
     display: none;
@@ -848,6 +920,8 @@ body::before {
     box-shadow: var(--shadow-card);
     position: relative;
     animation: popIn 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .close-btn {
@@ -1046,9 +1120,9 @@ body::before {
 /* Game Accounts Section */
 .game-accounts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    max-width: 1000px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -1056,7 +1130,7 @@ body::before {
     background: var(--bg-card);
     border: 2px solid rgba(125, 211, 252, 0.2);
     border-radius: 15px;
-    padding: 1.5rem;
+    padding: 1.25rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1092,18 +1166,18 @@ body::before {
 }
 
 .game-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 0.75rem;
     filter: drop-shadow(0 2px 8px rgba(125, 211, 252, 0.3));
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 60px;
+    height: 50px;
 }
 
 .game-icon svg {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     color: var(--accent-primary);
     transition: all 0.3s ease;
 }
@@ -1116,29 +1190,30 @@ body::before {
 
 .game-platform {
     font-family: 'Righteous', cursive;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin-bottom: 0.25rem;
     color: var(--text-primary);
 }
 
 .game-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .game-username {
     background: rgba(125, 211, 252, 0.1);
     border: 1px solid rgba(125, 211, 252, 0.3);
     border-radius: 8px;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
     font-family: 'DM Sans', monospace;
     font-weight: 600;
     color: var(--accent-primary);
     margin-bottom: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
+    word-break: break-all;
 }
 
 .game-account-card:hover .game-username {
@@ -1148,7 +1223,7 @@ body::before {
 }
 
 .copy-indicator {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     opacity: 0.7;
     transition: all 0.3s ease;
@@ -1166,7 +1241,7 @@ body::before {
         opacity: 1;
     }
     50% {
-        transform: scale(1.1);
+        transform: scale(1.05);
         opacity: 0.8;
     }
     100% {
@@ -1267,6 +1342,7 @@ body::before {
     
     .game-accounts-grid {
         grid-template-columns: 1fr;
+        max-width: 400px;
     }
     
     .copy-toast {
