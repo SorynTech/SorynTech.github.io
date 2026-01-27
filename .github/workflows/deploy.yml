@@ -1,19 +1,25 @@
-name: Deploy build env.js
-
+name: Deploy with env.js
 on:
   push:
     branches: [ main ]
-
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Create env.js from secrets
         run: |
@@ -28,6 +34,8 @@ jobs:
             IMGBB_API_KEY: "${{ secrets.IMGBB_API_KEY }}"
           };
           EOF
+          echo "✅ env.js created successfully"
+          cat env.js
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
