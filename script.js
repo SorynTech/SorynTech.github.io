@@ -25,7 +25,6 @@ let currentUser = {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    initRatCursor();
     initNavigation();
     initAuth();
     initProfileEditing();
@@ -34,27 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFromStorage();
     checkAuthState();
 });
-
-// Rat Cursor
-function initRatCursor() {
-    const ratCursor = document.getElementById('ratCursor');
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    function animate() {
-        cursorX += (mouseX - cursorX) * 0.1;
-        cursorY += (mouseY - cursorY) * 0.1;
-        ratCursor.style.left = cursorX + 'px';
-        ratCursor.style.top = cursorY + 'px';
-        requestAnimationFrame(animate);
-    }
-    animate();
-}
 
 // Navigation
 function initNavigation() {
@@ -211,6 +189,7 @@ function updateUIForRole() {
 // Gallery Password Protection
 function initGallery() {
     const uploadBtn = document.getElementById('uploadBtn');
+    const addUrlBtn = document.getElementById('addUrlBtn');
     const imageUpload = document.getElementById('imageUpload');
     const clearGalleryBtn = document.getElementById('clearGalleryBtn');
     const unlockBtn = document.getElementById('unlockBtn');
@@ -218,6 +197,7 @@ function initGallery() {
     const artPassword = document.getElementById('artPassword');
 
     if (uploadBtn) uploadBtn.addEventListener('click', () => imageUpload.click());
+    if (addUrlBtn) addUrlBtn.addEventListener('click', addImageUrl);
     if (imageUpload) imageUpload.addEventListener('change', handleGalleryUpload);
     if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
     if (unlockBtn) unlockBtn.addEventListener('click', checkGalleryPassword);
@@ -233,6 +213,61 @@ function initGallery() {
             if (e.key === 'Enter') checkGalleryPassword();
         });
     }
+}
+
+function addImageUrl() {
+    if (currentUser.role !== 'owner') {
+        alert('❌ Only the owner can add images!');
+        return;
+    }
+
+    const modal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    modal.classList.add('active');
+    modalTitle.textContent = '🔗 Add Image URL';
+    
+    modalBody.innerHTML = `
+        <label>Image URL</label>
+        <input type="text" id="imageUrlInput" placeholder="https://example.com/image.jpg">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0.5rem 0 1rem 0;">
+            📌 Host images on: GitHub, ImgBB, Imgur, or Cloudinary
+        </p>
+        <button onclick="saveImageUrl()">Add Image 🐀</button>
+    `;
+
+    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    };
+}
+
+function saveImageUrl() {
+    const url = document.getElementById('imageUrlInput').value.trim();
+    
+    if (!url) {
+        alert('❌ Please enter an image URL!');
+        return;
+    }
+
+    // Basic URL validation
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        alert('❌ URL must start with http:// or https://');
+        return;
+    }
+
+    const gallery = JSON.parse(localStorage.getItem(STORAGE_KEYS.gallery) || '[]');
+    gallery.push({
+        src: url,
+        timestamp: Date.now()
+    });
+    
+    localStorage.setItem(STORAGE_KEYS.gallery, JSON.stringify(gallery));
+    renderGallery();
+    
+    document.getElementById('editModal').classList.remove('active');
+    alert('✅ Image added successfully!');
 }
 
 function checkGalleryPassword() {
@@ -364,7 +399,7 @@ function initProfileEditing() {
     }
 
     // Social links editing
-    ['twitter', 'instagram', 'github', 'discord'].forEach(platform => {
+    ['twitter', 'instagram', 'github', 'discord', 'kofi'].forEach(platform => {
         const link = document.getElementById(`${platform}Link`);
         if (link) {
             link.addEventListener('contextmenu', (e) => {
@@ -618,7 +653,8 @@ function saveToStorage() {
             twitter: document.getElementById('twitterLink').getAttribute('href'),
             instagram: document.getElementById('instagramLink').getAttribute('href'),
             github: document.getElementById('githubLink').getAttribute('href'),
-            discord: document.getElementById('discordLink').getAttribute('href')
+            discord: document.getElementById('discordLink').getAttribute('href'),
+            kofi: document.getElementById('kofiLink').getAttribute('href')
         }
     };
 
@@ -634,9 +670,13 @@ function loadFromStorage() {
         if (profileData.image && !profileData.image.includes('profile.jpg')) {
             document.getElementById('lanyardImage').src = profileData.image;
         }
-        Object.keys(profileData.socials).forEach(platform => {
-            document.getElementById(`${platform}Link`).setAttribute('href', profileData.socials[platform]);
-        });
+        if (profileData.socials) {
+            if (profileData.socials.twitter) document.getElementById('twitterLink').setAttribute('href', profileData.socials.twitter);
+            if (profileData.socials.instagram) document.getElementById('instagramLink').setAttribute('href', profileData.socials.instagram);
+            if (profileData.socials.github) document.getElementById('githubLink').setAttribute('href', profileData.socials.github);
+            if (profileData.socials.discord) document.getElementById('discordLink').setAttribute('href', profileData.socials.discord);
+            if (profileData.socials.kofi) document.getElementById('kofiLink').setAttribute('href', profileData.socials.kofi);
+        }
     }
 
     // Load bots
@@ -653,3 +693,77 @@ window.saveBot = saveBot;
 window.deleteBot = deleteBot;
 window.deleteImage = deleteImage;
 window.openBotModal = openBotModal;
+window.saveImageUrl = saveImageUrl;
+window.copyToClipboard = copyToClipboard;
+
+// Clipboard copy function
+function copyToClipboard(text, platform) {
+    // Use the modern Clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showCopyToast(platform, text);
+            animateCopySuccess(event.currentTarget);
+        }).catch(err => {
+            // Fallback to older method
+            fallbackCopy(text, platform);
+        });
+    } else {
+        // Fallback for older browsers
+        fallbackCopy(text, platform);
+    }
+}
+
+function fallbackCopy(text, platform) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopyToast(platform, text);
+        animateCopySuccess(event.currentTarget);
+    } catch (err) {
+        alert('Failed to copy. Please copy manually: ' + text);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopyToast(platform, text) {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.copy-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = 'copy-toast';
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+            <span style="font-size: 1.2rem;">✅</span>
+            <div>
+                <div style="font-size: 0.9rem; margin-bottom: 0.2rem;">${platform} username copied!</div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">${text}</div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+function animateCopySuccess(card) {
+    card.classList.add('copied');
+    setTimeout(() => {
+        card.classList.remove('copied');
+    }, 400);
+}
