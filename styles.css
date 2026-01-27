@@ -1,17 +1,17 @@
 :root {
-    --bg-primary: #1a1d1e;
-    --bg-secondary: #252829;
-    --bg-card: #2d3436;
-    --accent-primary: #7bed9f;
-    --accent-secondary: #ff6348;
-    --accent-tertiary: #feca57;
+    --bg-primary: #1a1d2e;
+    --bg-secondary: #252839;
+    --bg-card: #2d3446;
+    --accent-primary: #7dd3fc;
+    --accent-secondary: #a855f7;
+    --accent-tertiary: #c084fc;
     --text-primary: #dfe6e9;
     --text-secondary: #b2bec3;
     --text-muted: #636e72;
-    --shadow-glow: 0 0 40px rgba(123, 237, 159, 0.3);
+    --shadow-glow: 0 0 40px rgba(125, 211, 252, 0.3);
     --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
     --rat-brown: #8b7355;
-    --sewer-green: #55a630;
+    --purple-dark: #7c3aed;
 }
 
 * {
@@ -37,26 +37,11 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 50%, rgba(123, 237, 159, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 99, 72, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(254, 202, 87, 0.03) 0%, transparent 40%);
+        radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(192, 132, 252, 0.03) 0%, transparent 40%);
     pointer-events: none;
     z-index: 0;
-}
-
-/* Rat Cursor */
-.rat-cursor {
-    position: fixed;
-    font-size: 2rem;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.1s ease;
-    animation: ratWiggle 2s infinite;
-}
-
-@keyframes ratWiggle {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
 }
 
 /* Cheese Background */
@@ -126,7 +111,7 @@ body::before {
     font-family: 'Righteous', cursive;
     font-size: 1.5rem;
     letter-spacing: 2px;
-    background: linear-gradient(135deg, var(--accent-primary), var(--sewer-green));
+    background: linear-gradient(135deg, var(--accent-primary), var(--purple-dark));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -357,7 +342,7 @@ body::before {
     right: 5px;
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, var(--accent-primary), var(--sewer-green));
+    background: linear-gradient(135deg, var(--accent-primary), var(--purple-dark));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -398,7 +383,7 @@ body::before {
 }
 
 .lanyard-role:hover {
-    color: var(--sewer-green);
+    color: var(--purple-dark);
     transform: translateY(-2px);
 }
 
@@ -942,6 +927,284 @@ body::before {
     pointer-events: all;
 }
 
+/* Friends & Artists Section */
+.friends-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 2px solid rgba(125, 211, 252, 0.2);
+}
+
+.friends-title {
+    font-family: 'Righteous', cursive;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: linear-gradient(135deg, var(--accent-primary), var(--purple-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.friends-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.friend-card {
+    background: var(--bg-card);
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-width: 320px;
+}
+
+.friend-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--purple-dark));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.friend-card:hover::before {
+    transform: scaleX(1);
+}
+
+.friend-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 30px rgba(125, 211, 252, 0.3);
+    transform: translateY(-5px);
+}
+
+.friend-name {
+    font-family: 'Righteous', cursive;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.bat-emoji {
+    font-size: 1.5rem;
+    animation: batFly 3s ease-in-out infinite;
+}
+
+@keyframes batFly {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+.friend-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.friend-kofi-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent-primary), var(--purple-dark));
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.friend-kofi-link:hover {
+    box-shadow: 0 6px 25px rgba(168, 85, 247, 0.5);
+    transform: translateY(-2px);
+}
+
+.rat-emoji {
+    font-size: 1.2rem;
+    animation: ratWiggle 2s ease-in-out infinite;
+}
+
+@keyframes ratWiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Game Accounts Section */
+.game-accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.game-account-card {
+    background: var(--bg-card);
+    border: 2px solid rgba(125, 211, 252, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-account-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--purple-dark));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.game-account-card:hover::before {
+    transform: scaleX(1);
+}
+
+.game-account-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 25px rgba(125, 211, 252, 0.4);
+    transform: translateY(-5px);
+}
+
+.game-account-card:active {
+    transform: translateY(-3px) scale(0.98);
+}
+
+.game-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 2px 8px rgba(125, 211, 252, 0.3));
+}
+
+.game-platform {
+    font-family: 'Righteous', cursive;
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.game-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.game-username {
+    background: rgba(125, 211, 252, 0.1);
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'DM Sans', monospace;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.game-account-card:hover .game-username {
+    background: rgba(125, 211, 252, 0.2);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.copy-indicator {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.game-account-card:hover .copy-indicator {
+    opacity: 1;
+    color: var(--accent-primary);
+}
+
+/* Copy success animation */
+@keyframes copySuccess {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.game-account-card.copied {
+    animation: copySuccess 0.4s ease;
+    border-color: #7bed9f;
+}
+
+.game-account-card.copied .copy-indicator {
+    color: #7bed9f;
+}
+
+/* Toast notification */
+.copy-toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, var(--accent-primary), var(--purple-dark));
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    font-weight: 600;
+    z-index: 10000;
+    animation: slideInUp 0.3s ease, slideOutDown 0.3s ease 2.7s;
+    pointer-events: none;
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .nav-container {
@@ -981,7 +1244,18 @@ body::before {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
     
-    .rat-cursor {
-        display: none;
+    .friends-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-accounts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .copy-toast {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        text-align: center;
     }
 }
