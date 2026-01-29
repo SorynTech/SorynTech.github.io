@@ -1016,3 +1016,5 @@ window.copyToClipboard = copyToClipboard;
 window.handleImageLoad = handleImageLoad;
 window.handleImageError = handleImageError;
 window.copyJsonToClipboard = copyJsonToClipboard;
+
+//End of Script
