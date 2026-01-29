@@ -1,10 +1,10 @@
 {
   "images": [
     {
-      "src": "./images/example-artwork.jpg",
-      "title": "Example Artwork",
-      "description": "This is an example image. Upload your artwork to the /images folder and add entries here!",
-      "timestamp": 1704067200000
+      "src": "./images/test.jpg",
+      "title": "Artwork 1",
+      "description": "",
+      "timestamp": 1769543157994
     }
   ]
 }

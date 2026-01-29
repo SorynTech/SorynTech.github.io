@@ -1,19 +1,15 @@
 name: Deploy with env.js
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: "pages"
   cancel-in-progress: false
-
 jobs:
   deploy:
     environment:
@@ -21,7 +17,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,7 +28,10 @@ jobs:
             SORYN_USER: "${{ secrets.SORYN_USER }}",
             SORYN_PASS: "${{ secrets.SORYN_PASS }}",
             GUEST_USER: "${{ secrets.GUEST_USER }}",
-            GUEST_PASS: "${{ secrets.GUEST_PASS }}"
+            GUEST_PASS: "${{ secrets.GUEST_PASS }}",
+            JSONBIN_API_KEY: "${{ secrets.JSONBIN_API_KEY }}",
+            JSONBIN_BIN_ID: "${{ secrets.JSONBIN_BIN_ID }}",
+            IMGBB_API_KEY: "${{ secrets.IMGBB_API_KEY }}"
           };
           EOF
           echo "✅ env.js created successfully"
@@ -43,7 +41,7 @@ jobs:
         uses: actions/configure-pages@v4
       
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
       
