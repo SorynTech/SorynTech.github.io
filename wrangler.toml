@@ -1,0 +1,8 @@
+# Root-level config so "npx wrangler deploy" from repo root finds the worker.
+# Entry point is the worker script inside worker/
+name = "soryntech-api"
+main = "worker/src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Optional: ALLOWED_ORIGINS = "https://soryntech.github.io"
