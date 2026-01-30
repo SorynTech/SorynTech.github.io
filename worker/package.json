@@ -1,0 +1,16 @@
+{
+  "name": "soryntech-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "hash": "node scripts/hash-password.js"
+  },
+  "dependencies": {
+    "jose": "^5.2.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

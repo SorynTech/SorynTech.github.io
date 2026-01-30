@@ -32,16 +32,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Hidden config element - injected during build, removed after reading -->
-    <div id="app-config" 
-         data-soryn-user="{{SORYN_USER}}"
-         data-soryn-pass="{{SORYN_PASS}}"
-         data-guest-user="{{GUEST_USER}}"
-         data-guest-pass="{{GUEST_PASS}}"
-         data-jsonbin-key="{{JSONBIN_API_KEY}}"
-         data-jsonbin-id="{{JSONBIN_BIN_ID}}"
-         data-imgbb-key="{{IMGBB_API_KEY}}"
-         style="display:none !important; visibility:hidden !important;"></div>
+    <!-- API base URL only (no secrets). Set to your Cloudflare Worker URL, e.g. https://soryntech-api.<account>.workers.dev -->
+    <div id="app-config" data-api-url="https://soryntech-api.YOUR_SUBDOMAIN.workers.dev" style="display:none !important;"></div>
     
     <!-- Cheese Background Elements -->
     <div class="cheese-bg">

@@ -1,27 +1,19 @@
-// Environment Configuration - Embedded at build time
+// API base URL (Cloudflare Worker). No credentials in client.
 const CONFIG = (() => {
-    // Read from data attributes injected during build
-    const configElement = document.getElementById('app-config');
-    const config = {
-        SORYN_USER: configElement?.dataset.sorynUser || "soryn",
-        SORYN_PASS: configElement?.dataset.sorynPass || "ratking123",
-        GUEST_USER: configElement?.dataset.guestUser || "guest",
-        GUEST_PASS: configElement?.dataset.guestPass || "cheese456",
-        JSONBIN_API_KEY: configElement?.dataset.jsonbinKey || "",
-        JSONBIN_BIN_ID: configElement?.dataset.jsonbinId || "",
-        IMGBB_API_KEY: configElement?.dataset.imgbbKey || ""
-    };
-    
-    // Remove the config element from DOM to hide credentials
-    if (configElement) {
-        configElement.remove();
-    }
-    
-    return Object.freeze(config);
+    const el = document.getElementById('app-config');
+    const apiUrl = (el?.dataset?.apiUrl || '').replace(/\/$/, '');
+    if (el) el.remove();
+    return Object.freeze({ API_BASE_URL: apiUrl });
 })();
 
-// JSONBin API Endpoints
-const JSONBIN_BASE_URL = "https://api.jsonbin.io/v3";
+function getAuthToken() {
+    return sessionStorage.getItem('authToken');
+}
+
+function setAuthToken(token) {
+    if (token) sessionStorage.setItem('authToken', token);
+    else sessionStorage.removeItem('authToken');
+}
 
 // Current user state
 let currentUser = {
@@ -44,173 +36,107 @@ document.addEventListener('DOMContentLoaded', async function() {
     initProfileEditing();
     initBotsSection();
     initGallery();
-    checkAuthState();
-    
-    // Check API configuration
-    if (!CONFIG.JSONBIN_API_KEY || CONFIG.JSONBIN_API_KEY === "YOUR_JSONBIN_API_KEY_HERE") {
-        showNotification('⚠️ JSONBin API key not configured! Check env.js', 'warning');
-    }
-    
-    // Load all data from JSONBin
-    await loadAllData();
+    await checkAuthState();
+    if (currentUser.isLoggedIn) await loadAllData();
 });
 
 // ===========================
-// JSONBIN API FUNCTIONS
+// API (Worker proxy) – no keys in client
 // ===========================
 
-async function initializeJSONBin() {
-    if (!CONFIG.JSONBIN_API_KEY) {
-        console.error('JSONBin API key is missing!');
+async function loadFromJSONBin() {
+    if (!CONFIG.API_BASE_URL) {
+        showNotification('⚠️ API URL not configured (data-api-url)', 'warning');
         return null;
     }
-    
-    // Check if bin ID exists
-    if (!CONFIG.JSONBIN_BIN_ID || CONFIG.JSONBIN_BIN_ID === "YOUR_BIN_ID_HERE") {
-        // Create initial bin
-        return await createInitialBin();
-    }
-    
-    return CONFIG.JSONBIN_BIN_ID;
-}
-
-async function createInitialBin() {
-    const initialData = {
-        bots: [],
-        profile: {
-            name: "SorynTech",
-            role: "Backend Developer",
-            image: "profile.jpg",
-            socials: {
-                twitter: "https://x.com/ZippyDrawz_",
-                instagram: "https://www.instagram.com/zippydrawz.offical__/",
-                github: "https://github.com/sorynTech",
-                discord: "https://Discord.gg/users/447812883158532106",
-                kofi: "https://Ko-fi.com/soryntech"
-            }
-        },
-        gallery: []
-    };
-    
+    const token = getAuthToken();
+    if (!token) return null;
     try {
-        const response = await fetch(`${JSONBIN_BASE_URL}/b`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': CONFIG.JSONBIN_API_KEY,
-                'X-Bin-Name': 'portfolio-data'
-            },
-            body: JSON.stringify(initialData)
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/data`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        
         if (response.ok) {
-            const result = await response.json();
-            const binId = result.metadata.id;
-            
-            showNotification(`✅ Bin created! Add this to env.js: ${binId}`, 'success');
-            console.log('🎉 Your Bin ID:', binId);
-            console.log('Add this to env.js as JSONBIN_BIN_ID');
-            
-            return binId;
+            const data = await response.json();
+            return data;
         }
-    } catch (error) {
-        console.error('Error creating bin:', error);
-        showNotification('❌ Failed to create JSONBin. Check console.', 'error');
-    }
-    
-    return null;
-}
-
-async function loadFromJSONBin() {
-    const binId = await initializeJSONBin();
-    if (!binId) return null;
-    
-    try {
-        const response = await fetch(`${JSONBIN_BASE_URL}/b/${binId}/latest`, {
-            headers: {
-                'X-Master-Key': CONFIG.JSONBIN_API_KEY
-            }
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            return result.record;
-        } else {
-            console.error('Failed to load from JSONBin:', response.status);
-            return null;
+        if (response.status === 401) {
+            setAuthToken(null);
+            currentUser = { username: null, role: 'guest', isLoggedIn: false };
+            updateUIForRole();
         }
-    } catch (error) {
-        console.error('Error loading from JSONBin:', error);
-        showNotification('⚠️ Could not connect to JSONBin', 'warning');
+        return null;
+    } catch (e) {
+        console.error('Error loading data:', e);
+        showNotification('⚠️ Could not connect to API', 'warning');
         return null;
     }
 }
 
 async function saveToJSONBin(data) {
-    const binId = await initializeJSONBin();
-    if (!binId) {
-        showNotification('❌ JSONBin not configured!', 'error');
+    if (!CONFIG.API_BASE_URL) {
+        showNotification('❌ API URL not configured', 'error');
         return false;
     }
-    
+    const token = getAuthToken();
+    if (!token) {
+        showNotification('❌ Not logged in', 'error');
+        return false;
+    }
     try {
-        const response = await fetch(`${JSONBIN_BASE_URL}/b/${binId}`, {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/data`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Master-Key': CONFIG.JSONBIN_API_KEY
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });
-        
         if (response.ok) {
             showNotification('✅ Saved to cloud!', 'success');
             return true;
-        } else {
-            console.error('Failed to save to JSONBin:', response.status);
-            showNotification('❌ Failed to save to cloud', 'error');
-            return false;
         }
-    } catch (error) {
-        console.error('Error saving to JSONBin:', error);
+        const err = await response.json().catch(() => ({}));
+        showNotification(err.error || '❌ Failed to save', 'error');
+        return false;
+    } catch (e) {
+        console.error('Error saving:', e);
         showNotification('❌ Network error while saving', 'error');
         return false;
     }
 }
 
 // ===========================
-// IMGBB API FUNCTIONS
+// IMAGE UPLOAD (via Worker proxy)
 // ===========================
 
 async function uploadToImgBB(file) {
-    if (!CONFIG.IMGBB_API_KEY || CONFIG.IMGBB_API_KEY === "YOUR_IMGBB_API_KEY_HERE") {
-        showNotification('⚠️ ImgBB API key not configured! Check env.js', 'warning');
+    if (!CONFIG.API_BASE_URL) {
+        showNotification('⚠️ API URL not configured', 'warning');
         return null;
     }
-    
+    const token = getAuthToken();
+    if (!token) {
+        showNotification('❌ Not logged in', 'error');
+        return null;
+    }
     const formData = new FormData();
     formData.append('image', file);
-    
     try {
-        showNotification('⏳ Uploading image to ImgBB...', 'info');
-        
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.IMGBB_API_KEY}`, {
+        showNotification('⏳ Uploading image...', 'info');
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
             method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
-        
-        if (response.ok) {
-            const result = await response.json();
-            showNotification('✅ Image uploaded successfully!', 'success');
-            return result.data.url;
-        } else {
-            const error = await response.json();
-            console.error('ImgBB upload failed:', error);
-            showNotification('❌ Image upload failed', 'error');
-            return null;
+        const result = await response.json().catch(() => ({}));
+        if (response.ok && result.url) {
+            showNotification('✅ Image uploaded!', 'success');
+            return result.url;
         }
-    } catch (error) {
-        console.error('Error uploading to ImgBB:', error);
+        showNotification(result.error || '❌ Upload failed', 'error');
+        return null;
+    } catch (e) {
+        console.error('Upload error:', e);
         showNotification('❌ Network error during upload', 'error');
         return null;
     }
@@ -324,63 +250,76 @@ function initAuth() {
     });
 }
 
-function attemptLogin() {
-    const username = document.getElementById('loginUsername').value;
+async function attemptLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
     const loginModal = document.getElementById('loginModal');
 
-    if (username === CONFIG.SORYN_USER && password === CONFIG.SORYN_PASS) {
-        login('owner', CONFIG.SORYN_USER);
-        loginModal.classList.remove('active');
-    } else if (username === CONFIG.GUEST_USER && password === CONFIG.GUEST_PASS) {
-        login('guest', CONFIG.GUEST_USER);
-        loginModal.classList.remove('active');
-    } else {
-        alert('❌ Invalid credentials! Try again, rat.');
-        document.getElementById('loginPassword').value = '';
+    if (!CONFIG.API_BASE_URL) {
+        alert('❌ API URL not configured. Set data-api-url on #app-config.');
+        return;
+    }
+    if (!username || !password) {
+        alert('❌ Enter username and password.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.token && data.role) {
+            setAuthToken(data.token);
+            login(data.role, data.username);
+            loginModal.classList.remove('active');
+            await loadAllData();
+        } else {
+            alert(data.error || '❌ Invalid credentials! Try again, rat.');
+            document.getElementById('loginPassword').value = '';
+        }
+    } catch (e) {
+        console.error('Login error:', e);
+        alert('❌ Could not reach API. Check URL and network.');
     }
 }
 
 function login(role, username) {
-    currentUser = {
-        username: username,
-        role: role,
-        isLoggedIn: true
-    };
-
-    sessionStorage.setItem('currentUser', username);
-    sessionStorage.setItem('userRole', role);
-
+    currentUser = { username, role, isLoggedIn: true };
     updateUIForRole();
     unlockGallery();
 }
 
 function logout() {
-    currentUser = {
-        username: null,
-        role: 'guest',
-        isLoggedIn: false
-    };
-
-    sessionStorage.removeItem('currentUser');
-    sessionStorage.removeItem('userRole');
-
+    currentUser = { username: null, role: 'guest', isLoggedIn: false };
+    setAuthToken(null);
     updateUIForRole();
     location.reload();
 }
 
-function checkAuthState() {
-    const savedUser = sessionStorage.getItem('currentUser');
-    const savedRole = sessionStorage.getItem('userRole');
-
-    if (savedUser && savedRole) {
-        currentUser = {
-            username: savedUser,
-            role: savedRole,
-            isLoggedIn: true
-        };
-        updateUIForRole();
-        unlockGallery();
+async function checkAuthState() {
+    const token = getAuthToken();
+    if (!token || !CONFIG.API_BASE_URL) return;
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            currentUser = {
+                username: data.username,
+                role: data.role,
+                isLoggedIn: true
+            };
+            updateUIForRole();
+            unlockGallery();
+        } else {
+            setAuthToken(null);
+        }
+    } catch {
+        setAuthToken(null);
     }
 }
 
@@ -550,16 +489,33 @@ async function saveImageUrl() {
     await saveAllData();
 }
 
-function checkGalleryPassword() {
-    const username = document.getElementById('artUsername').value;
+async function checkGalleryPassword() {
+    const username = document.getElementById('artUsername').value.trim();
     const password = document.getElementById('artPassword').value;
-
-    if ((username === CONFIG.SORYN_USER && password === CONFIG.SORYN_PASS) ||
-        (username === CONFIG.GUEST_USER && password === CONFIG.GUEST_PASS)) {
-        unlockGallery();
-    } else {
-        alert('❌ Access denied! Wrong credentials, rat.');
-        document.getElementById('artPassword').value = '';
+    if (!CONFIG.API_BASE_URL || !username || !password) {
+        alert('❌ Enter username and password.');
+        return;
+    }
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.token && data.role) {
+            setAuthToken(data.token);
+            currentUser = { username: data.username, role: data.role, isLoggedIn: true };
+            updateUIForRole();
+            unlockGallery();
+            await loadAllData();
+        } else {
+            alert(data.error || '❌ Access denied! Wrong credentials, rat.');
+            document.getElementById('artPassword').value = '';
+        }
+    } catch (e) {
+        console.error('Login error:', e);
+        alert('❌ Could not reach API.');
     }
 }
 
