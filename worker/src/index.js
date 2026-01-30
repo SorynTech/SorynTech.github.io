@@ -69,10 +69,34 @@ export default {
 };
 
 function isAllowedOrigin(origin, env) {
+  let originHost;
+  try {
+    originHost = new URL(origin).host;
+  } catch {
+    return false;
+  }
+  if (!originHost) return false;
+
   const allowed = env.ALLOWED_ORIGINS || 'https://soryntech.github.io';
   const list = allowed.split(',').map((o) => o.trim()).filter(Boolean);
   if (list.length === 0) return true;
-  return list.some((o) => origin === o || origin.endsWith(o));
+
+  return list.some((entry) => {
+    // Dot-prefixed pattern: e.g. ".github.io" allows "github.io" and "*.github.io"
+    if (entry.startsWith('.')) {
+      const suffix = entry;
+      const bare = entry.slice(1);
+      return originHost === bare || (originHost.length > suffix.length && originHost.endsWith(suffix));
+    }
+    // Full URL or bare host: exact host match only
+    let allowedHost;
+    try {
+      allowedHost = entry.includes('://') ? new URL(entry).host : entry;
+    } catch {
+      return false;
+    }
+    return originHost === allowedHost;
+  });
 }
 
 function corsResponse(status, env) {
@@ -121,7 +145,7 @@ async function verifyPassword(password, storedHashHex, saltBase64) {
   const derived = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt: new TextEncoder().encode(salt),
+      salt: saltBytes,
       iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256',
     },
