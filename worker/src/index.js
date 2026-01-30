@@ -173,8 +173,17 @@ async function handleLogin(request, env, origin) {
   const ownerHash = env.OWNER_PASSWORD_HASH;
   const guestHash = env.GUEST_PASSWORD_HASH;
 
-  if (!salt || !ownerHash || !guestHash) {
-    return jsonResponse({ error: 'Server configuration error' }, 500, env, origin);
+  const missing = [];
+  if (!salt) missing.push('PASSWORD_SALT');
+  if (!ownerHash) missing.push('OWNER_PASSWORD_HASH');
+  if (!guestHash) missing.push('GUEST_PASSWORD_HASH');
+  if (missing.length) {
+    return jsonResponse(
+      { error: 'Server configuration error', missing: missing },
+      500,
+      env,
+      origin
+    );
   }
 
   let role = null;
