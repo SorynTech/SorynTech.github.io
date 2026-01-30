@@ -1,13 +1,11 @@
 /**
- * SorynTech API – Cloudflare Worker
+ * SorynTech API – Cloudflare Worker (SIMPLIFIED - No Password Hashing)
  * Proxies JSONBin + ImgBB, JWT auth (owner/guest), CORS, validation.
  */
 import { SignJWT, jwtVerify } from 'jose';
 
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
 const IMGBB_UPLOAD = 'https://api.imgbb.com/1/upload';
-const PBKDF2_ITERATIONS = 100000;
-const PBKDF2_KEY_LEN = 32;
 const JWT_ISSUER = 'soryntech-api';
 const JWT_AUDIENCE = 'soryntech-app';
 
@@ -25,9 +23,6 @@ export default {
     if (!isAllowedOrigin(origin, env)) {
       return jsonResponse({ error: 'Forbidden' }, 403, env, origin);
     }
-
-    // Rate limit (simple: use CF cache or skip; for strict limit use KV/Durable Objects)
-    // Optional: check X-Forwarded-For / CF-Connecting-IP and increment in KV
 
     try {
       // Public: health
@@ -128,36 +123,7 @@ function jsonResponse(body, status, env, origin) {
   });
 }
 
-function base64ToBytes(base64) {
-  const binary = atob(base64);
-  return new Uint8Array(binary.length).map((_, i) => binary.charCodeAt(i));
-}
-
-async function verifyPassword(password, storedHashHex, saltBase64) {
-  const saltBytes = base64ToBytes(saltBase64);
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits']
-  );
-  const derived = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt: saltBytes,
-      iterations: PBKDF2_ITERATIONS,
-      hash: 'SHA-256',
-    },
-    key,
-    PBKDF2_KEY_LEN * 8
-  );
-  const derivedHex = Array.from(new Uint8Array(derived))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-  return derivedHex === storedHashHex;
-}
-
+// SIMPLIFIED LOGIN - Direct password comparison (no hashing)
 async function handleLogin(request, env, origin) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -170,14 +136,14 @@ async function handleLogin(request, env, origin) {
 
     const ownerUser = env.OWNER_USERNAME || 'owner';
     const guestUser = env.GUEST_USERNAME || 'guest';
-    const salt = env.PASSWORD_SALT;
-    const ownerHash = env.OWNER_PASSWORD_HASH;
-    const guestHash = env.GUEST_PASSWORD_HASH;
+    const ownerPassword = env.OWNER_PASSWORD;
+    const guestPassword = env.GUEST_PASSWORD;
 
+    // Check for missing secrets
     const missing = [];
-    if (!salt) missing.push('PASSWORD_SALT');
-    if (!ownerHash) missing.push('OWNER_PASSWORD_HASH');
-    if (!guestHash) missing.push('GUEST_PASSWORD_HASH');
+    if (!ownerPassword) missing.push('OWNER_PASSWORD');
+    if (!guestPassword) missing.push('GUEST_PASSWORD');
+    if (!env.JWT_SECRET) missing.push('JWT_SECRET');
     if (missing.length) {
       return jsonResponse(
         { error: 'Server configuration error', missing: missing },
@@ -187,10 +153,11 @@ async function handleLogin(request, env, origin) {
       );
     }
 
+    // Simple password comparison
     let role = null;
-    if (username === ownerUser && (await verifyPassword(password, ownerHash, salt))) {
+    if (username === ownerUser && password === ownerPassword) {
       role = 'owner';
-    } else if (username === guestUser && (await verifyPassword(password, guestHash, salt))) {
+    } else if (username === guestUser && password === guestPassword) {
       role = 'guest';
     }
 
@@ -198,10 +165,7 @@ async function handleLogin(request, env, origin) {
       return jsonResponse({ error: 'Invalid credentials' }, 401, env, origin);
     }
 
-    if (!env.JWT_SECRET) {
-      return jsonResponse({ error: 'Server configuration error', missing: ['JWT_SECRET'] }, 500, env, origin);
-    }
-
+    // Generate JWT token
     const secret = new TextEncoder().encode(env.JWT_SECRET);
     const token = await new SignJWT({ sub: username, role })
       .setProtectedHeader({ alg: 'HS256' })
