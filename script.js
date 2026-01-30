@@ -1,17 +1,20 @@
-// Environment Configuration - Hide from console
+// Environment Configuration - Embedded at build time
 const CONFIG = (() => {
+    // Read from data attributes injected during build
+    const configElement = document.getElementById('app-config');
     const config = {
-        SORYN_USER: window.ENV?.SORYN_USER || "soryn",
-        SORYN_PASS: window.ENV?.SORYN_PASS || "ratking123",
-        GUEST_USER: window.ENV?.GUEST_USER || "guest",
-        GUEST_PASS: window.ENV?.GUEST_PASS || "cheese456",
-        JSONBIN_API_KEY: window.ENV?.JSONBIN_API_KEY || "",
-        JSONBIN_BIN_ID: window.ENV?.JSONBIN_BIN_ID || "",
-        IMGBB_API_KEY: window.ENV?.IMGBB_API_KEY || ""
+        SORYN_USER: configElement?.dataset.sorynUser || "soryn",
+        SORYN_PASS: configElement?.dataset.sorynPass || "ratking123",
+        GUEST_USER: configElement?.dataset.guestUser || "guest",
+        GUEST_PASS: configElement?.dataset.guestPass || "cheese456",
+        JSONBIN_API_KEY: configElement?.dataset.jsonbinKey || "",
+        JSONBIN_BIN_ID: configElement?.dataset.jsonbinId || "",
+        IMGBB_API_KEY: configElement?.dataset.imgbbKey || ""
     };
     
-    if (window.ENV) {
-        delete window.ENV;
+    // Remove the config element from DOM to hide credentials
+    if (configElement) {
+        configElement.remove();
     }
     
     return Object.freeze(config);

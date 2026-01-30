@@ -7,7 +7,7 @@
     <!-- Primary Meta Tags -->
     <title>SorynTech - The Rat | Backend Developer & Artist</title>
     <meta name="title" content="SorynTech - The Rat | Backend Developer & Artist">
-    <meta name="description" content="Portfolio of SorynTech - Backend Developer, Artist, and Discord Bot Creator. Check out my art gallery, Discord bots, and connect with me!">
+    <meta name="description" content="Portfolio of SorynTech - Backend Developer, Artist, and Discord Bot Creator. Check out my art gallery, Discord bots, and projects!">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -32,6 +32,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Hidden config element - injected during build, removed after reading -->
+    <div id="app-config" 
+         data-soryn-user="{{SORYN_USER}}"
+         data-soryn-pass="{{SORYN_PASS}}"
+         data-guest-user="{{GUEST_USER}}"
+         data-guest-pass="{{GUEST_PASS}}"
+         data-jsonbin-key="{{JSONBIN_API_KEY}}"
+         data-jsonbin-id="{{JSONBIN_BIN_ID}}"
+         data-imgbb-key="{{IMGBB_API_KEY}}"
+         style="display:none !important; visibility:hidden !important;"></div>
+    
     <!-- Cheese Background Elements -->
     <div class="cheese-bg">
         <div class="cheese-piece" style="top: 10%; left: 5%;">🧀</div>
@@ -292,7 +303,6 @@
         </div>
     </div>
 
-    <script src="env.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

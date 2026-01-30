@@ -15,16 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Create env.js from secrets
+      - name: Inject secrets into HTML
         run: |
-          cat > env.js << 'EOF'
-          window.ENV = {
-            SORYN_USER: "${{ secrets.SORYN_USER }}",
-            SORYN_PASS: "${{ secrets.SORYN_PASS }}",
-            GUEST_USER: "${{ secrets.GUEST_USER }}",
-            GUEST_PASS: "${{ secrets.GUEST_PASS }}"
-          };
-          EOF
+          # Replace placeholders in index.html with actual secrets
+          sed -i "s/{{SORYN_USER}}/${{ secrets.SORYN_USER }}/g" index.html
+          sed -i "s/{{SORYN_PASS}}/${{ secrets.SORYN_PASS }}/g" index.html
+          sed -i "s/{{GUEST_USER}}/${{ secrets.GUEST_USER }}/g" index.html
+          sed -i "s/{{GUEST_PASS}}/${{ secrets.GUEST_PASS }}/g" index.html
+          sed -i "s/{{JSONBIN_API_KEY}}/${{ secrets.JSONBIN_API_KEY }}/g" index.html
+          sed -i "s/{{JSONBIN_BIN_ID}}/${{ secrets.JSONBIN_BIN_ID }}/g" index.html
+          sed -i "s/{{IMGBB_API_KEY}}/${{ secrets.IMGBB_API_KEY }}/g" index.html
       
       - name: Setup Pages
         uses: actions/configure-pages@v3
