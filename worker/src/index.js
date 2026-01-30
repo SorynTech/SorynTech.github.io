@@ -37,27 +37,27 @@ export default {
 
       // Auth: login
       if (url.pathname === '/api/auth/login' && method === 'POST') {
-        return handleLogin(request, env, origin);
+        return await handleLogin(request, env, origin);
       }
 
       // Auth: me (validate token)
       if (url.pathname === '/api/auth/me' && method === 'GET') {
-        return handleAuthMe(request, env, origin);
+        return await handleAuthMe(request, env, origin);
       }
 
       // Data: GET (read) – allow guest or owner
       if (url.pathname === '/api/data' && method === 'GET') {
-        return handleDataGet(request, env, origin);
+        return await handleDataGet(request, env, origin);
       }
 
       // Data: PUT (write) – owner only
       if (url.pathname === '/api/data' && method === 'PUT') {
-        return handleDataPut(request, env, origin);
+        return await handleDataPut(request, env, origin);
       }
 
       // Upload: POST – owner only
       if (url.pathname === '/api/upload' && method === 'POST') {
-        return handleUpload(request, env, origin);
+        return await handleUpload(request, env, origin);
       }
 
       return jsonResponse({ error: 'Not Found' }, 404, env, origin);
@@ -159,58 +159,67 @@ async function verifyPassword(password, storedHashHex, saltBase64) {
 }
 
 async function handleLogin(request, env, origin) {
-  const body = await request.json().catch(() => ({}));
-  const username = typeof body.username === 'string' ? body.username.trim() : '';
-  const password = typeof body.password === 'string' ? body.password : '';
+  try {
+    const body = await request.json().catch(() => ({}));
+    const username = typeof body.username === 'string' ? body.username.trim() : '';
+    const password = typeof body.password === 'string' ? body.password : '';
 
-  if (!username || !password) {
-    return jsonResponse({ error: 'Invalid request' }, 400, env, origin);
-  }
+    if (!username || !password) {
+      return jsonResponse({ error: 'Invalid request' }, 400, env, origin);
+    }
 
-  const ownerUser = env.OWNER_USERNAME || 'owner';
-  const guestUser = env.GUEST_USERNAME || 'guest';
-  const salt = env.PASSWORD_SALT;
-  const ownerHash = env.OWNER_PASSWORD_HASH;
-  const guestHash = env.GUEST_PASSWORD_HASH;
+    const ownerUser = env.OWNER_USERNAME || 'owner';
+    const guestUser = env.GUEST_USERNAME || 'guest';
+    const salt = env.PASSWORD_SALT;
+    const ownerHash = env.OWNER_PASSWORD_HASH;
+    const guestHash = env.GUEST_PASSWORD_HASH;
 
-  const missing = [];
-  if (!salt) missing.push('PASSWORD_SALT');
-  if (!ownerHash) missing.push('OWNER_PASSWORD_HASH');
-  if (!guestHash) missing.push('GUEST_PASSWORD_HASH');
-  if (missing.length) {
+    const missing = [];
+    if (!salt) missing.push('PASSWORD_SALT');
+    if (!ownerHash) missing.push('OWNER_PASSWORD_HASH');
+    if (!guestHash) missing.push('GUEST_PASSWORD_HASH');
+    if (missing.length) {
+      return jsonResponse(
+        { error: 'Server configuration error', missing: missing },
+        500,
+        env,
+        origin
+      );
+    }
+
+    let role = null;
+    if (username === ownerUser && (await verifyPassword(password, ownerHash, salt))) {
+      role = 'owner';
+    } else if (username === guestUser && (await verifyPassword(password, guestHash, salt))) {
+      role = 'guest';
+    }
+
+    if (!role) {
+      return jsonResponse({ error: 'Invalid credentials' }, 401, env, origin);
+    }
+
+    if (!env.JWT_SECRET) {
+      return jsonResponse({ error: 'Server configuration error', missing: ['JWT_SECRET'] }, 500, env, origin);
+    }
+
+    const secret = new TextEncoder().encode(env.JWT_SECRET);
+    const token = await new SignJWT({ sub: username, role })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuer(JWT_ISSUER)
+      .setAudience(JWT_AUDIENCE)
+      .setExpirationTime('7d')
+      .sign(secret);
+
     return jsonResponse(
-      { error: 'Server configuration error', missing: missing },
-      500,
+      { token, role, username },
+      200,
       env,
       origin
     );
+  } catch (e) {
+    console.error(e);
+    return jsonResponse({ error: 'Internal Server Error' }, 500, env, origin);
   }
-
-  let role = null;
-  if (username === ownerUser && (await verifyPassword(password, ownerHash, salt))) {
-    role = 'owner';
-  } else if (username === guestUser && (await verifyPassword(password, guestHash, salt))) {
-    role = 'guest';
-  }
-
-  if (!role) {
-    return jsonResponse({ error: 'Invalid credentials' }, 401, env, origin);
-  }
-
-  const secret = new TextEncoder().encode(env.JWT_SECRET);
-  const token = await new SignJWT({ sub: username, role })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuer(JWT_ISSUER)
-    .setAudience(JWT_AUDIENCE)
-    .setExpirationTime('7d')
-    .sign(secret);
-
-  return jsonResponse(
-    { token, role, username },
-    200,
-    env,
-    origin
-  );
 }
 
 async function getAuth(request, env) {

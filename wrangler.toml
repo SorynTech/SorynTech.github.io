@@ -5,4 +5,5 @@ main = "worker/src/index.js"
 compatibility_date = "2024-01-01"
 
 [vars]
-# Optional: ALLOWED_ORIGINS = "https://soryntech.github.io"
+# CORS: comma-separated origins that can call this Worker (your GitHub Pages URL).
+ALLOWED_ORIGINS = "https://soryntech.github.io"
