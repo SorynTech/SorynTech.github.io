@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Check API configuration
     if (!CONFIG.JSONBIN_API_KEY || CONFIG.JSONBIN_API_KEY === "YOUR_JSONBIN_API_KEY_HERE") {
-        showNotification('âš ï¸ JSONBin API key not configured! Check env.js', 'warning');
+        showNotification('⚠️ JSONBin API key not configured! Check env.js', 'warning');
     }
     
     // Load all data from JSONBin
@@ -107,15 +107,15 @@ async function createInitialBin() {
             const result = await response.json();
             const binId = result.metadata.id;
             
-            showNotification(`âœ… Bin created! Add this to env.js: ${binId}`, 'success');
-            console.log('ðŸŽ‰ Your Bin ID:', binId);
+            showNotification(`✅ Bin created! Add this to env.js: ${binId}`, 'success');
+            console.log('🎉 Your Bin ID:', binId);
             console.log('Add this to env.js as JSONBIN_BIN_ID');
             
             return binId;
         }
     } catch (error) {
         console.error('Error creating bin:', error);
-        showNotification('âŒ Failed to create JSONBin. Check console.', 'error');
+        showNotification('❌ Failed to create JSONBin. Check console.', 'error');
     }
     
     return null;
@@ -141,7 +141,7 @@ async function loadFromJSONBin() {
         }
     } catch (error) {
         console.error('Error loading from JSONBin:', error);
-        showNotification('âš ï¸ Could not connect to JSONBin', 'warning');
+        showNotification('⚠️ Could not connect to JSONBin', 'warning');
         return null;
     }
 }
@@ -149,7 +149,7 @@ async function loadFromJSONBin() {
 async function saveToJSONBin(data) {
     const binId = await initializeJSONBin();
     if (!binId) {
-        showNotification('âŒ JSONBin not configured!', 'error');
+        showNotification('❌ JSONBin not configured!', 'error');
         return false;
     }
     
@@ -164,16 +164,16 @@ async function saveToJSONBin(data) {
         });
         
         if (response.ok) {
-            showNotification('âœ… Saved to cloud!', 'success');
+            showNotification('✅ Saved to cloud!', 'success');
             return true;
         } else {
             console.error('Failed to save to JSONBin:', response.status);
-            showNotification('âŒ Failed to save to cloud', 'error');
+            showNotification('❌ Failed to save to cloud', 'error');
             return false;
         }
     } catch (error) {
         console.error('Error saving to JSONBin:', error);
-        showNotification('âŒ Network error while saving', 'error');
+        showNotification('❌ Network error while saving', 'error');
         return false;
     }
 }
@@ -184,7 +184,7 @@ async function saveToJSONBin(data) {
 
 async function uploadToImgBB(file) {
     if (!CONFIG.IMGBB_API_KEY || CONFIG.IMGBB_API_KEY === "YOUR_IMGBB_API_KEY_HERE") {
-        showNotification('âš ï¸ ImgBB API key not configured! Check env.js', 'warning');
+        showNotification('⚠️ ImgBB API key not configured! Check env.js', 'warning');
         return null;
     }
     
@@ -192,7 +192,7 @@ async function uploadToImgBB(file) {
     formData.append('image', file);
     
     try {
-        showNotification('â³ Uploading image to ImgBB...', 'info');
+        showNotification('⏳ Uploading image to ImgBB...', 'info');
         
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.IMGBB_API_KEY}`, {
             method: 'POST',
@@ -201,17 +201,17 @@ async function uploadToImgBB(file) {
         
         if (response.ok) {
             const result = await response.json();
-            showNotification('âœ… Image uploaded successfully!', 'success');
+            showNotification('✅ Image uploaded successfully!', 'success');
             return result.data.url;
         } else {
             const error = await response.json();
             console.error('ImgBB upload failed:', error);
-            showNotification('âŒ Image upload failed', 'error');
+            showNotification('❌ Image upload failed', 'error');
             return null;
         }
     } catch (error) {
         console.error('Error uploading to ImgBB:', error);
-        showNotification('âŒ Network error during upload', 'error');
+        showNotification('❌ Network error during upload', 'error');
         return null;
     }
 }
@@ -242,7 +242,7 @@ async function loadAllData() {
         }
     } catch (error) {
         console.error('Error loading data:', error);
-        showNotification('âš ï¸ Could not load data from cloud', 'warning');
+        showNotification('⚠️ Could not load data from cloud', 'warning');
     }
 }
 
@@ -336,7 +336,7 @@ function attemptLogin() {
         login('guest', CONFIG.GUEST_USER);
         loginModal.classList.remove('active');
     } else {
-        alert('âŒ Invalid credentials! Try again, rat.');
+        alert('❌ Invalid credentials! Try again, rat.');
         document.getElementById('loginPassword').value = '';
     }
 }
@@ -390,11 +390,11 @@ function updateUIForRole() {
     const badgeText = userBadge.querySelector('.badge-text');
 
     if (currentUser.isLoggedIn) {
-        badgeIcon.textContent = currentUser.role === 'owner' ? 'ðŸ‘‘' : 'ðŸ€';
+        badgeIcon.textContent = currentUser.role === 'owner' ? '👑' : '🐀';
         badgeText.textContent = currentUser.username;
         userBadge.title = 'Click to logout';
     } else {
-        badgeIcon.textContent = 'ðŸ”’';
+        badgeIcon.textContent = '🔒';
         badgeText.textContent = 'Login';
         userBadge.title = 'Click to login';
     }
@@ -446,7 +446,7 @@ function initGallery() {
 
 async function handleImageUpload(event) {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can upload images!');
+        alert('❌ Only the owner can upload images!');
         return;
     }
 
@@ -455,7 +455,7 @@ async function handleImageUpload(event) {
 
     for (let file of files) {
         if (!file.type.startsWith('image/')) {
-            showNotification(`âš ï¸ ${file.name} is not an image`, 'warning');
+            showNotification(`⚠️ ${file.name} is not an image`, 'warning');
             continue;
         }
 
@@ -482,7 +482,7 @@ async function handleImageUpload(event) {
 
 function addImageUrlModal() {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can add images!');
+        alert('❌ Only the owner can add images!');
         return;
     }
 
@@ -491,7 +491,7 @@ function addImageUrlModal() {
     const modalBody = document.getElementById('modalBody');
 
     modal.classList.add('active');
-    modalTitle.textContent = 'ðŸ–¼ï¸ Add Image to Gallery';
+    modalTitle.textContent = '🖼️ Add Image to Gallery';
     
     modalBody.innerHTML = `
         <label>Image URL</label>
@@ -499,14 +499,14 @@ function addImageUrlModal() {
         
         <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-                <strong>ðŸ“¸ Upload to ImgBB first:</strong><br>
+                <strong>📸 Upload to ImgBB first:</strong><br>
                 1. Go to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">imgbb.com</a><br>
                 2. Upload your image<br>
                 3. Copy the direct link<br>
                 4. Paste it above
             </p>
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
-                <strong>ðŸ’¡ Or use the Upload button to auto-upload!</strong>
+                <strong>💡 Or use the Upload button to auto-upload!</strong>
             </p>
         </div>
         
@@ -516,7 +516,7 @@ function addImageUrlModal() {
         <label>Image Description (optional)</label>
         <textarea id="imageDescInput" rows="2" placeholder="Description of the artwork"></textarea>
         
-        <button onclick="saveImageUrl()">Add to Gallery ðŸ€</button>
+        <button onclick="saveImageUrl()">Add to Gallery 🐀</button>
     `;
 
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
@@ -531,7 +531,7 @@ async function saveImageUrl() {
     const description = document.getElementById('imageDescInput').value.trim();
     
     if (!url) {
-        alert('âŒ Please enter an image URL!');
+        alert('❌ Please enter an image URL!');
         return;
     }
 
@@ -558,7 +558,7 @@ function checkGalleryPassword() {
         (username === CONFIG.GUEST_USER && password === CONFIG.GUEST_PASS)) {
         unlockGallery();
     } else {
-        alert('âŒ Access denied! Wrong credentials, rat.');
+        alert('❌ Access denied! Wrong credentials, rat.');
         document.getElementById('artPassword').value = '';
     }
 }
@@ -589,7 +589,7 @@ function renderGallery() {
     }
 
     const deleteButton = currentUser.role === 'owner' 
-        ? '<button class="delete-btn" onclick="deleteImage(INDEX)">Ã—</button>'
+        ? '<button class="delete-btn" onclick="deleteImage(INDEX)">×</button>'
         : '';
 
     galleryGrid.innerHTML = dataCache.gallery.map((item, index) => `
@@ -621,7 +621,7 @@ function handleImageError(index) {
             const retryBtn = document.createElement('button');
             retryBtn.className = 'delete-btn';
             retryBtn.style.cssText = 'opacity: 1; background: rgba(255, 150, 0, 0.9);';
-            retryBtn.textContent = 'ðŸ”„';
+            retryBtn.textContent = '🔄';
             retryBtn.title = 'Retry loading or click to delete';
             retryBtn.onclick = () => deleteImage(index);
             item.appendChild(retryBtn);
@@ -631,11 +631,11 @@ function handleImageError(index) {
 
 async function deleteImage(index) {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can delete art!');
+        alert('❌ Only the owner can delete art!');
         return;
     }
 
-    if (confirm('ðŸ€ Delete this image from the gallery?')) {
+    if (confirm('🐀 Delete this image from the gallery?')) {
         dataCache.gallery.splice(index, 1);
         renderGallery();
         await saveAllData();
@@ -644,11 +644,11 @@ async function deleteImage(index) {
 
 async function clearGallery() {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can clear the gallery!');
+        alert('❌ Only the owner can clear the gallery!');
         return;
     }
 
-    if (confirm('ðŸ€ Clear the entire gallery? This cannot be undone!')) {
+    if (confirm('🐀 Clear the entire gallery? This cannot be undone!')) {
         dataCache.gallery = [];
         renderGallery();
         await saveAllData();
@@ -680,10 +680,10 @@ function openBotModal(botData = null, index = null) {
     const modalBody = document.getElementById('modalBody');
 
     modal.classList.add('active');
-    modalTitle.textContent = botData ? 'âœï¸ Edit Bot/Project' : 'ðŸ€ Add Bot/Project';
+    modalTitle.textContent = botData ? '✏️ Edit Bot/Project' : '🐀 Add Bot/Project';
 
     const bot = botData || {
-        icon: 'ðŸ¤–',
+        icon: '🤖',
         name: '',
         description: '',
         servers: '',
@@ -695,7 +695,7 @@ function openBotModal(botData = null, index = null) {
 
     modalBody.innerHTML = `
         <label>Bot/Project Icon (emoji)</label>
-        <input type="text" id="botIcon" value="${bot.icon}" placeholder="ðŸ¤–">
+        <input type="text" id="botIcon" value="${bot.icon}" placeholder="🤖">
         
         <label>Bot/Project Name</label>
         <input type="text" id="botName" value="${bot.name}" placeholder="My Awesome Bot">
@@ -721,8 +721,8 @@ function openBotModal(botData = null, index = null) {
             If you store bot files in the repo (e.g., /bots/discord-bot/)
         </p>
         
-        <button onclick="saveBot(${index})">Save Bot/Project ðŸ€</button>
-        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete ðŸ—‘ï¸</button>` : ''}
+        <button onclick="saveBot(${index})">Save Bot/Project 🐀</button>
+        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete 🗑️</button>` : ''}
     `;
 
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
@@ -733,7 +733,7 @@ function openBotModal(botData = null, index = null) {
 
 async function saveBot(index = null) {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can save bots!');
+        alert('❌ Only the owner can save bots!');
         return;
     }
 
@@ -762,11 +762,11 @@ async function saveBot(index = null) {
 
 async function deleteBot(index) {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can delete bots!');
+        alert('❌ Only the owner can delete bots!');
         return;
     }
 
-    if (confirm('ðŸ€ Delete this bot/project?')) {
+    if (confirm('🐀 Delete this bot/project?')) {
         dataCache.bots.splice(index, 1);
         renderBots();
         document.getElementById('editModal').classList.remove('active');
@@ -780,14 +780,14 @@ function renderBots() {
     if (dataCache.bots.length === 0) {
         botsGrid.innerHTML = `
             <div class="bot-card">
-                <div class="bot-icon">ðŸ¤–</div>
+                <div class="bot-icon">🤖</div>
                 <h3 class="bot-name">Example Bot</h3>
                 <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to add your own!</p>
                 <div class="bot-stats">
                     <span class="stat"><strong>1.2K</strong> Servers</span>
                     <span class="stat"><strong>50K</strong> Users</span>
                 </div>
-                <a href="#" class="bot-link">Invite Bot â†’</a>
+                <a href="#" class="bot-link">Invite Bot →</a>
             </div>
         `;
         return;
@@ -814,7 +814,7 @@ function renderBots() {
                     <div class="bot-links" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
                         ${bot.inviteLink ? `
                             <a href="${bot.inviteLink}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
-                                ðŸ“¨ Invite
+                                📨 Invite
                             </a>
                         ` : ''}
                         ${bot.githubRepo ? `
@@ -827,7 +827,7 @@ function renderBots() {
                         ` : ''}
                         ${bot.botFolder ? `
                             <a href="${bot.botFolder}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
-                                ðŸ“ Files
+                                📁 Files
                             </a>
                         ` : ''}
                     </div>
@@ -879,7 +879,7 @@ function initProfileEditing() {
 
 function openEditModal(type, platform = null) {
     if (currentUser.role !== 'owner') {
-        alert('âŒ Only the owner can edit this!');
+        alert('❌ Only the owner can edit this!');
         return;
     }
 
@@ -891,39 +891,39 @@ function openEditModal(type, platform = null) {
 
     switch(type) {
         case 'name':
-            modalTitle.textContent = 'âœï¸ Edit Name';
+            modalTitle.textContent = '✏️ Edit Name';
             modalBody.innerHTML = `
                 <label>Display Name</label>
                 <input type="text" id="editInput" value="${document.getElementById('lanyardName').textContent}">
-                <button onclick="saveEdit('name')">Save ðŸ€</button>
+                <button onclick="saveEdit('name')">Save 🐀</button>
             `;
             break;
         case 'role':
-            modalTitle.textContent = 'âœï¸ Edit Role';
+            modalTitle.textContent = '✏️ Edit Role';
             modalBody.innerHTML = `
                 <label>Your Role/Title</label>
                 <input type="text" id="editInput" value="${document.getElementById('lanyardRole').textContent}">
-                <button onclick="saveEdit('role')">Save ðŸ€</button>
+                <button onclick="saveEdit('role')">Save 🐀</button>
             `;
             break;
         case 'image':
-            modalTitle.textContent = 'âœï¸ Change Profile Picture';
+            modalTitle.textContent = '✏️ Change Profile Picture';
             modalBody.innerHTML = `
                 <label>Image URL (from ImgBB)</label>
                 <input type="text" id="editInput" placeholder="https://i.ibb.co/xxxxx/profile.jpg">
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
                     Upload your profile image to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">ImgBB</a> and paste the URL here
                 </p>
-                <button onclick="saveEdit('image')">Save ðŸ€</button>
+                <button onclick="saveEdit('image')">Save 🐀</button>
             `;
             break;
         case 'social':
-            modalTitle.textContent = `âœï¸ Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
+            modalTitle.textContent = `✏️ Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
             const currentUrl = document.getElementById(`${platform}Link`).getAttribute('href');
             modalBody.innerHTML = `
                 <label>Profile URL</label>
                 <input type="text" id="editInput" value="${currentUrl}" placeholder="https://">
-                <button onclick="saveEdit('social', '${platform}')">Save ðŸ€</button>
+                <button onclick="saveEdit('social', '${platform}')">Save 🐀</button>
             `;
             break;
     }
@@ -1037,7 +1037,7 @@ function showCopyToast(platform, text) {
     toast.className = 'copy-toast';
     toast.innerHTML = `
         <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
-            <span style="font-size: 1.2rem;">âœ…</span>
+            <span style="font-size: 1.2rem;">✅</span>
             <div>
                 <div style="font-size: 0.9rem; margin-bottom: 0.2rem;">${platform} username copied!</div>
                 <div style="font-size: 0.85rem; opacity: 0.9;">${text}</div>
