@@ -862,7 +862,7 @@ body::before {
 }
 
 .gallery-item.loading::after {
-    content: '⏳ Loading...';
+    content: 'â³ Loading...';
     color: var(--text-muted);
     font-size: 0.9rem;
 }
@@ -876,7 +876,7 @@ body::before {
 }
 
 .gallery-item.error::after {
-    content: '❌ Failed to load';
+    content: 'âŒ Failed to load';
     color: var(--accent-secondary);
     font-size: 0.9rem;
     text-align: center;
@@ -1344,6 +1344,125 @@ body::before {
         transform: translateY(100px);
         opacity: 0;
     }
+}
+
+/* Privacy Section */
+.privacy-card {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-card);
+}
+
+.privacy-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.privacy-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.4));
+}
+
+.privacy-header h3 {
+    font-family: 'Righteous', cursive;
+    font-size: 1.8rem;
+    color: var(--accent-primary);
+}
+
+.privacy-intro {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.privacy-block {
+    margin-bottom: 1.75rem;
+}
+
+.privacy-block h4 {
+    font-family: 'Righteous', cursive;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.privacy-block h4 span {
+    font-size: 1.2rem;
+}
+
+.privacy-block p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.privacy-block a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.privacy-block a:hover {
+    color: var(--accent-tertiary);
+}
+
+.privacy-footer-note {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.site-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 2rem;
+}
+
+.site-footer p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.site-footer a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.site-footer a:hover {
+    color: var(--accent-tertiary);
+}
+
+.privacy-footer-link {
+    font-size: 0.8rem;
+    padding: 0;
+}
+
+.privacy-footer-link::after {
+    display: none;
 }
 
 @media (max-width: 768px) {
