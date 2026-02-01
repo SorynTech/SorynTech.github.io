@@ -34,7 +34,7 @@ const CONFIG = (() => {
     });
     async function loadFromJSONBin() {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('âš ï¸ API URL not configured (data-api-url)', 'warning');
+    showNotification('❌ API URL not configured (data-api-url)', 'warning');
     return null;
     }
     const token = getAuthToken();
@@ -55,18 +55,18 @@ const CONFIG = (() => {
     return null;
     } catch (e) {
     console.error('Error loading data:', e);
-    showNotification('âš ï¸ Could not connect to API', 'warning');
+    showNotification('❌ Could not connect to API', 'warning');
     return null;
     }
     }
     async function saveToJSONBin(data) {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('âŒ API URL not configured', 'error');
+    showNotification('❌ API URL not configured', 'error');
     return false;
     }
     const token = getAuthToken();
     if (!token) {
-    showNotification('âŒ Not logged in', 'error');
+    showNotification('❌ Not logged in', 'error');
     return false;
     }
     try {
@@ -79,32 +79,32 @@ const CONFIG = (() => {
     body: JSON.stringify(data)
     });
     if (response.ok) {
-    showNotification('âœ… Saved to cloud!', 'success');
+    showNotification('✅ Saved to cloud!', 'success');
     return true;
     }
     const err = await response.json().catch(() => ({}));
-    showNotification(err.error || 'âŒ Failed to save', 'error');
+    showNotification(err.error || '❌ Failed to save', 'error');
     return false;
     } catch (e) {
     console.error('Error saving:', e);
-    showNotification('âŒ Network error while saving', 'error');
+    showNotification('❌ Network error while saving', 'error');
     return false;
     }
     }
     async function uploadToImgBB(file) {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('âš ï¸ API URL not configured', 'warning');
+    showNotification('❌ API URL not configured', 'warning');
     return null;
     }
     const token = getAuthToken();
     if (!token) {
-    showNotification('âŒ Not logged in', 'error');
+    showNotification('❌ Not logged in', 'error');
     return null;
     }
     const formData = new FormData();
     formData.append('image', file);
     try {
-    showNotification('â³ Uploading image...', 'info');
+    showNotification('⏳ Uploading image...', 'info');
     const response = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}` },
@@ -112,14 +112,14 @@ const CONFIG = (() => {
     });
     const result = await response.json().catch(() => ({}));
     if (response.ok && result.url) {
-    showNotification('âœ… Image uploaded!', 'success');
+    showNotification('✅ Image uploaded!', 'success');
     return result.url;
     }
-    showNotification(result.error || 'âŒ Upload failed', 'error');
+    showNotification(result.error || '❌ Upload failed', 'error');
     return null;
     } catch (e) {
     console.error('Upload error:', e);
-    showNotification('âŒ Network error during upload', 'error');
+    showNotification('❌ Network error during upload', 'error');
     return null;
     }
     }
@@ -146,7 +146,7 @@ const CONFIG = (() => {
     }
     } catch (error) {
     console.error('Error loading data:', error);
-    showNotification('âš ï¸ Could not load data from cloud', 'warning');
+    showNotification('❌ Could not load data from cloud', 'warning');
     }
     }
     async function saveAllData() {
@@ -226,11 +226,11 @@ const CONFIG = (() => {
     const password = document.getElementById('loginPassword').value;
     const loginModal = document.getElementById('loginModal');
     if (!CONFIG.API_BASE_URL) {
-    await showAlert('âŒ API URL not configured. Set data-api-url on #app-config.', 'Configuration Error');
+    await showAlert('❌ API URL not configured. Set data-api-url on #app-config.', 'Configuration Error');
     return;
     }
     if (!username || !password) {
-    await showAlert('âŒ Enter username and password.', 'Missing Credentials');
+    await showAlert('❌ Enter username and password.', 'Missing Credentials');
     return;
     }
     try {
@@ -246,12 +246,12 @@ const CONFIG = (() => {
     loginModal.classList.remove('active');
     await loadAllData();
     } else {
-    await showAlert(data.error || 'âŒ Invalid credentials! Try again, rat.', 'ðŸ€ Access Denied');
+    await showAlert(data.error || '❌ Invalid credentials! Try again, rat.', 'ðŸ€ Access Denied');
     document.getElementById('loginPassword').value = '';
     }
     } catch (e) {
     console.error('Login error:', e);
-    await showAlert('âŒ Could not reach API. Check URL and network.', 'Connection Error');
+    await showAlert('❌ Could not reach API. Check URL and network.', 'Connection Error');
     }
     }
     function login(role, username) {
@@ -388,14 +388,14 @@ const CONFIG = (() => {
     }
     async function handleImageUpload(event) {
     if (currentUser.role !== 'owner') {
-    await showAlert('âŒ Only the owner can upload images!', 'Permission Denied');
+    await showAlert('❌ Only the owner can upload images!', 'Permission Denied');
     return;
     }
     const files = event.target.files;
     if (!files || files.length === 0) return;
     for (let file of files) {
     if (!file.type.startsWith('image/')) {
-    showNotification(`âš ï¸ ${file.name} is not an image`, 'warning');
+    showNotification(`❌ ${file.name} is not an image`, 'warning');
     continue;
     }
     const imageUrl = await uploadToImgBB(file);
@@ -415,14 +415,14 @@ const CONFIG = (() => {
     }
     async function handleCommissionImageUpload(event) {
     if (currentUser.role !== 'owner' && currentUser.role !== 'commission') {
-    await showAlert('âŒ Only the owner or commission artists can upload images!', 'Permission Denied');
+    await showAlert('❌ Only the owner or commission artists can upload images!', 'Permission Denied');
     return;
     }
     const files = event.target.files;
     if (!files || files.length === 0) return;
     for (let file of files) {
     if (!file.type.startsWith('image/')) {
-    showNotification(`âš ï¸ ${file.name} is not an image`, 'warning');
+    showNotification(`❌ ${file.name} is not an image`, 'warning');
     continue;
     }
     const imageUrl = await uploadToImgBB(file);
@@ -442,34 +442,34 @@ const CONFIG = (() => {
     }
     function addImageUrlModal() {
     if (currentUser.role !== 'owner') {
-    showAlert('âŒ Only the owner can add images!', 'Permission Denied');
+    showAlert('❌ Only the owner can add images!', 'Permission Denied');
     return;
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     modal.classList.add('active');
-    modalTitle.textContent = 'ðŸ–¼ï¸ Add Image to Gallery';
+    modalTitle.textContent = '🎨 Add Image to Gallery';
     modalBody.innerHTML = `
     <label>Image URL</label>
     <input type="text" id="imagePathInput" placeholder="https://i.ibb.co/xxxxx/imagename.jpg">
     <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-    <strong>ðŸ”¸ Upload to ImgBB first:</strong><br>
+    <strong>🖼️ Upload to ImgBB first:</strong><br>
     1. Go to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">imgbb.com</a><br>
     2. Upload your image<br>
     3. Copy the direct link<br>
     4. Paste it above
     </p>
     <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
-    <strong>ðŸ’¡ Or use the Upload button to auto-upload!</strong>
+    <strong>🖼️ Or use the Upload button to auto-upload!</strong>
     </p>
     </div>
     <label>Image Title (optional)</label>
     <input type="text" id="imageTitleInput" placeholder="My Artwork">
     <label>Image Description (optional)</label>
     <textarea id="imageDescInput" rows="2" placeholder="Description of the artwork"></textarea>
-    <button onclick="saveImageUrl()">Add to Gallery ðŸ€</button>
+    <button onclick="saveImageUrl()">Add to Gallery 🐀</button>
     `;
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
@@ -478,20 +478,20 @@ const CONFIG = (() => {
     }
     function addCommissionUrlModal() {
     if (currentUser.role !== 'owner' && currentUser.role !== 'commission') {
-    showAlert('âŒ Only the owner or commission artists can add images!', 'Permission Denied');
+    showAlert('❌ Only the owner or commission artists can add images!', 'Permission Denied');
     return;
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     modal.classList.add('active');
-    modalTitle.textContent = 'ðŸ–¼ï¸ Add Commission Image';
+    modalTitle.textContent = '🎨 Add Commission Image';
     modalBody.innerHTML = `
     <label>Image URL</label>
     <input type="text" id="commissionImagePathInput" placeholder="https://...">
     <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-    <strong>ðŸŽ¨ Supported Platforms:</strong>
+    <strong>🎨 Supported Platforms:</strong>
     </p>
     <ul style="color: var(--text-secondary); font-size: 0.85rem; margin-left: 1.5rem;">
     <li>ImgBB - imgbb.com</li>
@@ -503,14 +503,14 @@ const CONFIG = (() => {
     <li>Any direct image URL</li>
     </ul>
     <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
-    ðŸ’¡ Or use the <strong>Upload button</strong> to auto-upload to ImgBB!
+    🖼️ Or use the <strong>Upload button</strong> to auto-upload to ImgBB!
     </p>
     </div>
     <label>Image Title (optional)</label>
     <input type="text" id="commissionImageTitleInput" placeholder="Commission Title">
     <label>Image Description (optional)</label>
     <textarea id="commissionImageDescInput" rows="2" placeholder="Client name, commission details..."></textarea>
-    <button onclick="saveCommissionUrl()">Add to Gallery ðŸŽ¨</button>
+    <button onclick="saveCommissionUrl()">Add to Gallery 🎨</button>
     `;
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
@@ -522,7 +522,7 @@ const CONFIG = (() => {
     const title = document.getElementById('imageTitleInput').value.trim();
     const description = document.getElementById('imageDescInput').value.trim();
     if (!url) {
-    await showAlert('âŒ Please enter an image URL!', 'Missing URL');
+    await showAlert('❌ Please enter an image URL!', 'Missing URL');
     return;
     }
     const newImage = {
@@ -541,7 +541,7 @@ const CONFIG = (() => {
     const title = document.getElementById('commissionImageTitleInput').value.trim();
     const description = document.getElementById('commissionImageDescInput').value.trim();
     if (!url) {
-    await showAlert('âŒ Please enter an image URL!', 'Missing URL');
+    await showAlert('❌ Please enter an image URL!', 'Missing URL');
     return;
     }
     const newImage = {
@@ -559,7 +559,7 @@ const CONFIG = (() => {
     const username = document.getElementById('artUsername').value.trim();
     const password = document.getElementById('artPassword').value;
     if (!CONFIG.API_BASE_URL || !username || !password) {
-    await showAlert('âŒ Enter username and password.', 'Missing Credentials');
+    await showAlert('❌ Enter username and password.', 'Missing Credentials');
     return;
     }
     try {
@@ -576,19 +576,19 @@ const CONFIG = (() => {
     unlockGallery();
     await loadAllData();
     } else {
-    await showAlert(data.error || 'âŒ Access denied! Wrong credentials, rat.', 'ðŸ€ Access Denied');
+    await showAlert(data.error || '❌ Access denied! Wrong credentials, rat.', 'ðŸ€ Access Denied');
     document.getElementById('artPassword').value = '';
     }
     } catch (e) {
     console.error('Login error:', e);
-    await showAlert('âŒ Could not reach API.', 'Connection Error');
+    await showAlert('❌ Could not reach API.', 'Connection Error');
     }
     }
     async function checkCommissionsPassword() {
     const username = document.getElementById('commissionUsername').value.trim();
     const password = document.getElementById('commissionPassword').value;
     if (!CONFIG.API_BASE_URL || !username || !password) {
-    await showAlert('âŒ Enter username and password.', 'Missing Credentials');
+    await showAlert('❌ Enter username and password.', 'Missing Credentials');
     return;
     }
     try {
@@ -605,12 +605,12 @@ const CONFIG = (() => {
     unlockCommissions();
     await loadAllData();
     } else {
-    await showAlert(data.error || 'âŒ Access denied! Wrong credentials.', 'ðŸŽ¨ Access Denied');
+    await showAlert(data.error || '❌ Access denied! Wrong credentials.', 'ðŸŽ¨ Access Denied');
     document.getElementById('commissionPassword').value = '';
     }
     } catch (e) {
     console.error('Login error:', e);
-    await showAlert('âŒ Could not reach API.', 'Connection Error');
+    await showAlert('❌ Could not reach API.', 'Connection Error');
     }
     }
     function unlockGallery() {
@@ -641,7 +641,7 @@ const CONFIG = (() => {
     return;
     }
     const deleteButton = currentUser.role === 'owner'
-    ? '<button class="delete-btn" onclick="deleteImage(INDEX)">Ã—</button>'
+    ? '<button class="delete-btn" onclick="deleteImage(INDEX)">❌</button>'
     : '';
     galleryGrid.innerHTML = dataCache.gallery.map((item, index) => `
     <div class="gallery-item loading" id="gallery-item-${index}" onclick="expandImage('${item.src.replace(/'/g, "\\'")}', '${(item.title || '').replace(/'/g, "\\'")}', '${(item.description || '').replace(/'/g, "\\'")}')">
@@ -671,7 +671,7 @@ const CONFIG = (() => {
     }
     const canDelete = currentUser.role === 'owner' || currentUser.role === 'commission';
     const deleteButton = canDelete
-    ? '<button class="delete-btn" onclick="deleteCommission(INDEX)">Ã—</button>'
+    ? '<button class="delete-btn" onclick="deleteCommission(INDEX)">❌</button>'
     : '';
     commissionsGrid.innerHTML = dataCache.commissions.map((item, index) => `
     <div class="gallery-item loading" id="commission-item-${index}" onclick="expandImage('${item.src.replace(/'/g, "\\'")}', '${(item.title || '').replace(/'/g, "\\'")}', '${(item.description || '').replace(/'/g, "\\'")}')">
@@ -699,7 +699,7 @@ const CONFIG = (() => {
     const retryBtn = document.createElement('button');
     retryBtn.className = 'delete-btn';
     retryBtn.style.cssText = 'opacity: 1; background: rgba(255, 150, 0, 0.9);';
-    retryBtn.textContent = 'ðŸ”„';
+    retryBtn.textContent = '🐀';
     retryBtn.title = 'Retry loading or click to delete';
     retryBtn.onclick = (e) => {
     e.stopPropagation();
@@ -736,10 +736,10 @@ const CONFIG = (() => {
     }
     async function deleteImage(index) {
     if (currentUser.role !== 'owner') {
-    await showAlert('âŒ Only the owner can delete art!', 'Permission Denied');
+    await showAlert('❌ Only the owner can delete art!', 'Permission Denied');
     return;
     }
-    if (await showConfirm('ðŸ€ Delete this image from the gallery?', 'Delete Image')) {
+    if (await showConfirm('🐀 Delete this image from the gallery?', 'Delete Image')) {
     dataCache.gallery.splice(index, 1);
     renderGallery();
     await saveAllData();
@@ -747,10 +747,10 @@ const CONFIG = (() => {
     }
     async function deleteCommission(index) {
     if (currentUser.role !== 'owner' && currentUser.role !== 'commission') {
-    await showAlert('âŒ Only the owner or commission artists can delete!', 'Permission Denied');
+    await showAlert('❌ Only the owner or commission artists can delete!', 'Permission Denied');
     return;
     }
-    if (await showConfirm('ðŸŽ¨ Delete this commission from the gallery?', 'Delete Commission')) {
+    if (await showConfirm('🎨 Delete this commission from the gallery?', 'Delete Commission')) {
     dataCache.commissions.splice(index, 1);
     renderCommissions();
     await saveAllData();
@@ -758,10 +758,10 @@ const CONFIG = (() => {
     }
     async function clearGallery() {
     if (currentUser.role !== 'owner') {
-    await showAlert('âŒ Only the owner can clear the gallery!', 'Permission Denied');
+    await showAlert('❌ Only the owner can clear the gallery!', 'Permission Denied');
     return;
     }
-    if (await showConfirm('ðŸ€ Clear the entire gallery? This cannot be undone!', 'Clear Gallery')) {
+    if (await showConfirm('🐀 Clear the entire gallery? This cannot be undone!', 'Clear Gallery')) {
     dataCache.gallery = [];
     renderGallery();
     await saveAllData();
@@ -769,10 +769,10 @@ const CONFIG = (() => {
     }
     async function clearCommissions() {
     if (currentUser.role !== 'owner') {
-    await showAlert('âŒ Only the owner can clear the gallery!', 'Permission Denied');
+    await showAlert('❌ Only the owner can clear the commissions gallery!', 'Permission Denied');
     return;
     }
-    if (await showConfirm('ðŸŽ¨ Clear the entire commission gallery? This cannot be undone!', 'Clear Gallery')) {
+    if (await showConfirm('🎨 Clear the entire commission gallery? This cannot be undone!', 'Clear Gallery')) {
     dataCache.commissions = [];
     renderCommissions();
     await saveAllData();
@@ -855,9 +855,9 @@ const CONFIG = (() => {
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     modal.classList.add('active');
-    modalTitle.textContent = botData ? 'âœï¸ Edit Bot/Project' : 'ðŸ€ Add Bot/Project';
+    modalTitle.textContent = botData ? '🐀 Edit Bot/Project' : '🐀 Add Bot/Project';
     const bot = botData || {
-    icon: 'ðŸ¤–',
+    icon: '🐀',
     name: '',
     description: '',
     servers: '',
@@ -868,7 +868,7 @@ const CONFIG = (() => {
     };
     modalBody.innerHTML = `
     <label>Bot/Project Icon (emoji)</label>
-    <input type="text" id="botIcon" value="${bot.icon}" placeholder="ðŸ¤–">
+    <input type="text" id="botIcon" value="${bot.icon}" placeholder="🐀">
     <label>Bot/Project Name</label>
     <input type="text" id="botName" value="${bot.name}" placeholder="My Awesome Bot">
     <label>Description</label>
@@ -886,8 +886,8 @@ const CONFIG = (() => {
     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
     If you store bot files in the repo (e.g., /bots/discord-bot/)
     </p>
-    <button onclick="saveBot(${index})">Save Bot/Project ðŸ€</button>
-    ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete ðŸ—‘ï¸</button>` : ''}
+    <button onclick="saveBot(${index})">Save Bot/Project 🐀</button>
+    ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete 🐀</button>` : ''}
     `;
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
@@ -896,7 +896,7 @@ const CONFIG = (() => {
     }
     async function saveBot(index = null) {
     if (currentUser.role !== 'owner') {
-    await showAlert('âŒ Only the owner can save bots!', 'Permission Denied');
+    await showAlert('❌ Only the owner can save bots!', 'Permission Denied');
     return;
     }
     const botData = {
@@ -920,10 +920,10 @@ const CONFIG = (() => {
     }
     async function deleteBot(index) {
     if (currentUser.role !== 'owner') {
-    await showAlert('âŒ Only the owner can delete bots!', 'Permission Denied');
+    await showAlert('❌ Only the owner can delete bots!', 'Permission Denied');
     return;
     }
-    if (await showConfirm('ðŸ€ Delete this bot/project?', 'Delete Bot')) {
+    if (await showConfirm('🐀 Delete this bot/project?', 'Delete Bot')) {
     dataCache.bots.splice(index, 1);
     renderBots();
     document.getElementById('editModal').classList.remove('active');
@@ -935,14 +935,14 @@ const CONFIG = (() => {
     if (dataCache.bots.length === 0) {
     botsGrid.innerHTML = `
     <div class="bot-card">
-    <div class="bot-icon">ðŸ¤–</div>
+    <div class="bot-icon">🐀</div>
     <h3 class="bot-name">Example Bot</h3>
     <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to add your own!</p>
     <div class="bot-stats">
     <span class="stat"><strong>1.2K</strong> Servers</span>
     <span class="stat"><strong>50K</strong> Users</span>
     </div>
-    <a href="#" class="bot-link">Invite Bot â†’</a>
+    <a href="#" class="bot-link">Invite Bot ✉️</a>
     </div>
     `;
     return;
@@ -965,7 +965,7 @@ const CONFIG = (() => {
     <div class="bot-links" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
     ${bot.inviteLink ? `
     <a href="${bot.inviteLink}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
-    ðŸ”¨ Invite
+    ✉️ Invite
     </a>
     ` : ''}
     ${bot.githubRepo ? `
@@ -978,7 +978,7 @@ const CONFIG = (() => {
     ` : ''}
     ${bot.botFolder ? `
     <a href="${bot.botFolder}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
-    ðŸ“ Files
+    📁 Files
     </a>
     ` : ''}
     </div>
@@ -1020,7 +1020,7 @@ const CONFIG = (() => {
     }
     function openEditModal(type, platform = null) {
     if (currentUser.role !== 'owner') {
-    showAlert('âŒ Only the owner can edit this!', 'Permission Denied');
+    showAlert('❌ Only the owner can edit this!', 'Permission Denied');
     return;
     }
     const modal = document.getElementById('editModal');
@@ -1029,39 +1029,39 @@ const CONFIG = (() => {
     modal.classList.add('active');
     switch(type) {
     case 'name':
-    modalTitle.textContent = 'âœï¸ Edit Name';
+    modalTitle.textContent = '🐀 Edit Name';
     modalBody.innerHTML = `
     <label>Display Name</label>
     <input type="text" id="editInput" value="${document.getElementById('lanyardName').textContent}">
-    <button onclick="saveEdit('name')">Save ðŸ€</button>
+    <button onclick="saveEdit('name')">Save 🐀</button>
     `;
     break;
     case 'role':
-    modalTitle.textContent = 'âœï¸ Edit Role';
+    modalTitle.textContent = '🐀 Edit Role';
     modalBody.innerHTML = `
     <label>Your Role/Title</label>
     <input type="text" id="editInput" value="${document.getElementById('lanyardRole').textContent}">
-    <button onclick="saveEdit('role')">Save ðŸ€</button>
+    <button onclick="saveEdit('role')">Save 🐀</button>
     `;
     break;
     case 'image':
-    modalTitle.textContent = 'âœï¸ Change Profile Picture';
+    modalTitle.textContent = '🐀 Change Profile Picture';
     modalBody.innerHTML = `
     <label>Image URL (from ImgBB)</label>
     <input type="text" id="editInput" placeholder="https://i.ibb.co/...">
     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
     Upload your profile image to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">ImgBB</a> and paste the URL here
     </p>
-    <button onclick="saveEdit('image')">Save ðŸ€</button>
+    <button onclick="saveEdit('image')">Save 🐀</button>
     `;
     break;
     case 'social':
-    modalTitle.textContent = `âœï¸ Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
+    modalTitle.textContent = `🐀 Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
     const currentUrl = document.getElementById(`${platform}Link`).getAttribute('href');
     modalBody.innerHTML = `
     <label>Profile URL</label>
     <input type="text" id="editInput" value="${currentUrl}" placeholder="https://">
-    <button onclick="saveEdit('social', '${platform}')">Save ðŸ€</button>
+    <button onclick="saveEdit('social', '${platform}')">Save 🐀</button>
     `;
     break;
     }
@@ -1153,7 +1153,7 @@ const CONFIG = (() => {
     toast.className = 'copy-toast';
     toast.innerHTML = `
     <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
-    <span style="font-size: 1.2rem;">âœ…</span>
+    <span style="font-size: 1.2rem;">🐀</span>
     <div>
     <div style="font-size: 0.9rem; margin-bottom: 0.2rem;">${platform} username copied!</div>
     <div style="font-size: 0.85rem; opacity: 0.9;">${text}</div>
