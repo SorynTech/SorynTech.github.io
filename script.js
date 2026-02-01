@@ -1,35 +1,26 @@
-// API base URL (Cloudflare Worker). No credentials in client.
 const CONFIG = (() => {
     const el = document.getElementById('app-config');
     const apiUrl = (el?.dataset?.apiUrl || '').replace(/\/$/, '');
     if (el) el.remove();
     return Object.freeze({ API_BASE_URL: apiUrl });
 })();
-
 function getAuthToken() {
     return sessionStorage.getItem('authToken');
 }
-
 function setAuthToken(token) {
     if (token) sessionStorage.setItem('authToken', token);
     else sessionStorage.removeItem('authToken');
 }
-
-// Current user state
 let currentUser = {
     username: null,
     role: 'guest',
     isLoggedIn: false
 };
-
-// Cache for loaded data
 let dataCache = {
     bots: [],
     profile: null,
     gallery: []
 };
-
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
     initNavigation();
     initAuth();
@@ -39,14 +30,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     await checkAuthState();
     if (currentUser.isLoggedIn) await loadAllData();
 });
-
-// ===========================
-// API (Worker proxy) – no keys in client
-// ===========================
-
 async function loadFromJSONBin() {
     if (!CONFIG.API_BASE_URL) {
-        showNotification('⚠️ API URL not configured (data-api-url)', 'warning');
+        showNotification('âš ï¸ API URL not configured (data-api-url)', 'warning');
         return null;
     }
     const token = getAuthToken();
@@ -67,19 +53,18 @@ async function loadFromJSONBin() {
         return null;
     } catch (e) {
         console.error('Error loading data:', e);
-        showNotification('⚠️ Could not connect to API', 'warning');
+        showNotification('âš ï¸ Could not connect to API', 'warning');
         return null;
     }
 }
-
 async function saveToJSONBin(data) {
     if (!CONFIG.API_BASE_URL) {
-        showNotification('❌ API URL not configured', 'error');
+        showNotification('âŒ API URL not configured', 'error');
         return false;
     }
     const token = getAuthToken();
     if (!token) {
-        showNotification('❌ Not logged in', 'error');
+        showNotification('âŒ Not logged in', 'error');
         return false;
     }
     try {
@@ -92,37 +77,32 @@ async function saveToJSONBin(data) {
             body: JSON.stringify(data)
         });
         if (response.ok) {
-            showNotification('✅ Saved to cloud!', 'success');
+            showNotification('âœ… Saved to cloud!', 'success');
             return true;
         }
         const err = await response.json().catch(() => ({}));
-        showNotification(err.error || '❌ Failed to save', 'error');
+        showNotification(err.error || 'âŒ Failed to save', 'error');
         return false;
     } catch (e) {
         console.error('Error saving:', e);
-        showNotification('❌ Network error while saving', 'error');
+        showNotification('âŒ Network error while saving', 'error');
         return false;
     }
 }
-
-// ===========================
-// IMAGE UPLOAD (via Worker proxy)
-// ===========================
-
 async function uploadToImgBB(file) {
     if (!CONFIG.API_BASE_URL) {
-        showNotification('⚠️ API URL not configured', 'warning');
+        showNotification('âš ï¸ API URL not configured', 'warning');
         return null;
     }
     const token = getAuthToken();
     if (!token) {
-        showNotification('❌ Not logged in', 'error');
+        showNotification('âŒ Not logged in', 'error');
         return null;
     }
     const formData = new FormData();
     formData.append('image', file);
     try {
-        showNotification('⏳ Uploading image...', 'info');
+        showNotification('â³ Uploading image...', 'info');
         const response = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
@@ -130,36 +110,28 @@ async function uploadToImgBB(file) {
         });
         const result = await response.json().catch(() => ({}));
         if (response.ok && result.url) {
-            showNotification('✅ Image uploaded!', 'success');
+            showNotification('âœ… Image uploaded!', 'success');
             return result.url;
         }
-        showNotification(result.error || '❌ Upload failed', 'error');
+        showNotification(result.error || 'âŒ Upload failed', 'error');
         return null;
     } catch (e) {
         console.error('Upload error:', e);
-        showNotification('❌ Network error during upload', 'error');
+        showNotification('âŒ Network error during upload', 'error');
         return null;
     }
 }
-
-// ===========================
-// DATA LOADING
-// ===========================
-
 async function loadAllData() {
     try {
         const data = await loadFromJSONBin();
-        
         if (data) {
             dataCache.bots = data.bots || [];
             dataCache.profile = data.profile || null;
             dataCache.gallery = data.gallery || [];
-            
             if (dataCache.profile) applyProfileData(dataCache.profile);
             renderBots();
             renderGallery();
         } else {
-            // Use defaults if no data loaded
             dataCache.bots = [];
             dataCache.profile = null;
             dataCache.gallery = [];
@@ -168,25 +140,21 @@ async function loadAllData() {
         }
     } catch (error) {
         console.error('Error loading data:', error);
-        showNotification('⚠️ Could not load data from cloud', 'warning');
+        showNotification('âš ï¸ Could not load data from cloud', 'warning');
     }
 }
-
 async function saveAllData() {
     const data = {
         bots: dataCache.bots,
         profile: dataCache.profile,
         gallery: dataCache.gallery
     };
-    
     return await saveToJSONBin(data);
 }
-
 function applyProfileData(data) {
     if (data.name) document.getElementById('lanyardName').textContent = data.name;
     if (data.role) document.getElementById('lanyardRole').textContent = data.role;
     if (data.image) document.getElementById('lanyardImage').src = data.image;
-    
     if (data.socials) {
         if (data.socials.twitter) document.getElementById('twitterLink').setAttribute('href', data.socials.twitter);
         if (data.socials.instagram) document.getElementById('instagramLink').setAttribute('href', data.socials.instagram);
@@ -195,32 +163,24 @@ function applyProfileData(data) {
         if (data.socials.kofi) document.getElementById('kofiLink').setAttribute('href', data.socials.kofi);
     }
 }
-
-// Navigation
 function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('.section');
-
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetSection = link.getAttribute('data-section');
-
             navLinks.forEach(l => l.classList.remove('active'));
             sections.forEach(s => s.classList.remove('active'));
-
             link.classList.add('active');
             document.getElementById(targetSection).classList.add('active');
         });
     });
 }
-
-// Authentication
 function initAuth() {
     const userBadge = document.getElementById('userBadge');
     const loginModal = document.getElementById('loginModal');
     const closeLogin = document.getElementById('closeLogin');
-
     userBadge.addEventListener('click', () => {
         if (currentUser.isLoggedIn) {
             if (confirm('Logout?')) {
@@ -230,40 +190,33 @@ function initAuth() {
             loginModal.classList.add('active');
         }
     });
-
     closeLogin.addEventListener('click', () => {
         loginModal.classList.remove('active');
     });
-
     loginModal.addEventListener('click', (e) => {
         if (e.target === loginModal) {
             loginModal.classList.remove('active');
         }
     });
-
     document.getElementById('loginUsername').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') document.getElementById('loginPassword').focus();
     });
-
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') attemptLogin();
     });
 }
-
 async function attemptLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
     const loginModal = document.getElementById('loginModal');
-
     if (!CONFIG.API_BASE_URL) {
-        alert('❌ API URL not configured. Set data-api-url on #app-config.');
+        alert('âŒ API URL not configured. Set data-api-url on #app-config.');
         return;
     }
     if (!username || !password) {
-        alert('❌ Enter username and password.');
+        alert('âŒ Enter username and password.');
         return;
     }
-
     try {
         const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
             method: 'POST',
@@ -277,28 +230,25 @@ async function attemptLogin() {
             loginModal.classList.remove('active');
             await loadAllData();
         } else {
-            alert(data.error || '❌ Invalid credentials! Try again, rat.');
+            alert(data.error || 'âŒ Invalid credentials! Try again, rat.');
             document.getElementById('loginPassword').value = '';
         }
     } catch (e) {
         console.error('Login error:', e);
-        alert('❌ Could not reach API. Check URL and network.');
+        alert('âŒ Could not reach API. Check URL and network.');
     }
 }
-
 function login(role, username) {
     currentUser = { username, role, isLoggedIn: true };
     updateUIForRole();
     unlockGallery();
 }
-
 function logout() {
     currentUser = { username: null, role: 'guest', isLoggedIn: false };
     setAuthToken(null);
     updateUIForRole();
     location.reload();
 }
-
 async function checkAuthState() {
     const token = getAuthToken();
     if (!token || !CONFIG.API_BASE_URL) return;
@@ -322,22 +272,19 @@ async function checkAuthState() {
         setAuthToken(null);
     }
 }
-
 function updateUIForRole() {
     const userBadge = document.getElementById('userBadge');
     const badgeIcon = userBadge.querySelector('.badge-icon');
     const badgeText = userBadge.querySelector('.badge-text');
-
     if (currentUser.isLoggedIn) {
-        badgeIcon.textContent = currentUser.role === 'owner' ? '👑' : '🐀';
+        badgeIcon.textContent = currentUser.role === 'owner' ? 'ðŸ‘‘' : 'ðŸ€';
         badgeText.textContent = currentUser.username;
         userBadge.title = 'Click to logout';
     } else {
-        badgeIcon.textContent = '🔒';
+        badgeIcon.textContent = 'ðŸ”’';
         badgeText.textContent = 'Login';
         userBadge.title = 'Click to login';
     }
-
     const ownerOnlyElements = document.querySelectorAll('.owner-only');
     ownerOnlyElements.forEach(el => {
         if (currentUser.role === 'owner') {
@@ -351,11 +298,6 @@ function updateUIForRole() {
         }
     });
 }
-
-// ===========================
-// GALLERY FUNCTIONS
-// ===========================
-
 function initGallery() {
     const uploadBtn = document.getElementById('uploadBtn');
     const addUrlBtn = document.getElementById('addUrlBtn');
@@ -364,13 +306,11 @@ function initGallery() {
     const artUsername = document.getElementById('artUsername');
     const artPassword = document.getElementById('artPassword');
     const imageUpload = document.getElementById('imageUpload');
-
     if (uploadBtn) uploadBtn.addEventListener('click', () => imageUpload.click());
     if (imageUpload) imageUpload.addEventListener('change', handleImageUpload);
     if (addUrlBtn) addUrlBtn.addEventListener('click', addImageUrlModal);
     if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
     if (unlockBtn) unlockBtn.addEventListener('click', checkGalleryPassword);
-
     if (artUsername) {
         artUsername.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') artPassword.focus();
@@ -382,118 +322,93 @@ function initGallery() {
         });
     }
 }
-
 async function handleImageUpload(event) {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can upload images!');
+        alert('âŒ Only the owner can upload images!');
         return;
     }
-
     const files = event.target.files;
     if (!files || files.length === 0) return;
-
     for (let file of files) {
         if (!file.type.startsWith('image/')) {
-            showNotification(`⚠️ ${file.name} is not an image`, 'warning');
+            showNotification(`âš ï¸ ${file.name} is not an image`, 'warning');
             continue;
         }
-
         const imageUrl = await uploadToImgBB(file);
-        
         if (imageUrl) {
             const newImage = {
                 src: imageUrl,
-                title: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+                title: file.name.replace(/\.[^/.]+$/, ""), 
                 description: `Uploaded ${new Date().toLocaleDateString()}`,
                 timestamp: Date.now()
             };
-            
             dataCache.gallery.push(newImage);
         }
     }
-    
     renderGallery();
     await saveAllData();
-    
-    // Reset file input
     event.target.value = '';
 }
-
 function addImageUrlModal() {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can add images!');
+        alert('âŒ Only the owner can add images!');
         return;
     }
-
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
-
     modal.classList.add('active');
-    modalTitle.textContent = '🖼️ Add Image to Gallery';
-    
+    modalTitle.textContent = 'ðŸ–¼ï¸ Add Image to Gallery';
     modalBody.innerHTML = `
         <label>Image URL</label>
         <input type="text" id="imagePathInput" placeholder="https://i.ibb.co/xxxxx/image.jpg">
-        
         <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-                <strong>📸 Upload to ImgBB first:</strong><br>
+                <strong>ðŸ“¸ Upload to ImgBB first:</strong><br>
                 1. Go to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">imgbb.com</a><br>
                 2. Upload your image<br>
                 3. Copy the direct link<br>
                 4. Paste it above
             </p>
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
-                <strong>💡 Or use the Upload button to auto-upload!</strong>
+                <strong>ðŸ’¡ Or use the Upload button to auto-upload!</strong>
             </p>
         </div>
-        
         <label>Image Title (optional)</label>
         <input type="text" id="imageTitleInput" placeholder="My Artwork">
-        
         <label>Image Description (optional)</label>
         <textarea id="imageDescInput" rows="2" placeholder="Description of the artwork"></textarea>
-        
-        <button onclick="saveImageUrl()">Add to Gallery 🐀</button>
+        <button onclick="saveImageUrl()">Add to Gallery ðŸ€</button>
     `;
-
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
         if (e.target === modal) modal.classList.remove('active');
     };
 }
-
 async function saveImageUrl() {
     const url = document.getElementById('imagePathInput').value.trim();
     const title = document.getElementById('imageTitleInput').value.trim();
     const description = document.getElementById('imageDescInput').value.trim();
-    
     if (!url) {
-        alert('❌ Please enter an image URL!');
+        alert('âŒ Please enter an image URL!');
         return;
     }
-
     const newImage = {
         src: url,
         title: title || `Artwork ${dataCache.gallery.length + 1}`,
         description: description,
         timestamp: Date.now()
     };
-    
     dataCache.gallery.push(newImage);
     renderGallery();
-    
     document.getElementById('editModal').classList.remove('active');
-    
     await saveAllData();
 }
-
 async function checkGalleryPassword() {
     const username = document.getElementById('artUsername').value.trim();
     const password = document.getElementById('artPassword').value;
     if (!CONFIG.API_BASE_URL || !username || !password) {
-        alert('❌ Enter username and password.');
+        alert('âŒ Enter username and password.');
         return;
     }
     try {
@@ -510,26 +425,22 @@ async function checkGalleryPassword() {
             unlockGallery();
             await loadAllData();
         } else {
-            alert(data.error || '❌ Access denied! Wrong credentials, rat.');
+            alert(data.error || 'âŒ Access denied! Wrong credentials, rat.');
             document.getElementById('artPassword').value = '';
         }
     } catch (e) {
         console.error('Login error:', e);
-        alert('❌ Could not reach API.');
+        alert('âŒ Could not reach API.');
     }
 }
-
 function unlockGallery() {
     const passwordOverlay = document.getElementById('passwordOverlay');
     const galleryContent = document.querySelector('.gallery-content');
-    
     if (passwordOverlay) passwordOverlay.classList.add('unlocked');
     if (galleryContent) galleryContent.classList.add('unlocked');
 }
-
 function renderGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
-    
     if (dataCache.gallery.length === 0) {
         galleryGrid.innerHTML = `
             <div class="gallery-placeholder">
@@ -543,11 +454,9 @@ function renderGallery() {
         `;
         return;
     }
-
     const deleteButton = currentUser.role === 'owner' 
-        ? '<button class="delete-btn" onclick="deleteImage(INDEX)">×</button>'
+        ? '<button class="delete-btn" onclick="deleteImage(INDEX)">Ã—</button>'
         : '';
-
     galleryGrid.innerHTML = dataCache.gallery.map((item, index) => `
         <div class="gallery-item loading" id="gallery-item-${index}">
             <img src="${item.src}" 
@@ -559,62 +468,50 @@ function renderGallery() {
         </div>
     `).join('');
 }
-
 function handleImageLoad(index) {
     const item = document.getElementById(`gallery-item-${index}`);
     if (item) {
         item.classList.remove('loading', 'error');
     }
 }
-
 function handleImageError(index) {
     const item = document.getElementById(`gallery-item-${index}`);
     if (item) {
         item.classList.remove('loading');
         item.classList.add('error');
-        
         if (currentUser.role === 'owner') {
             const retryBtn = document.createElement('button');
             retryBtn.className = 'delete-btn';
             retryBtn.style.cssText = 'opacity: 1; background: rgba(255, 150, 0, 0.9);';
-            retryBtn.textContent = '🔄';
+            retryBtn.textContent = 'ðŸ”„';
             retryBtn.title = 'Retry loading or click to delete';
             retryBtn.onclick = () => deleteImage(index);
             item.appendChild(retryBtn);
         }
     }
 }
-
 async function deleteImage(index) {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can delete art!');
+        alert('âŒ Only the owner can delete art!');
         return;
     }
-
-    if (confirm('🐀 Delete this image from the gallery?')) {
+    if (confirm('ðŸ€ Delete this image from the gallery?')) {
         dataCache.gallery.splice(index, 1);
         renderGallery();
         await saveAllData();
     }
 }
-
 async function clearGallery() {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can clear the gallery!');
+        alert('âŒ Only the owner can clear the gallery!');
         return;
     }
-
-    if (confirm('🐀 Clear the entire gallery? This cannot be undone!')) {
+    if (confirm('ðŸ€ Clear the entire gallery? This cannot be undone!')) {
         dataCache.gallery = [];
         renderGallery();
         await saveAllData();
     }
 }
-
-// ===========================
-// BOTS SECTION
-// ===========================
-
 function initBotsSection() {
     const addBotBtn = document.getElementById('addBotBtn');
     if (addBotBtn) {
@@ -625,21 +522,17 @@ function initBotsSection() {
         });
     }
 }
-
 function openBotModal(botData = null, index = null) {
     if (currentUser.role !== 'owner' && botData) {
         return;
     }
-
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
-
     modal.classList.add('active');
-    modalTitle.textContent = botData ? '✏️ Edit Bot/Project' : '🐀 Add Bot/Project';
-
+    modalTitle.textContent = botData ? 'âœï¸ Edit Bot/Project' : 'ðŸ€ Add Bot/Project';
     const bot = botData || {
-        icon: '🤖',
+        icon: 'ðŸ¤–',
         name: '',
         description: '',
         servers: '',
@@ -648,51 +541,39 @@ function openBotModal(botData = null, index = null) {
         githubRepo: '',
         botFolder: ''
     };
-
     modalBody.innerHTML = `
         <label>Bot/Project Icon (emoji)</label>
-        <input type="text" id="botIcon" value="${bot.icon}" placeholder="🤖">
-        
+        <input type="text" id="botIcon" value="${bot.icon}" placeholder="ðŸ¤–">
         <label>Bot/Project Name</label>
         <input type="text" id="botName" value="${bot.name}" placeholder="My Awesome Bot">
-        
         <label>Description</label>
         <textarea id="botDescription" rows="3" placeholder="What does your bot/project do?">${bot.description}</textarea>
-        
         <label>Servers Count (optional)</label>
         <input type="text" id="botServers" value="${bot.servers}" placeholder="1.2K">
-        
         <label>Users Count (optional)</label>
         <input type="text" id="botUsers" value="${bot.users}" placeholder="50K">
-        
         <label>Invite Link (optional)</label>
         <input type="text" id="botInviteLink" value="${bot.inviteLink}" placeholder="https://discord.com/invite/...">
-        
         <label>GitHub Repository (optional)</label>
         <input type="text" id="botGithubRepo" value="${bot.githubRepo}" placeholder="https://github.com/sorynTech/my-bot">
-        
         <label>Bot Folder Path (optional)</label>
         <input type="text" id="botFolder" value="${bot.botFolder}" placeholder="./bots/my-bot/">
         <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
             If you store bot files in the repo (e.g., /bots/discord-bot/)
         </p>
-        
-        <button onclick="saveBot(${index})">Save Bot/Project 🐀</button>
-        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete 🗑️</button>` : ''}
+        <button onclick="saveBot(${index})">Save Bot/Project ðŸ€</button>
+        ${botData ? `<button onclick="deleteBot(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete ðŸ—‘ï¸</button>` : ''}
     `;
-
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
         if (e.target === modal) modal.classList.remove('active');
     };
 }
-
 async function saveBot(index = null) {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can save bots!');
+        alert('âŒ Only the owner can save bots!');
         return;
     }
-
     const botData = {
         icon: document.getElementById('botIcon').value,
         name: document.getElementById('botName').value,
@@ -703,74 +584,63 @@ async function saveBot(index = null) {
         githubRepo: document.getElementById('botGithubRepo').value,
         botFolder: document.getElementById('botFolder').value
     };
-
     if (index !== null) {
         dataCache.bots[index] = botData;
     } else {
         dataCache.bots.push(botData);
     }
-
     renderBots();
     document.getElementById('editModal').classList.remove('active');
-    
     await saveAllData();
 }
-
 async function deleteBot(index) {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can delete bots!');
+        alert('âŒ Only the owner can delete bots!');
         return;
     }
-
-    if (confirm('🐀 Delete this bot/project?')) {
+    if (confirm('ðŸ€ Delete this bot/project?')) {
         dataCache.bots.splice(index, 1);
         renderBots();
         document.getElementById('editModal').classList.remove('active');
         await saveAllData();
     }
 }
-
 function renderBots() {
     const botsGrid = document.getElementById('botsGrid');
-    
     if (dataCache.bots.length === 0) {
         botsGrid.innerHTML = `
             <div class="bot-card">
-                <div class="bot-icon">🤖</div>
+                <div class="bot-icon">ðŸ¤–</div>
                 <h3 class="bot-name">Example Bot</h3>
                 <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to add your own!</p>
                 <div class="bot-stats">
                     <span class="stat"><strong>1.2K</strong> Servers</span>
                     <span class="stat"><strong>50K</strong> Users</span>
                 </div>
-                <a href="#" class="bot-link">Invite Bot →</a>
+                <a href="#" class="bot-link">Invite Bot â†’</a>
             </div>
         `;
         return;
     }
-
     const isOwner = currentUser.role === 'owner';
     botsGrid.innerHTML = dataCache.bots.map((bot, index) => {
         const hasLinks = bot.inviteLink || bot.githubRepo || bot.botFolder;
-        
         return `
             <div class="bot-card" ${isOwner ? `onclick="openBotModal(${JSON.stringify(bot).replace(/"/g, '&quot;')}, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
                 <div class="bot-icon">${bot.icon}</div>
                 <h3 class="bot-name">${bot.name}</h3>
                 <p class="bot-description">${bot.description}</p>
-                
                 ${bot.servers || bot.users ? `
                     <div class="bot-stats">
                         ${bot.servers ? `<span class="stat"><strong>${bot.servers}</strong> Servers</span>` : ''}
                         ${bot.users ? `<span class="stat"><strong>${bot.users}</strong> Users</span>` : ''}
                     </div>
                 ` : ''}
-                
                 ${hasLinks ? `
                     <div class="bot-links" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
                         ${bot.inviteLink ? `
                             <a href="${bot.inviteLink}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
-                                📨 Invite
+                                ðŸ“¨ Invite
                             </a>
                         ` : ''}
                         ${bot.githubRepo ? `
@@ -783,7 +653,7 @@ function renderBots() {
                         ` : ''}
                         ${bot.botFolder ? `
                             <a href="${bot.botFolder}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
-                                📁 Files
+                                ðŸ“ Files
                             </a>
                         ` : ''}
                     </div>
@@ -792,34 +662,28 @@ function renderBots() {
         `;
     }).join('');
 }
-
 // ===========================
 // PROFILE EDITING
 // ===========================
-
 function initProfileEditing() {
     const lanyardName = document.getElementById('lanyardName');
     const lanyardRole = document.getElementById('lanyardRole');
     const lanyardImage = document.getElementById('lanyardImage');
-
     if (lanyardName) {
         lanyardName.addEventListener('click', () => {
             if (currentUser.role === 'owner') openEditModal('name');
         });
     }
-
     if (lanyardRole) {
         lanyardRole.addEventListener('click', () => {
             if (currentUser.role === 'owner') openEditModal('role');
         });
     }
-
     if (lanyardImage) {
         lanyardImage.addEventListener('click', () => {
             if (currentUser.role === 'owner') openEditModal('image');
         });
     }
-
     ['twitter', 'instagram', 'github', 'discord', 'kofi'].forEach(platform => {
         const link = document.getElementById(`${platform}Link`);
         if (link) {
@@ -832,68 +696,61 @@ function initProfileEditing() {
         }
     });
 }
-
 function openEditModal(type, platform = null) {
     if (currentUser.role !== 'owner') {
-        alert('❌ Only the owner can edit this!');
+        alert('âŒ Only the owner can edit this!');
         return;
     }
-
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
-
     modal.classList.add('active');
-
     switch(type) {
         case 'name':
-            modalTitle.textContent = '✏️ Edit Name';
+            modalTitle.textContent = 'âœï¸ Edit Name';
             modalBody.innerHTML = `
                 <label>Display Name</label>
                 <input type="text" id="editInput" value="${document.getElementById('lanyardName').textContent}">
-                <button onclick="saveEdit('name')">Save 🐀</button>
+                <button onclick="saveEdit('name')">Save ðŸ€</button>
             `;
             break;
         case 'role':
-            modalTitle.textContent = '✏️ Edit Role';
+            modalTitle.textContent = 'âœï¸ Edit Role';
             modalBody.innerHTML = `
                 <label>Your Role/Title</label>
                 <input type="text" id="editInput" value="${document.getElementById('lanyardRole').textContent}">
-                <button onclick="saveEdit('role')">Save 🐀</button>
+                <button onclick="saveEdit('role')">Save ðŸ€</button>
             `;
             break;
         case 'image':
-            modalTitle.textContent = '✏️ Change Profile Picture';
+            modalTitle.textContent = 'âœï¸ Change Profile Picture';
             modalBody.innerHTML = `
                 <label>Image URL (from ImgBB)</label>
-                <input type="text" id="editInput" placeholder="https://i.ibb.co/xxxxx/profile.jpg">
+                <input type="text" id="editInput" placeholder="https:
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
                     Upload your profile image to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">ImgBB</a> and paste the URL here
                 </p>
-                <button onclick="saveEdit('image')">Save 🐀</button>
+                <button onclick="saveEdit('image')">Save ðŸ€</button>
             `;
             break;
         case 'social':
-            modalTitle.textContent = `✏️ Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
+            modalTitle.textContent = `âœï¸ Edit ${platform.charAt(0).toUpperCase() + platform.slice(1)} Link`;
             const currentUrl = document.getElementById(`${platform}Link`).getAttribute('href');
             modalBody.innerHTML = `
                 <label>Profile URL</label>
                 <input type="text" id="editInput" value="${currentUrl}" placeholder="https://">
-                <button onclick="saveEdit('social', '${platform}')">Save 🐀</button>
+                <button onclick="saveEdit('social', '${platform}')">Save ðŸ€</button>
             `;
             break;
     }
-
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
         if (e.target === modal) modal.classList.remove('active');
     };
 }
-
 async function saveEdit(type, platform = null) {
     const input = document.getElementById('editInput').value;
     const modal = document.getElementById('editModal');
-
     switch(type) {
         case 'name':
             document.getElementById('lanyardName').textContent = input;
@@ -908,9 +765,7 @@ async function saveEdit(type, platform = null) {
             document.getElementById(`${platform}Link`).setAttribute('href', input);
             break;
     }
-
     modal.classList.remove('active');
-    
     // Update profile cache
     dataCache.profile = {
         name: document.getElementById('lanyardName').textContent,
@@ -924,31 +779,24 @@ async function saveEdit(type, platform = null) {
             kofi: document.getElementById('kofiLink').getAttribute('href')
         }
     };
-    
     await saveAllData();
 }
-
 // ===========================
 // UTILITY FUNCTIONS
 // ===========================
-
 function showNotification(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = 'copy-toast';
     toast.textContent = message;
-    
     if (type === 'success') toast.style.background = 'linear-gradient(135deg, #7bed9f, #7dd3fc)';
     if (type === 'warning') toast.style.background = 'linear-gradient(135deg, #ffa502, #ff6348)';
     if (type === 'error') toast.style.background = 'linear-gradient(135deg, #ff006e, #ff0080)';
     if (type === 'info') toast.style.background = 'linear-gradient(135deg, #7dd3fc, #a855f7)';
-    
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.remove();
     }, 3000);
 }
-
 // Clipboard functions
 function copyToClipboard(text, platform) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -962,7 +810,6 @@ function copyToClipboard(text, platform) {
         fallbackCopy(text, platform);
     }
 }
-
 function fallbackCopy(text, platform) {
     const textArea = document.createElement('textarea');
     textArea.value = text;
@@ -971,7 +818,6 @@ function fallbackCopy(text, platform) {
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
     try {
         document.execCommand('copy');
         showCopyToast(platform, text);
@@ -979,42 +825,35 @@ function fallbackCopy(text, platform) {
     } catch (err) {
         alert('Failed to copy. Please copy manually: ' + text);
     }
-    
     document.body.removeChild(textArea);
 }
-
 function showCopyToast(platform, text) {
     const existingToast = document.querySelector('.copy-toast');
     if (existingToast) {
         existingToast.remove();
     }
-    
     const toast = document.createElement('div');
     toast.className = 'copy-toast';
     toast.innerHTML = `
         <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
-            <span style="font-size: 1.2rem;">✅</span>
+            <span style="font-size: 1.2rem;">âœ…</span>
             <div>
                 <div style="font-size: 0.9rem; margin-bottom: 0.2rem;">${platform} username copied!</div>
                 <div style="font-size: 0.85rem; opacity: 0.9;">${text}</div>
             </div>
         </div>
     `;
-    
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.remove();
     }, 3000);
 }
-
 function animateCopySuccess(card) {
     card.classList.add('copied');
     setTimeout(() => {
         card.classList.remove('copied');
     }, 400);
 }
-
 // Make functions globally accessible
 window.attemptLogin = attemptLogin;
 window.saveEdit = saveEdit;

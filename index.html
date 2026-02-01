@@ -3,47 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Primary Meta Tags -->
     <title>SorynTech - The Rat | Backend Developer & Artist</title>
     <meta name="title" content="SorynTech - The Rat | Backend Developer & Artist">
     <meta name="description" content="Portfolio of SorynTech - Backend Developer, Artist, and Discord Bot Creator. Check out my art gallery, Discord bots, and projects!">
-    
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://yourusername.github.io/your-repo/">
     <meta property="og:title" content="🐀 SorynTech - The Rat">
     <meta property="og:description" content="Backend Developer • Artist • Bot Creator | Explore my art gallery, Discord bots, and projects!">
     <meta property="og:image" content="https://yourusername.github.io/your-repo/profile.jpg">
-    
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://yourusername.github.io/your-repo/">
     <meta property="twitter:title" content="🐀 SorynTech - The Rat">
     <meta property="twitter:description" content="Backend Developer • Artist • Bot Creator | Explore my art gallery, Discord bots, and projects!">
     <meta property="twitter:image" content="https://yourusername.github.io/your-repo/profile.jpg">
-    
-    <!-- Theme Color -->
     <meta name="theme-color" content="#7dd3fc">
-    
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://darkvisitors.com/tracker.js?project_key=f1969a1a-8b77-45e6-b6ac-3b7913e2fc9e" async></script>
 </head>
 <body>
-    <!-- API base URL only (no secrets). Cloudflare Worker URL -->
     <div id="app-config" data-api-url="https://soryntech-api.zippydrawzstudioz.workers.dev" style="display:none !important;"></div>
-    
-    <!-- Cheese Background Elements -->
     <div class="cheese-bg">
         <div class="cheese-piece" style="top: 10%; left: 5%;">🧀</div>
         <div class="cheese-piece" style="top: 20%; right: 10%;">🧀</div>
         <div class="cheese-piece" style="bottom: 15%; left: 15%;">🧀</div>
         <div class="cheese-piece" style="bottom: 25%; right: 8%;">🧀</div>
     </div>
-
-    <!-- Navigation -->
     <nav class="nav">
         <div class="nav-container">
             <div class="nav-brand">
@@ -60,8 +47,6 @@
             </div>
         </div>
     </nav>
-
-    <!-- Login Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <span class="close-btn" id="closeLogin">&times;</span>
@@ -77,11 +62,8 @@
             </div>
         </div>
     </div>
-
-    <!-- Socials Section -->
     <section id="socials" class="section active">
         <div class="profile-hero">
-            <!-- Falling Lanyard -->
             <div class="lanyard">
                 <div class="lanyard-string"></div>
                 <div class="lanyard-card">
@@ -106,8 +88,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Social Links -->
             <div class="social-links-container">
                 <h3 style="font-family: 'Righteous', cursive; font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
                     <span class="rat-emoji">🐀</span> My Socials <span class="rat-emoji">🐀</span>
@@ -144,8 +124,6 @@
                         <span>Ko-fi</span>
                     </a>
                 </div>
-
-                <!-- Friends & Artists Section -->
                 <div class="friends-section">
                     <h3 class="friends-title">Friends & Artists</h3>
                     <div class="friends-grid">
@@ -167,8 +145,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Game Accounts Section -->
                 <div class="friends-section">
                     <h3 class="friends-title">
                         <span style="font-size: 1.5rem;">🎮</span> Game Accounts <span style="font-size: 1.5rem;">🎮</span>
@@ -188,7 +164,6 @@
                             <div class="game-username">SorynTech#Fang</div>
                             <div class="copy-indicator">Click to copy 📋</div>
                         </div>
-
                         <div class="game-account-card" onclick="copyToClipboard('Mineoblocks', 'Roblox')">
                             <div class="game-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -200,19 +175,17 @@
                             <div class="game-username">Mineoblocks</div>
                             <div class="copy-indicator">Click to copy 📋</div>
                         </div>
-
-                        <div class="game-account-card" onclick="copyToClipboard('ZippyDrawz#2126', 'Battle.net')">
+                        <div class="game-account-card" onclick="copyToClipboard('ZDS Sharky', 'Epic Games')">
                             <div class="game-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M11.907,8.962a2.513,2.513,0,0,0-3.426.825l-.01.012-.018.022a2.517,2.517,0,0,0,.824,3.426l4.316,2.495L10.142,19.1l-4.325-2.494A7.608,7.608,0,0,1,3.29,9.412l.019-.032.019-.033,5.459,3.151a.768.768,0,1,0,.771-1.332L4.1,7.982a7.592,7.592,0,0,1,10.5-2.5l.021.013L19.049,8l-3.456,5.987,2.863,1.653,4.6-7.955A.774.774,0,0,0,22.752,6.4L17.893,3.649l-.017-.01A9.143,9.143,0,0,0,5.127,6.882l-.022.027L3.618,6.374a.76.76,0,0,0-.755.037A.773.773,0,0,0,2.5,7.076v9.507a.773.773,0,0,0,.359.654.766.766,0,0,0,.74.036l1.53-.529a9.112,9.112,0,0,0,3.175,3.613l.042.023.042.023a9.161,9.161,0,0,0,4.551,1.218,9.047,9.047,0,0,0,.98-.053.766.766,0,0,0,.474-.244l5.99-6.644a.776.776,0,0,0,.094-.1.762.762,0,0,0-.027-.977L11.908,8.969Z"/>
+                                    <path d="M18.46 17.47H13.7V21h-3.4v-3.53H5.54L5.54 21H2.18v-3.53H.01v-3.4h2.17V3.12h3.36V-.01h3.4v3.13h4.76V-.01h3.4v3.13h1.36v3.4h-1.36v10.95zm-3.4-3.4v-4.22h-4.76v4.22z"/>
                                 </svg>
                             </div>
-                            <h4 class="game-platform">Battle.net</h4>
-                            <p class="game-subtitle">Overwatch</p>
-                            <div class="game-username">ZippyDrawz#2126</div>
+                            <h4 class="game-platform">Epic Games</h4>
+                            <p class="game-subtitle">Epic Games Store</p>
+                            <div class="game-username">ZDS Sharky</div>
                             <div class="copy-indicator">Click to copy 📋</div>
                         </div>
-
                         <div class="game-account-card" onclick="copyToClipboard('SorynTech', 'Steam')">
                             <div class="game-icon">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -222,6 +195,7 @@
                             <h4 class="game-platform">Steam</h4>
                             <p class="game-subtitle">PC Gaming</p>
                             <div class="game-username">SorynTech</div>
+                            <div class="game-username-alt">Korai Fangtail</div>
                             <div class="copy-indicator">Click to copy 📋</div>
                         </div>
                     </div>
@@ -229,13 +203,10 @@
             </div>
         </div>
     </section>
-
-    <!-- Discord Bots Section -->
     <section id="bots" class="section">
         <div class="content-wrapper">
             <h2 class="section-title">🐀 Discord Bots</h2>
             <div class="bots-grid" id="botsGrid">
-                <!-- Bot cards will be added dynamically -->
                 <div class="bot-card">
                     <div class="bot-icon">🤖</div>
                     <h3 class="bot-name">Example Bot</h3>
@@ -250,8 +221,6 @@
             <button class="add-btn owner-only" id="addBotBtn" style="display: none;">🐀 Add Bot</button>
         </div>
     </section>
-
-    <!-- Art Gallery Section -->
     <section id="art" class="section">
         <div class="password-overlay" id="passwordOverlay">
             <div class="password-card">
@@ -263,7 +232,6 @@
                 <p class="password-hint">Guest or Owner access required</p>
             </div>
         </div>
-        
         <div class="content-wrapper gallery-content">
             <h2 class="section-title">🎨 Art Gallery</h2>
             <div class="gallery-controls">
@@ -273,7 +241,6 @@
                 <button class="clear-btn owner-only" id="clearGalleryBtn" style="display: none;">🗑️ Clear Gallery</button>
             </div>
             <div class="gallery-grid" id="galleryGrid">
-                <!-- Images will be added dynamically -->
                 <div class="gallery-placeholder">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -285,8 +252,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Edit Modal -->
     <div class="modal" id="editModal">
         <div class="modal-content">
             <span class="close-btn" id="closeModal">&times;</span>
@@ -294,7 +259,6 @@
             <div id="modalBody"></div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

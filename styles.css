@@ -44,7 +44,6 @@ body::before {
     z-index: 0;
 }
 
-/* Cheese Background */
 .cheese-bg {
     position: fixed;
     top: 0;
@@ -74,7 +73,6 @@ body::before {
     75% { transform: translateY(20px) rotate(5deg); }
 }
 
-/* Navigation */
 .nav {
     position: fixed;
     top: 0;
@@ -194,7 +192,6 @@ body::before {
     width: 100%;
 }
 
-/* Sections */
 .section {
     display: none;
     padding-top: 100px;
@@ -237,7 +234,6 @@ body::before {
     letter-spacing: 1px;
 }
 
-/* Lanyard Design */
 .profile-hero {
     display: flex;
     flex-direction: column;
@@ -421,7 +417,6 @@ body::before {
     }
 }
 
-/* Social Links Container */
 .social-links-container {
     width: 100%;
     max-width: 600px;
@@ -476,7 +471,6 @@ body::before {
     flex-shrink: 0;
 }
 
-/* Bots Section */
 .bots-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -630,7 +624,6 @@ body::before {
     transform: scale(1.05);
 }
 
-/* Art Gallery */
 .password-overlay {
     position: fixed;
     top: 0;
@@ -861,7 +854,6 @@ body::before {
     transform: scale(1.1);
 }
 
-/* Image loading state */
 .gallery-item.loading {
     background: var(--bg-secondary);
     display: flex;
@@ -870,7 +862,7 @@ body::before {
 }
 
 .gallery-item.loading::after {
-    content: '⏳ Loading...';
+    content: 'â³ Loading...';
     color: var(--text-muted);
     font-size: 0.9rem;
 }
@@ -884,14 +876,13 @@ body::before {
 }
 
 .gallery-item.error::after {
-    content: '❌ Failed to load';
+    content: 'âŒ Failed to load';
     color: var(--accent-secondary);
     font-size: 0.9rem;
     text-align: center;
     padding: 1rem;
 }
 
-/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -990,7 +981,6 @@ body::before {
     transform: translateY(-2px);
 }
 
-/* Owner-only elements */
 .owner-only {
     opacity: 0.5;
     pointer-events: none;
@@ -1001,7 +991,6 @@ body::before {
     pointer-events: all;
 }
 
-/* Friends & Artists Section */
 .friends-section {
     margin-top: 4rem;
     padding-top: 3rem;
@@ -1117,7 +1106,6 @@ body::before {
     50% { transform: rotate(5deg); }
 }
 
-/* Game Accounts Section */
 .game-accounts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1222,6 +1210,27 @@ body::before {
     color: var(--text-primary);
 }
 
+.game-username-alt {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    font-family: 'DM Sans', monospace;
+    font-weight: 500;
+    color: var(--accent-tertiary);
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    word-break: break-all;
+}
+
+.game-account-card:hover .game-username-alt {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--accent-tertiary);
+    color: var(--text-primary);
+}
+
 .copy-indicator {
     font-size: 0.8rem;
     color: var(--text-secondary);
@@ -1229,12 +1238,32 @@ body::before {
     transition: all 0.3s ease;
 }
 
-.game-account-card:hover .copy-indicator {
+.game-account-card:hover .game-username-alt {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    font-family: 'DM Sans', monospace;
+    font-weight: 500;
+    color: var(--accent-tertiary);
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    word-break: break-all;
+}
+
+.game-account-card:hover .game-username-alt {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--accent-tertiary);
+    color: var(--text-primary);
+}
+
+.copy-indicator {
     opacity: 1;
     color: var(--accent-primary);
 }
 
-/* Copy success animation */
 @keyframes copySuccess {
     0% {
         transform: scale(1);
@@ -1255,11 +1284,31 @@ body::before {
     border-color: #7bed9f;
 }
 
-.game-account-card.copied .copy-indicator {
+.game-account-card.copied .game-username-alt {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    font-family: 'DM Sans', monospace;
+    font-weight: 500;
+    color: var(--accent-tertiary);
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    word-break: break-all;
+}
+
+.game-account-card:hover .game-username-alt {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--accent-tertiary);
+    color: var(--text-primary);
+}
+
+.copy-indicator {
     color: #7bed9f;
 }
 
-/* Toast notification */
 .copy-toast {
     position: fixed;
     bottom: 2rem;
@@ -1297,7 +1346,6 @@ body::before {
     }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .nav-container {
         flex-direction: column;
@@ -1352,5 +1400,3 @@ body::before {
         text-align: center;
     }
 }
-
-/* End of file */
