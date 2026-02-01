@@ -246,7 +246,7 @@ const CONFIG = (() => {
     loginModal.classList.remove('active');
     await loadAllData();
     } else {
-    await showAlert(data.error || '❌ Invalid credentials! Try again, rat.', 'ðŸ€ Access Denied');
+    await showAlert(data.error || '❌ Invalid credentials! Try again, rat.', '🐀 Access Denied');
     document.getElementById('loginPassword').value = '';
     }
     } catch (e) {
