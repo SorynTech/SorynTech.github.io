@@ -34,7 +34,7 @@ const CONFIG = (() => {
     });
     async function loadFromJSONBin() {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('âš ï¸ API URL not configured (data-api-url)', 'warning');
+    showNotification('⚠️ API URL not configured (data-api-url)', 'warning');
     return null;
     }
     const token = getAuthToken();
@@ -55,13 +55,13 @@ const CONFIG = (() => {
     return null;
     } catch (e) {
     console.error('Error loading data:', e);
-    showNotification('âš ï¸ Could not connect to API', 'warning');
+    showNotification('⚠️ Could not connect to API', 'warning');
     return null;
     }
     }
     async function saveToJSONBin(data) {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('âŒ API URL not configured', 'error');
+    showNotification('⚠️ API URL not configured', 'error');
     return false;
     }
     const token = getAuthToken();
@@ -79,7 +79,7 @@ const CONFIG = (() => {
     body: JSON.stringify(data)
     });
     if (response.ok) {
-    showNotification('âœ… Saved to cloud!', 'success');
+    showNotification('✅ Saved to cloud!', 'success');
     return true;
     }
     const err = await response.json().catch(() => ({}));
@@ -93,18 +93,18 @@ const CONFIG = (() => {
     }
     async function uploadToImgBB(file) {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('âš ï¸ API URL not configured', 'warning');
+    showNotification('⚠️ API URL not configured', 'warning');
     return null;
     }
     const token = getAuthToken();
     if (!token) {
-    showNotification('âŒ Not logged in', 'error');
+    showNotification('👤❌ Not logged in', 'error');
     return null;
     }
     const formData = new FormData();
     formData.append('image', file);
     try {
-    showNotification('â³ Uploading image...', 'info');
+    showNotification('⏳ Uploading image...', 'info');
     const response = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}` },
@@ -112,14 +112,14 @@ const CONFIG = (() => {
     });
     const result = await response.json().catch(() => ({}));
     if (response.ok && result.url) {
-    showNotification('âœ… Image uploaded!', 'success');
+    showNotification('✅ Image uploaded!', 'success');
     return result.url;
     }
-    showNotification(result.error || 'âŒ Upload failed', 'error');
+    showNotification(result.error || '❌ Upload failed', 'error');
     return null;
     } catch (e) {
     console.error('Upload error:', e);
-    showNotification('âŒ Network error during upload', 'error');
+    showNotification('❌ Network error during upload', 'error');
     return null;
     }
     }
@@ -146,7 +146,7 @@ const CONFIG = (() => {
     }
     } catch (error) {
     console.error('Error loading data:', error);
-    showNotification('âš ï¸ Could not load data from cloud', 'warning');
+    showNotification('❌ Could not load data from cloud', 'warning');
     }
     }
     async function saveAllData() {
