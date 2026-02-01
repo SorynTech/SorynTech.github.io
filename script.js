@@ -34,7 +34,7 @@ const CONFIG = (() => {
     });
     async function loadFromJSONBin() {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('⚠️ API URL not configured (data-api-url)', 'warning');
+    showNotification('âš ï¸ API URL not configured (data-api-url)', 'warning');
     return null;
     }
     const token = getAuthToken();
@@ -55,13 +55,13 @@ const CONFIG = (() => {
     return null;
     } catch (e) {
     console.error('Error loading data:', e);
-    showNotification('⚠️ Could not connect to API', 'warning');
+    showNotification('âš ï¸ Could not connect to API', 'warning');
     return null;
     }
     }
     async function saveToJSONBin(data) {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('⚠️ API URL not configured', 'error');
+    showNotification('âŒ API URL not configured', 'error');
     return false;
     }
     const token = getAuthToken();
@@ -79,32 +79,32 @@ const CONFIG = (() => {
     body: JSON.stringify(data)
     });
     if (response.ok) {
-    showNotification('✅ Saved to cloud!', 'success');
+    showNotification('âœ… Saved to cloud!', 'success');
     return true;
     }
     const err = await response.json().catch(() => ({}));
-    showNotification(err.error || '❌ Failed to save', 'error');
+    showNotification(err.error || 'âŒ Failed to save', 'error');
     return false;
     } catch (e) {
     console.error('Error saving:', e);
-    showNotification('❌ Network error while saving', 'error');
+    showNotification('âŒ Network error while saving', 'error');
     return false;
     }
     }
     async function uploadToImgBB(file) {
     if (!CONFIG.API_BASE_URL) {
-    showNotification('⚠️ API URL not configured', 'warning');
+    showNotification('âš ï¸ API URL not configured', 'warning');
     return null;
     }
     const token = getAuthToken();
     if (!token) {
-    showNotification('👤❌ Not logged in', 'error');
+    showNotification('âŒ Not logged in', 'error');
     return null;
     }
     const formData = new FormData();
     formData.append('image', file);
     try {
-    showNotification('⏳ Uploading image...', 'info');
+    showNotification('â³ Uploading image...', 'info');
     const response = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}` },
@@ -112,14 +112,14 @@ const CONFIG = (() => {
     });
     const result = await response.json().catch(() => ({}));
     if (response.ok && result.url) {
-    showNotification('✅ Image uploaded!', 'success');
+    showNotification('âœ… Image uploaded!', 'success');
     return result.url;
     }
-    showNotification(result.error || '❌ Upload failed', 'error');
+    showNotification(result.error || 'âŒ Upload failed', 'error');
     return null;
     } catch (e) {
     console.error('Upload error:', e);
-    showNotification('❌ Network error during upload', 'error');
+    showNotification('âŒ Network error during upload', 'error');
     return null;
     }
     }
@@ -146,7 +146,7 @@ const CONFIG = (() => {
     }
     } catch (error) {
     console.error('Error loading data:', error);
-    showNotification('❌ Could not load data from cloud', 'warning');
+    showNotification('âš ï¸ Could not load data from cloud', 'warning');
     }
     }
     async function saveAllData() {
@@ -226,11 +226,11 @@ const CONFIG = (() => {
     const password = document.getElementById('loginPassword').value;
     const loginModal = document.getElementById('loginModal');
     if (!CONFIG.API_BASE_URL) {
-    await showAlert('❌ API URL not configured. Set data-api-url on #app-config.', 'Configuration Error');
+    await showAlert('âŒ API URL not configured. Set data-api-url on #app-config.', 'Configuration Error');
     return;
     }
     if (!username || !password) {
-    await showAlert('❌ Enter username and password.', 'Missing Credentials');
+    await showAlert('âŒ Enter username and password.', 'Missing Credentials');
     return;
     }
     try {
@@ -246,12 +246,12 @@ const CONFIG = (() => {
     loginModal.classList.remove('active');
     await loadAllData();
     } else {
-    await showAlert(data.error || '❌ Invalid credentials! Try again, rat.', '🐀 Access Denied');
+    await showAlert(data.error || 'âŒ Invalid credentials! Try again, rat.', 'ðŸ€ Access Denied');
     document.getElementById('loginPassword').value = '';
     }
     } catch (e) {
     console.error('Login error:', e);
-    await showAlert('❌ Could not reach API. Check URL and network.', 'Connection Error');
+    await showAlert('âŒ Could not reach API. Check URL and network.', 'Connection Error');
     }
     }
     function login(role, username) {
@@ -388,14 +388,14 @@ const CONFIG = (() => {
     }
     async function handleImageUpload(event) {
     if (currentUser.role !== 'owner') {
-    await showAlert('❌ Only the owner can upload images!', 'Permission Denied');
+    await showAlert('âŒ Only the owner can upload images!', 'Permission Denied');
     return;
     }
     const files = event.target.files;
     if (!files || files.length === 0) return;
     for (let file of files) {
     if (!file.type.startsWith('image/')) {
-    showNotification(`❌ ${file.name} is not an image`, 'warning');
+    showNotification(`âš ï¸ ${file.name} is not an image`, 'warning');
     continue;
     }
     const imageUrl = await uploadToImgBB(file);
@@ -415,14 +415,14 @@ const CONFIG = (() => {
     }
     async function handleCommissionImageUpload(event) {
     if (currentUser.role !== 'owner' && currentUser.role !== 'commission') {
-    await showAlert('❌ Only the owner or commission artists can upload images!', 'Permission Denied');
+    await showAlert('âŒ Only the owner or commission artists can upload images!', 'Permission Denied');
     return;
     }
     const files = event.target.files;
     if (!files || files.length === 0) return;
     for (let file of files) {
     if (!file.type.startsWith('image/')) {
-    showNotification(`❌ ${file.name} is not an image`, 'warning');
+    showNotification(`âš ï¸ ${file.name} is not an image`, 'warning');
     continue;
     }
     const imageUrl = await uploadToImgBB(file);
@@ -442,34 +442,34 @@ const CONFIG = (() => {
     }
     function addImageUrlModal() {
     if (currentUser.role !== 'owner') {
-    showAlert('❌ Only the owner can add images!', 'Permission Denied');
+    showAlert('âŒ Only the owner can add images!', 'Permission Denied');
     return;
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     modal.classList.add('active');
-    modalTitle.textContent = '🎨 Add Image to Gallery';
+    modalTitle.textContent = 'ðŸ–¼ï¸ Add Image to Gallery';
     modalBody.innerHTML = `
     <label>Image URL</label>
     <input type="text" id="imagePathInput" placeholder="https://i.ibb.co/xxxxx/imagename.jpg">
     <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-    <strong>🖼️ Upload to ImgBB first:</strong><br>
+    <strong>ðŸ”¸ Upload to ImgBB first:</strong><br>
     1. Go to <a href="https://imgbb.com" target="_blank" style="color: var(--accent-primary);">imgbb.com</a><br>
     2. Upload your image<br>
     3. Copy the direct link<br>
     4. Paste it above
     </p>
     <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
-    <strong>🖼️ Or use the Upload button to auto-upload!</strong>
+    <strong>ðŸ’¡ Or use the Upload button to auto-upload!</strong>
     </p>
     </div>
     <label>Image Title (optional)</label>
     <input type="text" id="imageTitleInput" placeholder="My Artwork">
     <label>Image Description (optional)</label>
     <textarea id="imageDescInput" rows="2" placeholder="Description of the artwork"></textarea>
-    <button onclick="saveImageUrl()">Add to Gallery 🐀</button>
+    <button onclick="saveImageUrl()">Add to Gallery ðŸ€</button>
     `;
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
@@ -478,20 +478,20 @@ const CONFIG = (() => {
     }
     function addCommissionUrlModal() {
     if (currentUser.role !== 'owner' && currentUser.role !== 'commission') {
-    showAlert('❌ Only the owner or commission artists can add images!', 'Permission Denied');
+    showAlert('âŒ Only the owner or commission artists can add images!', 'Permission Denied');
     return;
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     modal.classList.add('active');
-    modalTitle.textContent = '🎨 Add Commission Image';
+    modalTitle.textContent = 'ðŸ–¼ï¸ Add Commission Image';
     modalBody.innerHTML = `
     <label>Image URL</label>
     <input type="text" id="commissionImagePathInput" placeholder="https://...">
     <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-    <strong>🎨 Supported Platforms:</strong>
+    <strong>ðŸŽ¨ Supported Platforms:</strong>
     </p>
     <ul style="color: var(--text-secondary); font-size: 0.85rem; margin-left: 1.5rem;">
     <li>ImgBB - imgbb.com</li>
@@ -503,14 +503,14 @@ const CONFIG = (() => {
     <li>Any direct image URL</li>
     </ul>
     <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
-    🖼️ Or use the <strong>Upload button</strong> to auto-upload to ImgBB!
+    ðŸ’¡ Or use the <strong>Upload button</strong> to auto-upload to ImgBB!
     </p>
     </div>
     <label>Image Title (optional)</label>
     <input type="text" id="commissionImageTitleInput" placeholder="Commission Title">
     <label>Image Description (optional)</label>
     <textarea id="commissionImageDescInput" rows="2" placeholder="Client name, commission details..."></textarea>
-    <button onclick="saveCommissionUrl()">Add to Gallery 🎨</button>
+    <button onclick="saveCommissionUrl()">Add to Gallery ðŸŽ¨</button>
     `;
     document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => {
@@ -522,7 +522,7 @@ const CONFIG = (() => {
     const title = document.getElementById('imageTitleInput').value.trim();
     const description = document.getElementById('imageDescInput').value.trim();
     if (!url) {
-    await showAlert('❌ Please enter an image URL!', 'Missing URL');
+    await showAlert('âŒ Please enter an image URL!', 'Missing URL');
     return;
     }
     const newImage = {
@@ -541,7 +541,7 @@ const CONFIG = (() => {
     const title = document.getElementById('commissionImageTitleInput').value.trim();
     const description = document.getElementById('commissionImageDescInput').value.trim();
     if (!url) {
-    await showAlert('❌ Please enter an image URL!', 'Missing URL');
+    await showAlert('âŒ Please enter an image URL!', 'Missing URL');
     return;
     }
     const newImage = {
