@@ -97,9 +97,10 @@ function jsonResponse(body, status, env, origin) {
   });
 }
 async function handleGetCredentials(request, env, origin) {
+  const expose = env.PUBLIC_GUEST_CREDENTIALS === 'true';
   return jsonResponse({
     guestUser: env.GUEST_USERNAME || 'guest',
-    guestPass: env.GUEST_PASSWORD || ''
+    ...(expose ? { guestPass: env.GUEST_PASSWORD || '' } : {})
   }, 200, env, origin);
 }
 async function handleLogin(request, env, origin) {
