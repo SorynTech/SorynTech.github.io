@@ -300,16 +300,16 @@ const CONFIG = (() => {
     const badgeText = userBadge.querySelector('.badge-text');
     if (currentUser.isLoggedIn) {
     if (currentUser.role === 'owner') {
-    badgeIcon.textContent = 'ðŸ‘‘';
+    badgeIcon.textContent = '👑';
     } else if (currentUser.role === 'commission') {
-    badgeIcon.textContent = 'ðŸŽ¨';
+    badgeIcon.textContent = '🎨';
     } else {
-    badgeIcon.textContent = 'ðŸ€';
+    badgeIcon.textContent = '👤';
     }
     badgeText.textContent = currentUser.username;
     userBadge.title = 'Click to logout';
     } else {
-    badgeIcon.textContent = 'ðŸ”’';
+    badgeIcon.textContent = '🔒';
     badgeText.textContent = 'Login';
     userBadge.title = 'Click to login';
     }
@@ -576,7 +576,7 @@ const CONFIG = (() => {
     unlockGallery();
     await loadAllData();
     } else {
-    await showAlert(data.error || '❌ Access denied! Wrong credentials, rat.', 'ðŸ€ Access Denied');
+    await showAlert(data.error || '❌ Access denied! Wrong credentials, rat.', '🐀 Access Denied');
     document.getElementById('artPassword').value = '';
     }
     } catch (e) {
