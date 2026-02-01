@@ -361,7 +361,7 @@ function addImageUrlModal() {
     modalTitle.textContent = '🖼️ Add Image to Gallery';
     modalBody.innerHTML = `
         <label>Image URL</label>
-        <input type="text" id="imagePathInput" placeholder="https://i.ibb.co/xxxxx/image.jpg">
+        <input type="text" id="imagePathInput" placeholder="https://i.ibb.co/xxxxx/imagename.jpg">
         <div style="margin: 1rem 0; padding: 1rem; background: rgba(125, 211, 252, 0.1); border-radius: 10px;">
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
                 <strong>📸 Upload to ImgBB first:</strong><br>
