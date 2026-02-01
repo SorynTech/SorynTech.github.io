@@ -1518,4 +1518,166 @@ body::before {
         left: 1rem;
         text-align: center;
     }
+}.commission-only {
+opacity: 0.5;
+pointer-events: none;
+}
+.commission-only.enabled {
+opacity: 1;
+pointer-events: all;
+}
+.image-expand-content {
+max-width: 90vw;
+max-height: 90vh;
+padding: 0;
+background: var(--bg-primary);
+overflow: hidden;
+display: flex;
+flex-direction: column;
+}
+.image-expand-content img {
+max-width: 100%;
+max-height: calc(90vh - 150px);
+object-fit: contain;
+border-radius: 15px 15px 0 0;
+}
+.image-expand-info {
+padding: 1.5rem 2rem;
+background: var(--bg-card);
+border-radius: 0 0 15px 15px;
+}
+.image-expand-info h3 {
+font-family: 'Righteous', cursive;
+font-size: 1.5rem;
+margin-bottom: 0.5rem;
+color: var(--accent-primary);
+}
+.image-expand-info p {
+color: var(--text-secondary);
+line-height: 1.6;
+}
+.alert-modal-content {
+max-width: 450px;
+width: 90%;
+text-align: center;
+}
+.alert-modal-content h3 {
+font-family: 'Righteous', cursive;
+font-size: 1.5rem;
+margin-bottom: 1rem;
+color: var(--accent-primary);
+}
+.alert-modal-content p {
+color: var(--text-secondary);
+margin-bottom: 1.5rem;
+line-height: 1.6;
+}
+.modal-btn {
+padding: 0.75rem 2rem;
+background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+border: none;
+border-radius: 10px;
+color: var(--text-primary);
+font-size: 1rem;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+font-family: 'DM Sans', sans-serif;
+flex: 1;
+}
+.modal-btn:hover {
+box-shadow: var(--shadow-glow);
+transform: translateY(-2px);
+}
+.modal-btn-cancel {
+background: rgba(255, 0, 110, 0.2);
+border: 1px solid rgba(255, 0, 110, 0.4);
+}
+.modal-btn-cancel:hover {
+background: rgba(255, 0, 110, 0.3);
+box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+.gallery-item {
+cursor: pointer;
+}
+.gallery-item img {
+cursor: pointer;
+}
+.image-expand-content .close-btn {
+position: absolute;
+top: 1rem;
+right: 1.5rem;
+z-index: 10;
+background: rgba(0, 0, 0, 0.7);
+width: 40px;
+height: 40px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.5rem;
+color: white;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+.image-expand-content .close-btn:hover {
+background: rgba(255, 0, 110, 0.9);
+transform: rotate(90deg);
+}
+.gallery-item .delete-btn {
+z-index: 5;
+}
+.gallery-item .delete-btn:hover {
+z-index: 10;
+}
+#commissionsGrid .gallery-item {
+border: 2px solid rgba(168, 85, 247, 0.2);
+}
+#commissionsGrid .gallery-item:hover {
+border-color: rgba(168, 85, 247, 0.6);
+}
+#commissionsGrid .gallery-item.loading::after {
+content: 'ðŸŽ¨ Loading commission...';
+}
+#commissionsGrid .gallery-item.error::after {
+content: 'âŒ Commission failed to load';
+}
+@media (max-width: 768px) {
+.image-expand-content {
+max-width: 95vw;
+max-height: 95vh;
+}
+.image-expand-content img {
+max-height: calc(95vh - 120px);
+}
+.image-expand-info {
+padding: 1rem;
+}
+.image-expand-info h3 {
+font-size: 1.2rem;
+}
+.alert-modal-content {
+width: 95%;
+}
+}
+.guest-credentials {
+margin-top: 1.5rem;
+padding: 1rem;
+background: rgba(125, 211, 252, 0.1);
+border: 1px solid rgba(125, 211, 252, 0.3);
+border-radius: 10px;
+text-align: left;
+}
+.credentials-label {
+font-size: 0.9rem;
+font-weight: 600;
+color: var(--accent-primary);
+margin-bottom: 0.5rem;
+}
+.credentials-value {
+font-family: 'DM Sans', monospace;
+font-size: 0.85rem;
+color: var(--text-secondary);
+white-space: pre-line;
+line-height: 1.6;
 }
