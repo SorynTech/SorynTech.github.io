@@ -1637,10 +1637,10 @@ border: 2px solid rgba(168, 85, 247, 0.2);
 border-color: rgba(168, 85, 247, 0.6);
 }
 #commissionsGrid .gallery-item.loading::after {
-content: 'ðŸŽ¨ Loading commission...';
+content: '⏳ Loading commission...';
 }
 #commissionsGrid .gallery-item.error::after {
-content: 'âŒ Commission failed to load';
+content: '❌ Commission failed to load';
 }
 @media (max-width: 768px) {
 .image-expand-content {
