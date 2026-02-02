@@ -471,6 +471,18 @@ body::before {
     flex-shrink: 0;
 }
 
+.social-link i {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.social-link img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
 .bots-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -862,7 +874,8 @@ body::before {
 }
 
 .gallery-item.loading::after {
-    content: 'Ã¢ÂÂ³ Loading...';
+    content: '
+    ' Loading...';
     color: var(--text-muted);
     font-size: 0.9rem;
 }
@@ -876,7 +889,7 @@ body::before {
 }
 
 .gallery-item.error::after {
-    content: 'Ã¢ÂÅ’ Failed to load';
+    content: 'Failed to load';
     color: var(--accent-secondary);
     font-size: 0.9rem;
     text-align: center;
@@ -1170,8 +1183,19 @@ body::before {
     transition: all 0.3s ease;
 }
 
+.game-icon img {
+    width: 40px;
+    height: 40px;
+    transition: all 0.3s ease;
+}
+
 .game-account-card:hover .game-icon svg {
     color: var(--purple-dark);
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.5));
+}
+
+.game-account-card:hover .game-icon img {
     transform: scale(1.1);
     filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.5));
 }
