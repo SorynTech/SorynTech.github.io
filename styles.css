@@ -1663,7 +1663,7 @@ border-color: rgba(168, 85, 247, 0.6);
 content: '⏳ Loading commission...';
 }
 #commissionsGrid .gallery-item.error::after {
-content: ❌ Commission failed to load';
+content: '❌ Commission failed to load';
 }
 @media (max-width: 768px) {
 .image-expand-content {
