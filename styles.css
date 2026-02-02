@@ -234,6 +234,33 @@ body::before {
     letter-spacing: 1px;
 }
 
+/* Lanyard / Profile Hero, omitted for brevity - same as original */
+
+.gallery-item.loading::after {
+    content: '🎨 Loading...';
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.gallery-item.error::after {
+    content: '❌ Failed to load';
+    color: var(--accent-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+#commissionsGrid .gallery-item.loading::after {
+    content: '🎨 Loading commission...';
+}
+
+#commissionsGrid .gallery-item.error::after {
+    content: '❌ Commission failed to load';
+}
+
+/* Rest of the CSS remains identical to original */
+
+
 .profile-hero {
     display: flex;
     flex-direction: column;
