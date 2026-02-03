@@ -471,6 +471,18 @@ body::before {
     flex-shrink: 0;
 }
 
+.social-link i {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.social-link img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
 .bots-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -862,7 +874,7 @@ body::before {
 }
 
 .gallery-item.loading::after {
-    content: 'Ã¢ÂÂ³ Loading...';
+    content: 'ÃƒÂ¢Ã‚ÂÃ‚Â³ Loading...';
     color: var(--text-muted);
     font-size: 0.9rem;
 }
@@ -876,7 +888,7 @@ body::before {
 }
 
 .gallery-item.error::after {
-    content: 'Ã¢ÂÅ’ Failed to load';
+    content: 'ÃƒÂ¢Ã‚ÂÃ…â€™ Failed to load';
     color: var(--accent-secondary);
     font-size: 0.9rem;
     text-align: center;
@@ -1170,8 +1182,19 @@ body::before {
     transition: all 0.3s ease;
 }
 
+.game-icon img {
+    width: 40px;
+    height: 40px;
+    transition: all 0.3s ease;
+}
+
 .game-account-card:hover .game-icon svg {
     color: var(--purple-dark);
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.5));
+}
+
+.game-account-card:hover .game-icon img {
     transform: scale(1.1);
     filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.5));
 }
@@ -1502,16 +1525,16 @@ body::before {
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    
+
     .friends-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .game-accounts-grid {
         grid-template-columns: 1fr;
         max-width: 400px;
     }
-    
+
     .copy-toast {
         bottom: 1rem;
         right: 1rem;
@@ -1637,10 +1660,10 @@ border: 2px solid rgba(168, 85, 247, 0.2);
 border-color: rgba(168, 85, 247, 0.6);
 }
 #commissionsGrid .gallery-item.loading::after {
-content: '⏳ Loading commission...';
+content: 'â³ Loading commission...';
 }
 #commissionsGrid .gallery-item.error::after {
-content: '❌ Commission failed to load';
+content: 'âŒ Commission failed to load';
 }
 @media (max-width: 768px) {
 .image-expand-content {
