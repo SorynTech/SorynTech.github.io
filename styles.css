@@ -874,8 +874,7 @@ body::before {
 }
 
 .gallery-item.loading::after {
-    content: '
-    ' Loading...';
+    content: '⏳ Loading...';
     color: var(--text-muted);
     font-size: 0.9rem;
 }
@@ -889,7 +888,7 @@ body::before {
 }
 
 .gallery-item.error::after {
-    content: 'Failed to load';
+    content: '❌ Failed to load';
     color: var(--accent-secondary);
     font-size: 0.9rem;
     text-align: center;
@@ -1526,16 +1525,16 @@ body::before {
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    
+
     .friends-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .game-accounts-grid {
         grid-template-columns: 1fr;
         max-width: 400px;
     }
-    
+
     .copy-toast {
         bottom: 1rem;
         right: 1rem;

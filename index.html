@@ -23,7 +23,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-<!-- Simple Icons for brand logos -->
 <script src="https://unpkg.com/simple-icons@latest/icons.js"></script>
 </head>
 <body>
@@ -47,8 +46,8 @@
                 <li><a href="#" class="nav-link" data-section="privacy">🐀 The Rat's Vault</a></li>
             </ul>
             <div class="user-badge" id="userBadge">
-                <span class="badge-icon">👤</span>
-                <span class="badge-text">Guest</span>
+                <span class="badge-icon">🔒</span>
+                <span class="badge-text">Login</span>
             </div>
         </div>
     </nav>
@@ -63,7 +62,10 @@
                 <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="Enter password">
                 <button onclick="attemptLogin()">Enter the Nest 🐀</button>
-                <p class="password-hint">Owner, Guest, or Commission Artist access available</p>
+                <div class="guest-credentials">
+                    <p class="credentials-label">Guest Access:</p>
+                    <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
+                </div>
             </div>
         </div>
     </div>
@@ -103,7 +105,7 @@
                         <span>Twitter/X</span>
                     </a>
                     <a href="https://www.instagram.com/zippydrawz.offical__/" class="social-link" id="instagramLink" target="_blank" rel="noopener noreferrer">
-                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg" alt="Instagram" style="width: 24px; height: 24px; filter: invert(1);">
+                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg" alt="Instagram" style="width: 24px; height: 24px;">
                         <span>Instagram</span>
                     </a>
                     <a href="https://github.com/sorynTech" class="social-link" id="githubLink" target="_blank" rel="noopener noreferrer">
@@ -111,11 +113,11 @@
                         <span>GitHub</span>
                     </a>
                     <a href="https://Discord.gg/users/447812883158532106" class="social-link" id="discordLink" target="_blank" rel="noopener noreferrer">
-                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" alt="Discord" style="width: 24px; height: 24px; filter: invert(1);">
+                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" alt="Discord" style="width: 24px; height: 24px;">
                         <span>Discord</span>
                     </a>
                     <a href="https://Ko-fi.com/soryntech" class="social-link" id="kofiLink" target="_blank" rel="noopener noreferrer">
-                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/kofi.svg" alt="Ko-fi" style="width: 24px; height: 24px; filter: invert(1);">
+                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/kofi.svg" alt="Ko-fi" style="width: 24px; height: 24px;">
                         <span>Ko-fi</span>
                     </a>
                 </div>
@@ -150,7 +152,7 @@
                     <div class="game-accounts-grid">
                         <div class="game-account-card" onclick="copyToClipboard('SorynTech#Fang', 'Riot Games')">
                             <div class="game-icon">
-                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/riotgames.svg" alt="Riot Games" style="width: 40px; height: 40px; filter: brightness(0) saturate(100%) invert(79%) sepia(36%) saturate(464%) hue-rotate(167deg) brightness(101%) contrast(97%);">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/riotgames.svg" alt="Riot Games" style="width: 40px; height: 40px;">
                             </div>
                             <h4 class="game-platform">Riot Games</h4>
                             <p class="game-subtitle">League of Legends • Valorant</p>
@@ -194,15 +196,14 @@
         <div class="content-wrapper">
             <h2 class="section-title">🐀 Discord Bots</h2>
             <div class="bots-grid" id="botsGrid">
-                <div class="bot-card">
-                    <div class="bot-icon">🤖</div>
-                    <h3 class="bot-name">Example Bot</h3>
-                    <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to customize!</p>
-                    <div class="bot-stats">
-                        <span class="stat"><strong>1.2K</strong> Servers</span>
-                        <span class="stat"><strong>50K</strong> Users</span>
+                <div class="gallery-placeholder" style="padding: 3rem; text-align: center;">
+                    <i data-feather="lock" style="width: 60px; height: 60px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-primary);">Login Required</h3>
+                    <p style="color: var(--text-secondary); font-size: 1rem;">To see bots, please login with the guest credentials</p>
+                    <div class="guest-credentials" style="max-width: 300px; margin: 1.5rem auto 0;">
+                        <p class="credentials-label">Guest Access:</p>
+                        <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
                     </div>
-                    <a href="#" class="bot-link">Invite Bot →</a>
                 </div>
             </div>
             <button class="add-btn owner-only" id="addBotBtn" style="display: none;">🐀 Add Bot</button>
@@ -216,7 +217,10 @@
                 <input type="text" id="artUsername" placeholder="Username">
                 <input type="password" id="artPassword" placeholder="Password">
                 <button id="unlockBtn">Unlock Vault 🔓</button>
-                <p class="password-hint">Guest or Owner access required</p>
+                <div class="guest-credentials">
+                    <p class="credentials-label">Guest Access:</p>
+                    <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
+                </div>
             </div>
         </div>
         <div class="content-wrapper gallery-content">
@@ -245,7 +249,7 @@
                 <button id="unlockCommissionsBtn">Unlock Gallery 🔓</button>
                 <div class="guest-credentials" id="commissionsGuestCreds">
                     <p class="credentials-label">Guest Access:</p>
-                    <p class="credentials-value">Loading...</p>
+                    <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
                 </div>
             </div>
         </div>
@@ -279,7 +283,7 @@
                 <div class="privacy-block">
                     <h4><span>👾</span> What Gets Tracked</h4>
                     <p>
-                        Dark Visitors logs incoming requests to detect and identify automated bots — not you. It looks at user-agent strings and request patterns to tell the difference between a real visitor and a bot trying to scrape or train on this site's content.
+                        Dark Visitors logs incoming requests to detect and identify automated bots â€” not you. It looks at user-agent strings and request patterns to tell the difference between a real visitor and a bot trying to scrape or train on this site's content.
                     </p>
                 </div>
                 <div class="privacy-block">
