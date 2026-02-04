@@ -1196,7 +1196,7 @@ const CONFIG = (() => {
     const data = await response.json();
     const artCreds = document.getElementById('artGuestCreds');
     const commCreds = document.getElementById('commissionsGuestCreds');
-    const credsText = `Username: ${data.guestUser || 'guest'}\nPassword: ${data.guestPass || '(not set)'}`;
+    const credsText = `Username: ${data.guestUser || 'Guest'}\nPassword: ${data.guestPass || 'Rat_Guest'}`;
     if (artCreds) {
     const valueEl = artCreds.querySelector('.credentials-value');
     if (valueEl) valueEl.textContent = credsText;
