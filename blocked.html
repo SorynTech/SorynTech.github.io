@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Not Supported - SorynTech</title>
+    <style>
+        :root {
+            --bg-primary: #1a1d2e;
+            --bg-secondary: #252839;
+            --bg-card: #2d3446;
+            --accent-primary: #7dd3fc;
+            --accent-secondary: #a855f7;
+            --text-primary: #dfe6e9;
+            --text-secondary: #b2bec3;
+            --text-muted: #636e72;
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .block-container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .block-icon {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .block-icon svg {
+            width: 80px;
+            height: 80px;
+            color: var(--accent-secondary);
+            filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.3));
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .message {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .reason {
+            background: rgba(168, 85, 247, 0.1);
+            border-left: 3px solid var(--accent-secondary);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .reason p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .browsers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .browser-card {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .browser-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(125, 211, 252, 0.3);
+        }
+
+        .browser-card img {
+            width: 48px;
+            height: 48px;
+        }
+
+        .browser-card span {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 640px) {
+            .block-container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .browsers {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="block-container">
+        <div class="block-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+        </div>
+
+        <h1>Browser Not Supported</h1>
+
+        <p class="message">
+            Microsoft Edge is not supported on this website.
+        </p>
+
+        <div class="reason">
+            <p>
+                <strong>Why?</strong> To protect my artwork and content from being used to train AI models, 
+                Microsoft Edge is blocked due to Microsoft's data collection practices and integration with AI services.
+            </p>
+        </div>
+
+        <p style="text-align: center; color: var(--text-primary); margin-bottom: 1.5rem; font-weight: 600;">
+            Please use one of these recommended browsers:
+        </p>
+
+        <div class="browsers">
+            <a href="https://www.google.com/chrome/" class="browser-card" target="_blank" rel="noopener noreferrer">
+                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/googlechrome.svg" alt="Chrome" style="filter: invert(1);">
+                <span>Google Chrome</span>
+            </a>
+            <a href="https://www.mozilla.org/firefox/" class="browser-card" target="_blank" rel="noopener noreferrer">
+                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/firefox.svg" alt="Firefox" style="filter: invert(1);">
+                <span>Mozilla Firefox</span>
+            </a>
+        </div>
+
+        <div class="footer-note">
+            Thank you for understanding. This helps protect creative work from unauthorized AI training.
+        </div>
+    </div>
+</body>
+</html>

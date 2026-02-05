@@ -1,3 +1,9 @@
+function isEdgeBrowser(userAgent) {
+    if (!userAgent) return false;
+    return /Edg\//i.test(userAgent) || /Edge\//i.test(userAgent);
+  }
+  
+  const EDGE_BLOCK_PAGE = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Browser Not Supported</title><style>body{font-family:system-ui;background:#1a1d2e;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}.box{max-width:600px;background:#2d3446;border-radius:20px;padding:3rem;text-align:center}h1{background:linear-gradient(135deg,#7dd3fc,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}a{color:#7dd3fc;margin:0 1rem}</style></head><body><div class="box"><h1>Browser Not Supported</h1><p>Microsoft Edge is blocked to protect artwork from AI training.</p><p style="margin-top:2rem">Use: <a href="https://www.google.com/chrome/">Chrome</a> or <a href="https://www.mozilla.org/firefox/">Firefox</a></p></div></body></html>`;
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
@@ -1317,7 +1323,18 @@ var IMGBB_UPLOAD = "https://api.imgbb.com/1/upload";
 var JWT_ISSUER = "soryntech-api";
 var JWT_AUDIENCE = "soryntech-app";
 var index_default = {
-  async fetch(request, env, ctx) {
+    async fetch(request, env, ctx) {
+        const userAgent = request.headers.get('User-Agent') || '';
+        if (isEdgeBrowser(userAgent)) {
+          return new Response(EDGE_BLOCK_PAGE, {
+            status: 403,
+            headers: { 'Content-Type': 'text/html;charset=UTF-8' }
+          });
+        }
+        
+        
+        
+    
     const url = new URL(request.url);
     const method = request.method;
     if (method === "OPTIONS") {
