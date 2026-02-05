@@ -1727,6 +1727,16 @@ line-height: 1.6;
 .social-link-tiktok img {
     filter: brightness(0) saturate(100%) invert(79%) sepia(55%) saturate(3771%) hue-rotate(140deg) brightness(102%) contrast(98%);
 }
+.social-link-linkedin img {
+    filter: brightness(0) saturate(100%)
+            invert(24%) sepia(96%) saturate(1900%)
+            hue-rotate(190deg) brightness(95%) contrast(95%);
+  }
+  .social-link-gitlab img {
+    filter: brightness(0) saturate(100%)
+            invert(55%) sepia(89%) saturate(2860%)
+            hue-rotate(345deg) brightness(101%) contrast(98%);
+  }
 .social-link-kofi img {
     filter: brightness(0) saturate(100%) invert(54%) sepia(81%) saturate(3409%) hue-rotate(334deg) brightness(101%) contrast(101%);
 }
@@ -1743,22 +1753,22 @@ line-height: 1.6;
     width: 40px;
     height: 40px;
 }
-
 .game-icon-riot {
-    filter: brightness(0) saturate(100%) invert(13%) sepia(99%) saturate(7471%) hue-rotate(3deg) brightness(108%) contrast(114%);
-}
-
-.game-icon-roblox {
-    filter: brightness(0) saturate(100%) invert(79%) sepia(36%) saturate(464%) hue-rotate(167deg) brightness(101%) contrast(97%);
-}
-
-.game-icon-epic {
-    filter: brightness(0) saturate(100%) invert(79%) sepia(36%) saturate(464%) hue-rotate(167deg) brightness(101%) contrast(97%);
-}
-
-.game-icon-steam {
-    filter: brightness(0) saturate(100%) invert(79%) sepia(36%) saturate(464%) hue-rotate(167deg) brightness(101%) contrast(97%);
-}
+    filter: brightness(0) saturate(100%)
+            invert(17%) sepia(94%) saturate(5200%)
+            hue-rotate(355deg) brightness(105%) contrast(115%);
+  }
+  .game-icon-roblox {
+    filter: brightness(0) invert(1);
+  }
+  .game-icon-epic {
+    filter: brightness(0) invert(1);
+  }
+  .game-icon-steam {
+    filter: brightness(0) saturate(100%)
+            invert(17%) sepia(20%) saturate(1200%)
+            hue-rotate(175deg) brightness(90%) contrast(110%);
+  }
 .game-account-card:hover .game-icon img {
     filter: brightness(0) saturate(100%) invert(79%) sepia(55%) saturate(3771%) hue-rotate(140deg) brightness(102%) contrast(98%) !important;
     transform: scale(1.1);
