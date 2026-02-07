@@ -1246,42 +1246,92 @@ const CONFIG = (() => {
     document.addEventListener('DOMContentLoaded', function() {
     loadGuestCredentials();
     });
-
-// GitHub Contribution Graph Configuration
 const GITHUB_CONFIG = {
     username: 'SorynTech',
-    // Set your GitHub account creation date here
-    // You can find this at: https://github.com/YOUR_USERNAME (joined date)
-    accountCreatedAt: new Date('2020-01-15')
+    accountCreatedAt: new Date('2025-11-01')
 };
 
 async function fetchGitHubContributions(username) {
     try {
         if (!CONFIG.API_BASE_URL) {
-            return { error: 'API not configured' };
+            console.warn('GitHub graph: API_BASE_URL not configured, using demo data');
+            return createDemoGraph(GITHUB_CONFIG.accountCreatedAt, true);
         }
 
-        const response = await fetch(`${CONFIG.API_BASE_URL}/api/github/user?username=${encodeURIComponent(username)}`);
-        if (!response.ok) {
-            return { error: 'API not configured' };
+        // Try the real GraphQL contributions endpoint first
+        const response = await fetch(
+            `${CONFIG.API_BASE_URL}/api/github/contributions?username=${encodeURIComponent(username)}`
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.weeks && Array.isArray(data.weeks)) {
+                return parseRealContributions(data);
+            }
         }
-        
-        const userData = await response.json();
-        if (userData.error || !userData.created_at) {
-            return { error: 'API not configured' };
+
+        // If contributions endpoint failed, try the user endpoint for account age at least
+        console.warn('GitHub graph: contributions endpoint failed, falling back to demo data');
+        const userResp = await fetch(
+            `${CONFIG.API_BASE_URL}/api/github/user?username=${encodeURIComponent(username)}`
+        );
+        if (userResp.ok) {
+            const userData = await userResp.json();
+            if (userData.created_at) {
+                return createDemoGraph(new Date(userData.created_at), true);
+            }
         }
-        
-        const accountCreatedAt = new Date(userData.created_at);
-        return createDemoGraph(accountCreatedAt);
-        
+
+        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt, true);
     } catch (error) {
         console.error('Error fetching GitHub contributions:', error);
-        return { error: 'API not configured' };
+        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt, true);
     }
 }
 
+/**
+ * Parse the real contribution data returned by the Worker's GraphQL proxy
+ * into the shape expected by renderGitHubGraph.
+ */
+function parseRealContributions(data) {
+    const accountCreatedAt = data.createdAt ? new Date(data.createdAt) : GITHUB_CONFIG.accountCreatedAt;
+    const now = new Date();
 
-function createDemoGraph(accountCreatedAt) {
+    // data.weeks already has the right shape from GitHub's API:
+    // [ { contributionDays: [ { date, contributionCount } ] } ]
+    const weeks = (data.weeks || []).map(week => ({
+        contributionDays: week.contributionDays.map(day => ({
+            date: day.date,
+            contributionCount: day.contributionCount
+        }))
+    }));
+
+    const totalContributions = data.totalContributions ?? weeks.reduce(
+        (sum, w) => sum + w.contributionDays.reduce((s, d) => s + d.contributionCount, 0), 0
+    );
+
+    const accountAgeDays = Math.floor((now - accountCreatedAt) / (1000 * 60 * 60 * 24));
+    const accountAgeYears = Math.floor(accountAgeDays / 365);
+    const accountAgeMonths = Math.floor((accountAgeDays % 365) / 30);
+
+    return {
+        totalContributions,
+        weeks,
+        accountCreatedAt,
+        isDemo: false,
+        accountAge: {
+            days: accountAgeDays,
+            display: `${accountAgeYears}y ${accountAgeMonths}m`
+        }
+    };
+}
+
+/**
+ * Generate random demo contribution data as a fallback.
+ * @param {Date} accountCreatedAt
+ * @param {boolean} isDemo  marks the result so the renderer can show a "Demo" badge
+ */
+function createDemoGraph(accountCreatedAt, isDemo = true) {
     const now = new Date();
     const weeks = [];
     
@@ -1336,6 +1386,7 @@ function createDemoGraph(accountCreatedAt) {
         totalContributions,
         weeks,
         accountCreatedAt,
+        isDemo: isDemo,
         accountAge: {
             days: accountAgeDays,
             display: `${accountAgeYears}y ${accountAgeMonths}m`
@@ -1369,7 +1420,15 @@ function renderGitHubGraph(calendar) {
         container.innerHTML = '<p style="color: #586069; text-align: center;">API not configured</p>';
         return;
     }
-    
+    if (calendar.isDemo) {
+        const demoBanner = document.createElement('div');
+        demoBanner.style.cssText = 'text-align:center;padding:0.4rem 0.8rem;margin-bottom:0.75rem;' +
+            'background:rgba(255,165,0,0.15);border:1px solid rgba(255,165,0,0.4);border-radius:8px;' +
+            'color:#ffa502;font-size:0.85rem;font-weight:500;';
+        demoBanner.textContent = '⚠️ Demo / Sample Data — GitHub API key not configured';
+        container.appendChild(demoBanner);
+    }
+
     // Create tooltip element
     const tooltip = document.createElement('div');
     tooltip.className = 'graph-tooltip';
@@ -1389,24 +1448,16 @@ function renderGitHubGraph(calendar) {
             dayDiv.className = `contribution-day level-${getContributionLevel(day.contributionCount)}`;
             dayDiv.dataset.date = day.date;
             dayDiv.dataset.count = day.contributionCount;
-            
-            // Add hover effect with viewport boundary checks
             dayDiv.addEventListener('mouseenter', (e) => {
                 const rect = e.target.getBoundingClientRect();
                 tooltip.textContent = `${day.contributionCount} contributions on ${formatDate(day.date)}`;
                 tooltip.style.display = 'block';
-                
-                // Calculate position and ensure it stays within viewport
                 let left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
                 let top = rect.top - tooltip.offsetHeight - 10;
-                
-                // Prevent tooltip from going off left edge
                 if (left < 0) left = 5;
-                // Prevent tooltip from going off right edge
                 if (left + tooltip.offsetWidth > window.innerWidth) {
                     left = window.innerWidth - tooltip.offsetWidth - 5;
                 }
-                // If tooltip would go off top, show below instead
                 if (top < 0) {
                     top = rect.bottom + 10;
                 }
@@ -1439,8 +1490,6 @@ function renderGitHubGraph(calendar) {
         </div>
         <span>More</span>
     `;
-    
-    // Create stats
     const stats = document.createElement('div');
     stats.className = 'graph-stats';
     
@@ -1448,8 +1497,6 @@ function renderGitHubGraph(calendar) {
     const activeDays = calendar.weeks.reduce((sum, week) => 
         sum + week.contributionDays.filter(day => day.contributionCount > 0).length, 0);
     const avgPerDay = (calendar.totalContributions / totalDays).toFixed(1);
-    
-    // Add account creation info if available
     let accountInfo = '';
     if (calendar.accountAge) {
         accountInfo = `
@@ -1475,21 +1522,15 @@ function renderGitHubGraph(calendar) {
         </div>
         ${accountInfo}
     `;
-    
-    // Clear and append everything
     container.innerHTML = '';
     container.appendChild(graphWrapper);
     container.appendChild(legend);
     container.appendChild(stats);
 }
-
-// Initialize GitHub contribution graph
 async function initGitHubGraph() {
     const calendar = await fetchGitHubContributions(GITHUB_CONFIG.username);
     renderGitHubGraph(calendar);
 }
-
-// Load graph when page loads
 document.addEventListener('DOMContentLoaded', function() {
     initGitHubGraph();
 });

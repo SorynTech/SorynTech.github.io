@@ -1352,6 +1352,9 @@ var index_default = {
       if (url.pathname === "/api/github/user" && method === "GET") {
         return await handleGitHubUser(request, env, origin);
       }
+      if (url.pathname === "/api/github/contributions" && method === "GET") {
+        return await handleGitHubContributions(request, env, origin);
+      }
       return jsonResponse({ error: "Not Found" }, 404, env, origin);
     } catch (e) {
       console.error(e);
@@ -1687,6 +1690,78 @@ async function handleGitHubUser(request, env, origin) {
   }
 }
 __name(handleGitHubUser, "handleGitHubUser");
+async function handleGitHubContributions(request, env, origin) {
+  const key = env.GITHUB_API_KEY;
+  if (!key) {
+    return jsonResponse({ error: "GitHub API key not configured" }, 500, env, origin);
+  }
+  const url = new URL(request.url);
+  const username = url.searchParams.get("username");
+  if (!username) {
+    return jsonResponse({ error: "Username required" }, 400, env, origin);
+  }
+  const now2 = new Date();
+  const from = new Date(now2);
+  from.setDate(from.getDate() - 52 * 7);
+  const fromISO = from.toISOString();
+  const toISO = now2.toISOString();
+  const query = `
+    query($username: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $username) {
+        createdAt
+        contributionsCollection(from: $from, to: $to) {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays {
+                date
+                contributionCount
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  try {
+    const response = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        "Authorization": `bearer ${key}`,
+        "Content-Type": "application/json",
+        "User-Agent": "SorynTech-Portfolio"
+      },
+      body: JSON.stringify({
+        query,
+        variables: { username, from: fromISO, to: toISO }
+      })
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("GitHub GraphQL HTTP error:", response.status, text);
+      return jsonResponse({ error: "GitHub API error", status: response.status }, response.status, env, origin);
+    }
+    const json = await response.json();
+    if (json.errors) {
+      console.error("GitHub GraphQL errors:", JSON.stringify(json.errors));
+      return jsonResponse({ error: "GitHub GraphQL error", details: json.errors[0]?.message }, 502, env, origin);
+    }
+    const user = json.data?.user;
+    if (!user) {
+      return jsonResponse({ error: "User not found" }, 404, env, origin);
+    }
+    const calendar = user.contributionsCollection.contributionCalendar;
+    return jsonResponse({
+      createdAt: user.createdAt,
+      totalContributions: calendar.totalContributions,
+      weeks: calendar.weeks
+    }, 200, env, origin);
+  } catch (error) {
+    console.error("GitHub contributions error:", error);
+    return jsonResponse({ error: "Failed to fetch contribution data" }, 500, env, origin);
+  }
+}
+__name(handleGitHubContributions, "handleGitHubContributions");
 export {
   index_default as default
 };
