@@ -838,15 +838,10 @@ const CONFIG = (() => {
     const botsGrid = document.getElementById('botsGrid');
     if (dataCache.bots.length === 0) {
     botsGrid.innerHTML = `
-    <div class="bot-card">
-    <div class="bot-icon">🐀</div>
-    <h3 class="bot-name">Example Bot</h3>
-    <p class="bot-description">A helpful Discord bot that does amazing things. Login as owner to add your own!</p>
-    <div class="bot-stats">
-    <span class="stat"><strong>1.2K</strong> Servers</span>
-    <span class="stat"><strong>50K</strong> Users</span>
-    </div>
-    <a href="#" class="bot-link">Invite Bot ✉️</a>
+    <div class="gallery-placeholder" style="padding: 3rem; text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">🐀</div>
+    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-primary);">No Bots Yet</h3>
+    <p style="color: var(--text-secondary); font-size: 1rem;">Nothing to see here... yet!</p>
     </div>
     `;
     return;
@@ -983,13 +978,10 @@ const CONFIG = (() => {
     const projectsGrid = document.getElementById('projectsGrid');
     if (dataCache.projects.length === 0) {
     projectsGrid.innerHTML = `
-    <div class="project-card">
-    <div class="project-icon">💻</div>
-    <h3 class="project-name">Example Project</h3>
-    <p class="project-description">A cool coding project that does amazing things. Login as owner to add your own!</p>
-    <div class="project-links">
-    <a href="#" class="project-link-btn">🔗 Demo</a>
-    </div>
+    <div class="gallery-placeholder" style="padding: 3rem; text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">🐀</div>
+    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-primary);">No Projects Yet</h3>
+    <p style="color: var(--text-secondary); font-size: 1rem;">Nothing to see here... yet!</p>
     </div>
     `;
     return;
