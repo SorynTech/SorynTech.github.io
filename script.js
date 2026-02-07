@@ -1247,17 +1247,28 @@ const CONFIG = (() => {
     loadGuestCredentials();
     });
 
+// GitHub Contribution Graph Configuration
+const GITHUB_CONFIG = {
+    username: 'SorynTech',
+    // Set your GitHub account creation date here
+    // You can find this at: https://github.com/YOUR_USERNAME (joined date)
+    accountCreatedAt: new Date('2020-01-15')
+};
+
 // GitHub Contribution Graph
 async function fetchGitHubContributions(username) {
     try {
-        // In a production environment, this would fetch from GitHub API
-        // For now, generate a demonstration graph with realistic data
-        const accountCreatedAt = new Date('2020-01-15'); // Example account creation date
-        return createDemoGraph(accountCreatedAt);
+        // NOTE: In production with CORS properly configured, you can fetch real data from GitHub API:
+        // const response = await fetch(`https://api.github.com/users/${username}`);
+        // const userData = await response.json();
+        // const accountCreatedAt = new Date(userData.created_at);
+        
+        // For now, we generate a realistic demonstration graph
+        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt);
         
     } catch (error) {
         console.error('Error fetching GitHub contributions:', error);
-        return createDemoGraph(new Date('2020-01-15'));
+        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt);
     }
 }
 
@@ -1435,8 +1446,7 @@ function renderGitHubGraph(calendar) {
 
 // Initialize GitHub contribution graph
 async function initGitHubGraph() {
-    const username = 'SorynTech';
-    const calendar = await fetchGitHubContributions(username);
+    const calendar = await fetchGitHubContributions(GITHUB_CONFIG.username);
     renderGitHubGraph(calendar);
 }
 
