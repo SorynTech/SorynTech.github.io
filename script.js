@@ -855,8 +855,12 @@ const CONFIG = (() => {
     }
     }
     function openBotModal(botData = null, index = null) {
-    if (currentUser.role !== 'owner' && botData) {
+    if (currentUser.role !== 'owner') {
     return;
+    }
+    // Get bot data from cache if index is provided but botData is null
+    if (index !== null && !botData) {
+    botData = dataCache.bots[index];
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -958,7 +962,7 @@ const CONFIG = (() => {
     botsGrid.innerHTML = dataCache.bots.map((bot, index) => {
     const hasLinks = bot.inviteLink || bot.githubRepo || bot.botFolder;
     return `
-    <div class="bot-card" ${isOwner ? `onclick="openBotModal(${JSON.stringify(bot).replace(/"/g, '&quot;')}, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
+    <div class="bot-card" ${isOwner ? `data-bot-index="${index}" onclick="openBotModal(null, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
     <div class="bot-icon">${bot.icon}</div>
     <h3 class="bot-name">${bot.name}</h3>
     <p class="bot-description">${bot.description}</p>
@@ -1005,8 +1009,12 @@ const CONFIG = (() => {
     }
     }
     function openProjectModal(projectData = null, index = null) {
-    if (currentUser.role !== 'owner' && projectData) {
+    if (currentUser.role !== 'owner') {
     return;
+    }
+    // Get project data from cache if index is provided but projectData is null
+    if (index !== null && !projectData) {
+    projectData = dataCache.projects[index];
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -1098,7 +1106,7 @@ const CONFIG = (() => {
     projectsGrid.innerHTML = dataCache.projects.map((project, index) => {
     const hasLinks = project.githubRepo || project.liveDemo || project.projectFolder;
     return `
-    <div class="project-card" ${isOwner ? `onclick="openProjectModal(${JSON.stringify(project).replace(/"/g, '&quot;')}, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
+    <div class="project-card" ${isOwner ? `data-project-index="${index}" onclick="openProjectModal(null, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
     <div class="project-icon">${project.icon}</div>
     <h3 class="project-name">${project.name}</h3>
     <p class="project-description">${project.description}</p>
