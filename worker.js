@@ -1657,6 +1657,11 @@ async function handleUpload(request, env, origin) {
   return jsonResponse({ url: data.data?.url || data.data?.display_url }, 200, env, origin);
 }
 __name(handleUpload, "handleUpload");
+var GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
+function isValidGitHubUsername(name) {
+  return typeof name === "string" && name.length >= 1 && name.length <= 39 && GITHUB_USERNAME_RE.test(name);
+}
+__name(isValidGitHubUsername, "isValidGitHubUsername");
 async function handleGitHubUser(request, env, origin) {
   const key = env.GITHUB_API_KEY;
   if (!key) {
@@ -1667,8 +1672,11 @@ async function handleGitHubUser(request, env, origin) {
   if (!username) {
     return jsonResponse({ error: "Username required" }, 400, env, origin);
   }
+  if (!isValidGitHubUsername(username)) {
+    return jsonResponse({ error: "Invalid username. Only letters, numbers, and hyphens allowed (max 39 chars)." }, 400, env, origin);
+  }
   try {
-    const response = await fetch(`https://api.github.com/users/${username}`, {
+    const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
       headers: {
         "Authorization": `token ${key}`,
         "Accept": "application/vnd.github.v3+json",
@@ -1699,6 +1707,9 @@ async function handleGitHubContributions(request, env, origin) {
   const username = url.searchParams.get("username");
   if (!username) {
     return jsonResponse({ error: "Username required" }, 400, env, origin);
+  }
+  if (!isValidGitHubUsername(username)) {
+    return jsonResponse({ error: "Invalid username. Only letters, numbers, and hyphens allowed (max 39 chars)." }, 400, env, origin);
   }
   const now2 = new Date();
   const from = new Date(now2);
