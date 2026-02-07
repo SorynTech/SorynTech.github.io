@@ -1293,20 +1293,23 @@ function createDemoGraph(accountCreatedAt) {
         const week = { contributionDays: [] };
         
         for (let i = 0; i < 7 && currentDate <= now; i++) {
-            // Generate realistic-looking contribution pattern
-            const dayOfWeek = currentDate.getDay();
-            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-            
-            // More activity on weekdays, less on weekends
-            const baseActivity = isWeekend ? Math.random() * 3 : Math.random() * 8;
-            const count = Math.floor(baseActivity);
-            
-            totalContributions += count;
-            
-            week.contributionDays.push({
-                date: currentDate.toISOString().split('T')[0],
-                contributionCount: count
-            });
+            // Only add days after account creation
+            if (currentDate >= accountCreatedAt) {
+                // Generate realistic-looking contribution pattern
+                const dayOfWeek = currentDate.getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                // More activity on weekdays, less on weekends
+                const baseActivity = isWeekend ? Math.random() * 3 : Math.random() * 8;
+                const count = Math.floor(baseActivity);
+                
+                totalContributions += count;
+                
+                week.contributionDays.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    contributionCount: count
+                });
+            }
             
             currentDate.setDate(currentDate.getDate() + 1);
         }
@@ -1316,10 +1319,19 @@ function createDemoGraph(accountCreatedAt) {
         }
     }
     
+    // Calculate account age once for reuse
+    const accountAgeDays = Math.floor((now - accountCreatedAt) / (1000 * 60 * 60 * 24));
+    const accountAgeYears = Math.floor(accountAgeDays / 365);
+    const accountAgeMonths = Math.floor((accountAgeDays % 365) / 30);
+    
     return {
         totalContributions,
         weeks,
-        accountCreatedAt
+        accountCreatedAt,
+        accountAge: {
+            days: accountAgeDays,
+            display: `${accountAgeYears}y ${accountAgeMonths}m`
+        }
     };
 }
 
@@ -1365,13 +1377,29 @@ function renderGitHubGraph(calendar) {
             dayDiv.dataset.date = day.date;
             dayDiv.dataset.count = day.contributionCount;
             
-            // Add hover effect
+            // Add hover effect with viewport boundary checks
             dayDiv.addEventListener('mouseenter', (e) => {
                 const rect = e.target.getBoundingClientRect();
                 tooltip.textContent = `${day.contributionCount} contributions on ${formatDate(day.date)}`;
                 tooltip.style.display = 'block';
-                tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
-                tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
+                
+                // Calculate position and ensure it stays within viewport
+                let left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
+                let top = rect.top - tooltip.offsetHeight - 10;
+                
+                // Prevent tooltip from going off left edge
+                if (left < 0) left = 5;
+                // Prevent tooltip from going off right edge
+                if (left + tooltip.offsetWidth > window.innerWidth) {
+                    left = window.innerWidth - tooltip.offsetWidth - 5;
+                }
+                // If tooltip would go off top, show below instead
+                if (top < 0) {
+                    top = rect.bottom + 10;
+                }
+                
+                tooltip.style.left = `${left}px`;
+                tooltip.style.top = `${top}px`;
             });
             
             dayDiv.addEventListener('mouseleave', () => {
@@ -1410,12 +1438,10 @@ function renderGitHubGraph(calendar) {
     
     // Add account creation info if available
     let accountInfo = '';
-    if (calendar.accountCreatedAt) {
-        const createdDate = new Date(calendar.accountCreatedAt);
-        const accountAge = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+    if (calendar.accountAge) {
         accountInfo = `
         <div class="stat-item">
-            <div class="stat-value">${Math.floor(accountAge / 365)}y ${Math.floor((accountAge % 365) / 30)}m</div>
+            <div class="stat-value">${calendar.accountAge.display}</div>
             <div class="stat-label">Account Age</div>
         </div>
         `;
