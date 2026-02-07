@@ -36,6 +36,9 @@ export default {
       if (url.pathname === '/api/upload' && method === 'POST') {
         return await handleUpload(request, env, origin);
       }
+      if (url.pathname === '/api/github/key' && method === 'GET') {
+        return await handleGitHubKey(request, env, origin);
+      }
       return jsonResponse({ error: 'Not Found' }, 404, env, origin);
     } catch (e) {
       console.error(e);
@@ -331,4 +334,11 @@ async function handleUpload(request, env, origin) {
     );
   }
   return jsonResponse({ url: data.data?.url || data.data?.display_url }, 200, env, origin);
+}
+async function handleGitHubKey(request, env, origin) {
+  const key = env.GITHUB_API_KEY;
+  if (!key) {
+    return jsonResponse({ error: 'GitHub API key not configured' }, 500, env, origin);
+  }
+  return jsonResponse({ key }, 200, env, origin);
 }

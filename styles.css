@@ -1456,7 +1456,6 @@ body::before {
     }
 }
 
-/* Tech Stack Section */
 .tech-stack-section {
     margin-top: 4rem;
     padding-top: 3rem;
@@ -1626,7 +1625,6 @@ body::before {
     filter: brightness(0) saturate(100%) invert(100%);
 }
 
-/* Privacy Section */
 .privacy-card {
     max-width: 720px;
     margin: 0 auto;
@@ -2032,9 +2030,8 @@ line-height: 1.6;
     transition: all 0.3s ease;
 }}
 
-/* GitHub Contribution Graph Styles */
 .github-graph-container {
-    margin-bottom: 2rem;
+    margin-bottom: 5px;
     padding: 1.5rem;
     background: rgba(139, 69, 19, 0.05);
     border-radius: 15px;
@@ -2042,7 +2039,7 @@ line-height: 1.6;
 }
 
 .github-graph {
-    background: rgba(255, 255, 255, 0.95);
+    background: transparent;
     border-radius: 10px;
     padding: 20px;
     overflow-x: auto;
@@ -2090,11 +2087,11 @@ line-height: 1.6;
     border: 1px solid #8B4513;
 }
 
-.contribution-day.level-0 { background-color: #ebedf0; }
-.contribution-day.level-1 { background-color: #9be9a8; }
-.contribution-day.level-2 { background-color: #40c463; }
-.contribution-day.level-3 { background-color: #30a14e; }
-.contribution-day.level-4 { background-color: #216e39; }
+.contribution-day.level-0 { background-color: rgba(255, 192, 203, 0.2); }
+.contribution-day.level-1 { background-color: rgba(255, 192, 203, 0.4); }
+.contribution-day.level-2 { background-color: rgba(255, 105, 180, 0.6); }
+.contribution-day.level-3 { background-color: rgba(255, 20, 147, 0.8); }
+.contribution-day.level-4 { background-color: rgb(255, 20, 147); }
 
 .graph-legend {
     display: flex;
