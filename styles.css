@@ -1498,6 +1498,10 @@ body::before {
     margin: 0 auto;
 }
 
+.tech-stack-grid.coding-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
 .tech-item {
     background: var(--bg-card);
     border: 2px solid rgba(125, 211, 252, 0.2);
