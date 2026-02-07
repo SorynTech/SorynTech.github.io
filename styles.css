@@ -1543,7 +1543,6 @@ body::before {
 }
 
 .tech-item:hover img {
-    filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(125, 211, 252, 0.6));
     transform: scale(1.1);
 }
 
@@ -1557,6 +1556,70 @@ body::before {
 
 .tech-item:hover span {
     color: var(--accent-primary);
+}
+
+.tech-item-python img {
+    filter: brightness(0) saturate(100%) invert(46%) sepia(26%) saturate(1167%) hue-rotate(165deg) brightness(85%) contrast(86%);
+}
+.tech-item-javascript img {
+    filter: brightness(0) saturate(100%) invert(92%) sepia(15%) saturate(3329%) hue-rotate(343deg) brightness(111%) contrast(94%);
+}
+.tech-item-html5 img {
+    filter: brightness(0) saturate(100%) invert(48%) sepia(87%) saturate(2291%) hue-rotate(339deg) brightness(86%) contrast(108%);
+}
+.tech-item-css3 img {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(67%) saturate(5001%) hue-rotate(187deg) brightness(82%) contrast(84%);
+}
+.tech-item-githubcopilot img {
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+.tech-item-anthropic img {
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+.tech-item-github img {
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+.tech-item-gitlab img {
+    filter: brightness(0) saturate(100%) invert(49%) sepia(48%) saturate(2981%) hue-rotate(345deg) brightness(104%) contrast(98%);
+}
+.tech-item-git img {
+    filter: brightness(0) saturate(100%) invert(34%) sepia(23%) saturate(2889%) hue-rotate(333deg) brightness(116%) contrast(102%);
+}
+.tech-item-vscode img {
+    filter: brightness(0) saturate(100%) invert(33%) sepia(100%) saturate(1106%) hue-rotate(179deg) brightness(90%) contrast(104%);
+}
+.tech-item-windows img {
+    filter: brightness(0) saturate(100%) invert(30%) sepia(87%) saturate(1416%) hue-rotate(183deg) brightness(96%) contrast(108%);
+}
+.tech-item-macos img {
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+.tech-item-zorin img {
+    filter: brightness(0) saturate(100%) invert(60%) sepia(48%) saturate(3228%) hue-rotate(170deg) brightness(93%) contrast(103%);
+}
+.tech-item-cloudflare img {
+    filter: brightness(0) saturate(100%) invert(63%) sepia(29%) saturate(5993%) hue-rotate(350deg) brightness(102%) contrast(91%);
+}
+.tech-item-supabase img {
+    filter: brightness(0) saturate(100%) invert(80%) sepia(32%) saturate(878%) hue-rotate(91deg) brightness(88%) contrast(83%);
+}
+.tech-item-photoshop img {
+    filter: brightness(0) saturate(100%) invert(47%) sepia(84%) saturate(737%) hue-rotate(179deg) brightness(105%) contrast(101%);
+}
+.tech-item-illustrator img {
+    filter: brightness(0) saturate(100%) invert(59%) sepia(23%) saturate(2850%) hue-rotate(1deg) brightness(104%) contrast(106%);
+}
+.tech-item-krita img {
+    filter: brightness(0) saturate(100%) invert(61%) sepia(17%) saturate(6654%) hue-rotate(183deg) brightness(102%) contrast(105%);
+}
+.tech-item-gimp img {
+    filter: brightness(0) saturate(100%) invert(32%) sepia(14%) saturate(672%) hue-rotate(5deg) brightness(94%) contrast(86%);
+}
+.tech-item-premierepro img {
+    filter: brightness(0) saturate(100%) invert(61%) sepia(23%) saturate(1109%) hue-rotate(202deg) brightness(99%) contrast(108%);
+}
+.tech-item-obs img {
+    filter: brightness(0) saturate(100%) invert(100%);
 }
 
 /* Privacy Section */
