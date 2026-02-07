@@ -4,6 +4,10 @@ name = "soryntech-api"
 main = "worker/src/index.js"
 compatibility_date = "2024-01-01"
 
+# Secrets (set via wrangler secret put or dashboard):
+# JWT_SECRET, OWNER_PASSWORD, GUEST_PASSWORD, COMM_PASS,
+# JSONBIN_API_KEY, JSONBIN_BIN_ID, IMGBB_API_KEY, GITHUB_API_KEY
+
 [vars]
 # CORS: comma-separated origins that can call this Worker (your GitHub Pages URL).
 ALLOWED_ORIGINS = "https://soryntech.me"

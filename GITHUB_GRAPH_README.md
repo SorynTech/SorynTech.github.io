@@ -1,79 +1,128 @@
 # GitHub Contribution Graph Feature
 
 ## Overview
-This feature displays a live, updating GitHub contribution graph on your portfolio website, showing your coding activity from your account creation date to the current date in the user's timezone.
+This feature displays a **real** GitHub contribution graph on your portfolio website
+by querying the GitHub GraphQL API through a Cloudflare Worker proxy.  If the API
+key is missing or the request fails, the graph falls back to randomly-generated
+demo data and shows a visible **"Demo / Sample Data"** banner so visitors know
+the numbers are not real.
 
 ## Configuration
 
-### Setting Your GitHub Username and Account Creation Date
+### GitHub API Key Setup
 
-Open `script.js` and find the `GITHUB_CONFIG` object near the GitHub contribution graph section:
+The graph uses GitHub's **GraphQL API** (`contributionsCollection` query) which
+requires an authenticated token.
+
+#### Token type
+
+Either a **fine-grained PAT** or a **classic PAT** works.
+
+| Token type | Required scopes |
+|---|---|
+| Fine-grained | **read-only** access to your **public profile** (no repo access needed) |
+| Classic | `read:user` |
+
+#### How to Create the Token
+
+1. Go to **GitHub Settings → Developer Settings → Personal Access Tokens**
+2. Choose *Fine-grained tokens* (recommended) or *Tokens (classic)*
+3. Give it a name like "Portfolio Website"
+4. For fine-grained: grant **read-only user profile** access.  For classic: check `read:user`.
+5. Click **Generate token** and copy it immediately.
+
+#### How to Configure the Token
+
+Add the token as a Cloudflare Worker secret:
+
+```bash
+wrangler secret put GITHUB_API_KEY
+```
+
+Paste your token when prompted, then redeploy the Worker.
+
+**Security Note**: The token is never sent to the browser.  The Cloudflare Worker
+uses it server-side and returns only contribution counts and dates.
+
+### Setting Your GitHub Username
+
+Open `script.js` and find the `GITHUB_CONFIG` object:
 
 ```javascript
 const GITHUB_CONFIG = {
     username: 'SorynTech',
-    // Set your GitHub account creation date here
-    // You can find this at: https://github.com/YOUR_USERNAME (joined date)
-    accountCreatedAt: new Date('2020-01-15')
+    accountCreatedAt: new Date('2025-11-01')   // fallback only
 };
 ```
 
-Update the values:
-1. **username**: Your GitHub username
-2. **accountCreatedAt**: The date you created your GitHub account (YYYY-MM-DD format)
+- **username** – your GitHub login (used for all API calls).
+- **accountCreatedAt** – only used when the API is unreachable (demo mode).
+  When real data is available the account creation date comes from GitHub.
 
-### How to Find Your Account Creation Date
+## How It Works
 
-1. Go to your GitHub profile: `https://github.com/YOUR_USERNAME`
-2. Look for the "Joined" date in your profile
-3. Use that date in the format: `new Date('YYYY-MM-DD')`
+```
+Browser                                  Cloudflare Worker                     GitHub
+  │                                           │                                  │
+  │  GET /api/github/contributions?username=…  │                                  │
+  │ ─────────────────────────────────────────► │                                  │
+  │                                           │  POST https://api.github.com/graphql
+  │                                           │  (contributionsCollection query)  │
+  │                                           │ ────────────────────────────────► │
+  │                                           │ ◄──────── weeks + counts ──────── │
+  │ ◄──── { weeks, totalContributions } ───── │                                  │
+  │                                           │                                  │
+  │  renderGitHubGraph(realData)              │                                  │
+```
+
+If the `/api/github/contributions` call fails the frontend automatically falls
+back to `/api/github/user` (REST, for account age) and then to local demo
+generation, marking the result with `isDemo: true`.
+
+## API Endpoints
+
+### `GET /api/github/contributions?username=…`
+Returns real contribution data (last 52 weeks) via the GraphQL API.
+
+**Response:**
+```json
+{
+  "createdAt": "2025-11-01T…",
+  "totalContributions": 842,
+  "weeks": [
+    { "contributionDays": [{ "date": "2025-02-01", "contributionCount": 5 }, …] },
+    …
+  ]
+}
+```
+
+### `GET /api/github/user?username=…`  (unchanged)
+Returns basic user info (login, name, created_at) via the REST API.
 
 ## Features
 
-- **Live Visualization**: GitHub-style contribution heatmap with green squares
-- **Statistics Display**:
-  - Total Contributions
-  - Active Days (days with at least 1 contribution)
-  - Average Contributions per Day
-  - Account Age (years and months)
-- **Interactive Hover**: Hover over any day to see the exact date and contribution count
-- **Responsive Design**: Adapts to mobile and desktop screens
-- **Timezone Aware**: Uses the browser's local timezone for date calculations
-
-## Technical Details
-
-### Current Implementation
-The graph currently generates a realistic demonstration with randomly distributed contributions. This was implemented to work without requiring external API authentication.
-
-### Future Enhancement: Real GitHub Data
-To fetch real contribution data from GitHub, you would need to:
-
-1. Set up a backend proxy or use a GitHub Personal Access Token
-2. Uncomment and modify the API fetch code in `fetchGitHubContributions()`:
-
-```javascript
-const response = await fetch(`https://api.github.com/users/${username}`);
-const userData = await response.json();
-const accountCreatedAt = new Date(userData.created_at);
-```
-
-3. For full contribution data, you'd need to use GitHub's GraphQL API with authentication
-
-## Styling
-
-All styles are in `styles.css` under the "GitHub Contribution Graph Styles" section. You can customize:
-
-- Colors for different contribution levels (`.contribution-day.level-0` through `.level-4`)
-- Container background and borders (`.github-graph-container`)
-- Hover effects
-- Mobile responsive breakpoints
+- **Real contribution data** fetched from GitHub's GraphQL API
+- **Demo fallback** with a visible ⚠️ banner when the API key is missing
+- **Statistics**: Total Contributions · Active Days · Avg per Day · Account Age
+- **Interactive Hover**: date and count tooltip on each square
+- **Responsive**: adapts to mobile and desktop
+- **Secure**: token stays server-side in the Worker
 
 ## File Locations
 
-- **HTML**: `index.html` (lines ~100-109)
-- **CSS**: `styles.css` (GitHub Contribution Graph Styles section)
-- **JavaScript**: `script.js` (GITHUB_CONFIG and related functions)
+| File | Purpose |
+|---|---|
+| `index.html` | Graph container (`#github-contribution-graph`) |
+| `styles.css` | Contribution graph CSS (`.contribution-day.level-*`) |
+| `script.js` | `GITHUB_CONFIG`, `fetchGitHubContributions`, `parseRealContributions`, `createDemoGraph`, `renderGitHubGraph` |
+| `worker/src/index.js` | `handleGitHubContributions` (GraphQL proxy) and `handleGitHubUser` (REST proxy) |
+| `worker.js` | Bundled Worker output (mirrors `worker/src/index.js`) |
 
-## Support
+## Troubleshooting
 
-The graph uses standard web technologies (HTML, CSS, JavaScript) and doesn't require any external libraries beyond what's already in your project.
+| Symptom | Fix |
+|---|---|
+| Graph shows **"Demo / Sample Data"** banner | `GITHUB_API_KEY` secret is missing or the token lacks `read:user` / profile scope. |
+| Graph shows **"API not configured"** | `CONFIG.API_BASE_URL` is empty – check the `#app-config` element's `data-api-url`. |
+| 401 / 403 from GitHub | Token expired or wrong scope.  Regenerate and `wrangler secret put GITHUB_API_KEY`. |
+| Counts seem stale | GitHub caches contribution data; changes may take a few minutes to appear. |
