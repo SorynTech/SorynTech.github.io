@@ -855,10 +855,12 @@ const CONFIG = (() => {
     }
     }
     function openBotModal(botData = null, index = null) {
+    // Only owners can edit bots
     if (currentUser.role !== 'owner') {
     return;
     }
     // Get bot data from cache if index is provided but botData is null
+    // This prevents XSS by avoiding JSON.stringify in HTML attributes
     if (index !== null && !botData) {
     botData = dataCache.bots[index];
     }
@@ -1009,10 +1011,12 @@ const CONFIG = (() => {
     }
     }
     function openProjectModal(projectData = null, index = null) {
+    // Only owners can edit projects
     if (currentUser.role !== 'owner') {
     return;
     }
     // Get project data from cache if index is provided but projectData is null
+    // This prevents XSS by avoiding JSON.stringify in HTML attributes
     if (index !== null && !projectData) {
     projectData = dataCache.projects[index];
     }
