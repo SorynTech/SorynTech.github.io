@@ -36,8 +36,8 @@ export default {
       if (url.pathname === '/api/upload' && method === 'POST') {
         return await handleUpload(request, env, origin);
       }
-      if (url.pathname === '/api/github/key' && method === 'GET') {
-        return await handleGitHubKey(request, env, origin);
+      if (url.pathname === '/api/github/user' && method === 'GET') {
+        return await handleGitHubUser(request, env, origin);
       }
       return jsonResponse({ error: 'Not Found' }, 404, env, origin);
     } catch (e) {
@@ -335,10 +335,39 @@ async function handleUpload(request, env, origin) {
   }
   return jsonResponse({ url: data.data?.url || data.data?.display_url }, 200, env, origin);
 }
-async function handleGitHubKey(request, env, origin) {
+async function handleGitHubUser(request, env, origin) {
   const key = env.GITHUB_API_KEY;
   if (!key) {
     return jsonResponse({ error: 'GitHub API key not configured' }, 500, env, origin);
   }
-  return jsonResponse({ key }, 200, env, origin);
+  
+  const url = new URL(request.url);
+  const username = url.searchParams.get('username');
+  if (!username) {
+    return jsonResponse({ error: 'Username required' }, 400, env, origin);
+  }
+  
+  try {
+    const response = await fetch(`https://api.github.com/users/${username}`, {
+      headers: {
+        'Authorization': `token ${key}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'SorynTech-Portfolio'
+      }
+    });
+    
+    if (!response.ok) {
+      return jsonResponse({ error: 'GitHub API error', status: response.status }, response.status, env, origin);
+    }
+    
+    const userData = await response.json();
+    return jsonResponse({ 
+      created_at: userData.created_at,
+      login: userData.login,
+      name: userData.name
+    }, 200, env, origin);
+  } catch (error) {
+    console.error('GitHub API error:', error);
+    return jsonResponse({ error: 'Failed to fetch GitHub data' }, 500, env, origin);
+  }
 }

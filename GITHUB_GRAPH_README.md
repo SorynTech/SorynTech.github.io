@@ -36,7 +36,7 @@ wrangler secret put GITHUB_API_KEY
 
 Then paste your GitHub Personal Access Token when prompted.
 
-The API endpoint at `/api/github/key` will provide this token to the frontend for making authenticated requests to the GitHub API.
+**Security Note**: The GitHub API key is kept secure on the server side. The Cloudflare Worker acts as a proxy, using the key to fetch data from GitHub and returning only the necessary information to the frontend. The API key is never exposed to the client.
 
 ### Setting Your GitHub Username and Account Creation Date
 

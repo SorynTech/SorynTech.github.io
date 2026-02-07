@@ -1261,25 +1261,17 @@ async function fetchGitHubContributions(username) {
             return { error: 'API not configured' };
         }
 
-        const apiKeyResponse = await fetch(`${CONFIG.API_BASE_URL}/api/github/key`);
-        if (!apiKeyResponse.ok) {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/github/user?username=${encodeURIComponent(username)}`);
+        if (!response.ok) {
             return { error: 'API not configured' };
         }
         
-        const { key } = await apiKeyResponse.json();
-        if (!key) {
-            return { error: 'API not configured' };
-        }
-
-        const headers = {
-            'Authorization': `token ${key}`,
-            'Accept': 'application/vnd.github.v3+json'
-        };
-
-        const response = await fetch(`https://api.github.com/users/${username}`, { headers });
         const userData = await response.json();
-        const accountCreatedAt = new Date(userData.created_at);
+        if (userData.error || !userData.created_at) {
+            return { error: 'API not configured' };
+        }
         
+        const accountCreatedAt = new Date(userData.created_at);
         return createDemoGraph(accountCreatedAt);
         
     } catch (error) {
