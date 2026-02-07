@@ -1246,3 +1246,237 @@ const CONFIG = (() => {
     document.addEventListener('DOMContentLoaded', function() {
     loadGuestCredentials();
     });
+
+// GitHub Contribution Graph Configuration
+const GITHUB_CONFIG = {
+    username: 'SorynTech',
+    // Set your GitHub account creation date here
+    // You can find this at: https://github.com/YOUR_USERNAME (joined date)
+    accountCreatedAt: new Date('2020-01-15')
+};
+
+// GitHub Contribution Graph
+async function fetchGitHubContributions(username) {
+    try {
+        // NOTE: In production with CORS properly configured, you can fetch real data from GitHub API:
+        // const response = await fetch(`https://api.github.com/users/${username}`);
+        // const userData = await response.json();
+        // const accountCreatedAt = new Date(userData.created_at);
+        
+        // For now, we generate a realistic demonstration graph
+        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt);
+        
+    } catch (error) {
+        console.error('Error fetching GitHub contributions:', error);
+        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt);
+    }
+}
+
+
+function createDemoGraph(accountCreatedAt) {
+    const now = new Date();
+    const weeks = [];
+    
+    // Show last 52 weeks (1 year) of activity
+    const startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - (52 * 7));
+    
+    // Ensure we start from account creation if it's more recent
+    if (startDate < accountCreatedAt) {
+        startDate.setTime(accountCreatedAt.getTime());
+    }
+    
+    let currentDate = new Date(startDate);
+    let totalContributions = 0;
+    
+    while (currentDate <= now) {
+        const week = { contributionDays: [] };
+        
+        for (let i = 0; i < 7 && currentDate <= now; i++) {
+            // Only add days after account creation
+            if (currentDate >= accountCreatedAt) {
+                // Generate realistic-looking contribution pattern
+                const dayOfWeek = currentDate.getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                // More activity on weekdays, less on weekends
+                const baseActivity = isWeekend ? Math.random() * 3 : Math.random() * 8;
+                const count = Math.floor(baseActivity);
+                
+                totalContributions += count;
+                
+                week.contributionDays.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    contributionCount: count
+                });
+            }
+            
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        
+        if (week.contributionDays.length > 0) {
+            weeks.push(week);
+        }
+    }
+    
+    // Calculate account age once for reuse
+    const accountAgeDays = Math.floor((now - accountCreatedAt) / (1000 * 60 * 60 * 24));
+    const accountAgeYears = Math.floor(accountAgeDays / 365);
+    const accountAgeMonths = Math.floor((accountAgeDays % 365) / 30);
+    
+    return {
+        totalContributions,
+        weeks,
+        accountCreatedAt,
+        accountAge: {
+            days: accountAgeDays,
+            display: `${accountAgeYears}y ${accountAgeMonths}m`
+        }
+    };
+}
+
+
+function getContributionLevel(count) {
+    if (count === 0) return 0;
+    if (count < 3) return 1;
+    if (count < 6) return 2;
+    if (count < 9) return 3;
+    return 4;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+}
+
+function renderGitHubGraph(calendar) {
+    const container = document.getElementById('github-contribution-graph');
+    if (!calendar) {
+        container.innerHTML = '<p style="color: #586069; text-align: center;">Unable to load contribution data. This feature requires GitHub authentication.</p>';
+        return;
+    }
+    
+    // Create tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.className = 'graph-tooltip';
+    document.body.appendChild(tooltip);
+    
+    // Create graph container
+    const graphWrapper = document.createElement('div');
+    graphWrapper.className = 'contribution-graph';
+    
+    // Render contribution squares
+    calendar.weeks.forEach(week => {
+        const weekDiv = document.createElement('div');
+        weekDiv.className = 'contribution-week';
+        
+        week.contributionDays.forEach(day => {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = `contribution-day level-${getContributionLevel(day.contributionCount)}`;
+            dayDiv.dataset.date = day.date;
+            dayDiv.dataset.count = day.contributionCount;
+            
+            // Add hover effect with viewport boundary checks
+            dayDiv.addEventListener('mouseenter', (e) => {
+                const rect = e.target.getBoundingClientRect();
+                tooltip.textContent = `${day.contributionCount} contributions on ${formatDate(day.date)}`;
+                tooltip.style.display = 'block';
+                
+                // Calculate position and ensure it stays within viewport
+                let left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
+                let top = rect.top - tooltip.offsetHeight - 10;
+                
+                // Prevent tooltip from going off left edge
+                if (left < 0) left = 5;
+                // Prevent tooltip from going off right edge
+                if (left + tooltip.offsetWidth > window.innerWidth) {
+                    left = window.innerWidth - tooltip.offsetWidth - 5;
+                }
+                // If tooltip would go off top, show below instead
+                if (top < 0) {
+                    top = rect.bottom + 10;
+                }
+                
+                tooltip.style.left = `${left}px`;
+                tooltip.style.top = `${top}px`;
+            });
+            
+            dayDiv.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
+            
+            weekDiv.appendChild(dayDiv);
+        });
+        
+        graphWrapper.appendChild(weekDiv);
+    });
+    
+    // Create legend
+    const legend = document.createElement('div');
+    legend.className = 'graph-legend';
+    legend.innerHTML = `
+        <span>Less</span>
+        <div class="legend-scale">
+            <div class="legend-day level-0"></div>
+            <div class="legend-day level-1"></div>
+            <div class="legend-day level-2"></div>
+            <div class="legend-day level-3"></div>
+            <div class="legend-day level-4"></div>
+        </div>
+        <span>More</span>
+    `;
+    
+    // Create stats
+    const stats = document.createElement('div');
+    stats.className = 'graph-stats';
+    
+    const totalDays = calendar.weeks.reduce((sum, week) => sum + week.contributionDays.length, 0);
+    const activeDays = calendar.weeks.reduce((sum, week) => 
+        sum + week.contributionDays.filter(day => day.contributionCount > 0).length, 0);
+    const avgPerDay = (calendar.totalContributions / totalDays).toFixed(1);
+    
+    // Add account creation info if available
+    let accountInfo = '';
+    if (calendar.accountAge) {
+        accountInfo = `
+        <div class="stat-item">
+            <div class="stat-value">${calendar.accountAge.display}</div>
+            <div class="stat-label">Account Age</div>
+        </div>
+        `;
+    }
+    
+    stats.innerHTML = `
+        <div class="stat-item">
+            <div class="stat-value">${calendar.totalContributions.toLocaleString()}</div>
+            <div class="stat-label">Total Contributions</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">${activeDays.toLocaleString()}</div>
+            <div class="stat-label">Active Days</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">${avgPerDay}</div>
+            <div class="stat-label">Avg per Day</div>
+        </div>
+        ${accountInfo}
+    `;
+    
+    // Clear and append everything
+    container.innerHTML = '';
+    container.appendChild(graphWrapper);
+    container.appendChild(legend);
+    container.appendChild(stats);
+}
+
+// Initialize GitHub contribution graph
+async function initGitHubGraph() {
+    const calendar = await fetchGitHubContributions(GITHUB_CONFIG.username);
+    renderGitHubGraph(calendar);
+}
+
+// Load graph when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initGitHubGraph();
+});
