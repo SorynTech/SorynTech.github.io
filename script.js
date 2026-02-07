@@ -1255,20 +1255,28 @@ const GITHUB_CONFIG = {
     accountCreatedAt: new Date('2020-01-15')
 };
 
-// GitHub Contribution Graph
 async function fetchGitHubContributions(username) {
     try {
-        // NOTE: In production with CORS properly configured, you can fetch real data from GitHub API:
-        // const response = await fetch(`https://api.github.com/users/${username}`);
-        // const userData = await response.json();
-        // const accountCreatedAt = new Date(userData.created_at);
+        if (!CONFIG.API_BASE_URL) {
+            return { error: 'API not configured' };
+        }
+
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/github/user?username=${encodeURIComponent(username)}`);
+        if (!response.ok) {
+            return { error: 'API not configured' };
+        }
         
-        // For now, we generate a realistic demonstration graph
-        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt);
+        const userData = await response.json();
+        if (userData.error || !userData.created_at) {
+            return { error: 'API not configured' };
+        }
+        
+        const accountCreatedAt = new Date(userData.created_at);
+        return createDemoGraph(accountCreatedAt);
         
     } catch (error) {
         console.error('Error fetching GitHub contributions:', error);
-        return createDemoGraph(GITHUB_CONFIG.accountCreatedAt);
+        return { error: 'API not configured' };
     }
 }
 
@@ -1354,6 +1362,11 @@ function renderGitHubGraph(calendar) {
     const container = document.getElementById('github-contribution-graph');
     if (!calendar) {
         container.innerHTML = '<p style="color: #586069; text-align: center;">Unable to load contribution data. This feature requires GitHub authentication.</p>';
+        return;
+    }
+    
+    if (calendar.error) {
+        container.innerHTML = '<p style="color: #586069; text-align: center;">API not configured</p>';
         return;
     }
     

@@ -5,6 +5,39 @@ This feature displays a live, updating GitHub contribution graph on your portfol
 
 ## Configuration
 
+### GitHub API Key Setup
+
+The GitHub graph feature requires a GitHub Personal Access Token to fetch real contribution data.
+
+#### What is Required
+
+You need to create a GitHub Personal Access Token (classic) with the following permissions:
+- `public_repo` - Access public repositories
+- `read:user` - Read user profile data
+
+#### How to Create the API Key
+
+1. Go to GitHub Settings > Developer Settings > Personal Access Tokens > Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Give your token a descriptive name (e.g., "Portfolio Website")
+4. Select the following scopes:
+   - `public_repo` - Access public repositories
+   - `read:user` - Read user profile data
+5. Click "Generate token"
+6. Copy the token immediately (you won't be able to see it again)
+
+#### How to Configure the API Key
+
+Add the token as an environment variable in your Cloudflare Worker:
+
+```bash
+wrangler secret put GITHUB_API_KEY
+```
+
+Then paste your GitHub Personal Access Token when prompted.
+
+**Security Note**: The GitHub API key is kept secure on the server side. The Cloudflare Worker acts as a proxy, using the key to fetch data from GitHub and returning only the necessary information to the frontend. The API key is never exposed to the client.
+
 ### Setting Your GitHub Username and Account Creation Date
 
 Open `script.js` and find the `GITHUB_CONFIG` object near the GitHub contribution graph section:
@@ -12,8 +45,6 @@ Open `script.js` and find the `GITHUB_CONFIG` object near the GitHub contributio
 ```javascript
 const GITHUB_CONFIG = {
     username: 'SorynTech',
-    // Set your GitHub account creation date here
-    // You can find this at: https://github.com/YOUR_USERNAME (joined date)
     accountCreatedAt: new Date('2020-01-15')
 };
 ```
@@ -30,7 +61,7 @@ Update the values:
 
 ## Features
 
-- **Live Visualization**: GitHub-style contribution heatmap with green squares
+- **Live Visualization**: GitHub-style contribution heatmap with pink squares matching the website theme
 - **Statistics Display**:
   - Total Contributions
   - Active Days (days with at least 1 contribution)
@@ -39,41 +70,23 @@ Update the values:
 - **Interactive Hover**: Hover over any day to see the exact date and contribution count
 - **Responsive Design**: Adapts to mobile and desktop screens
 - **Timezone Aware**: Uses the browser's local timezone for date calculations
-
-## Technical Details
-
-### Current Implementation
-The graph currently generates a realistic demonstration with randomly distributed contributions. This was implemented to work without requiring external API authentication.
-
-### Future Enhancement: Real GitHub Data
-To fetch real contribution data from GitHub, you would need to:
-
-1. Set up a backend proxy or use a GitHub Personal Access Token
-2. Uncomment and modify the API fetch code in `fetchGitHubContributions()`:
-
-```javascript
-const response = await fetch(`https://api.github.com/users/${username}`);
-const userData = await response.json();
-const accountCreatedAt = new Date(userData.created_at);
-```
-
-3. For full contribution data, you'd need to use GitHub's GraphQL API with authentication
+- **Error Handling**: Shows "API not configured" message if the GitHub API key is not set up
 
 ## Styling
 
-All styles are in `styles.css` under the "GitHub Contribution Graph Styles" section. You can customize:
+All styles are in `styles.css` under the GitHub graph section. The graph uses pink colors to match the website theme:
 
-- Colors for different contribution levels (`.contribution-day.level-0` through `.level-4`)
-- Container background and borders (`.github-graph-container`)
-- Hover effects
-- Mobile responsive breakpoints
+- Colors for different contribution levels use pink shades (`.contribution-day.level-0` through `.level-4`)
+- Container has transparent background to blend with the website theme
+- 5px spacing between the graph and social links section
 
 ## File Locations
 
-- **HTML**: `index.html` (lines ~100-109)
-- **CSS**: `styles.css` (GitHub Contribution Graph Styles section)
+- **HTML**: `index.html` (GitHub graph container section)
+- **CSS**: `styles.css` (GitHub Contribution Graph styles)
 - **JavaScript**: `script.js` (GITHUB_CONFIG and related functions)
+- **Backend**: `worker/src/index.js` (GitHub API key endpoint)
 
 ## Support
 
-The graph uses standard web technologies (HTML, CSS, JavaScript) and doesn't require any external libraries beyond what's already in your project.
+The graph uses standard web technologies (HTML, CSS, JavaScript) and fetches data through your Cloudflare Worker backend to keep the API key secure.
