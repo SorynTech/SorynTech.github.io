@@ -7,7 +7,7 @@ compatibility_date = "2024-01-01"
 
 # Secrets (set via wrangler secret put or dashboard):
 # JWT_SECRET, PASSWORD_SALT, OWNER_PASSWORD_HASH, GUEST_PASSWORD_HASH,
-# JSONBIN_API_KEY, JSONBIN_BIN_ID, IMGBB_API_KEY
+# JSONBIN_API_KEY, JSONBIN_BIN_ID, IMGBB_API_KEY, GITHUB_API_KEY
 # Allowed origins for CORS (e.g. https://soryntech.github.io)
 [vars]
 # Optional: set ALLOWED_ORIGINS as a var if you prefer (e.g. "https://soryntech.github.io")
