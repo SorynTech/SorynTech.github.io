@@ -264,10 +264,6 @@ const CONFIG = (() => {
     function login(role, username) {
     currentUser = { username, role, isLoggedIn: true };
     updateUIForRole();
-    unlockGallery();
-    if (role === 'owner' || role === 'commission') {
-    unlockCommissions();
-    }
     }
     function logout() {
     currentUser = { username: null, role: 'guest', isLoggedIn: false };
@@ -290,9 +286,6 @@ const CONFIG = (() => {
     isLoggedIn: true
     };
     updateUIForRole();
-    unlockGallery();
-    if (data.role === 'owner' || data.role === 'commission') {
-    unlockCommissions();
     }
     } else {
     setAuthToken(null);
@@ -349,49 +342,21 @@ const CONFIG = (() => {
     const uploadBtn = document.getElementById('uploadBtn');
     const addUrlBtn = document.getElementById('addUrlBtn');
     const clearGalleryBtn = document.getElementById('clearGalleryBtn');
-    const unlockBtn = document.getElementById('unlockBtn');
-    const artUsername = document.getElementById('artUsername');
-    const artPassword = document.getElementById('artPassword');
     const imageUpload = document.getElementById('imageUpload');
     if (uploadBtn) uploadBtn.addEventListener('click', () => imageUpload.click());
     if (imageUpload) imageUpload.addEventListener('change', handleImageUpload);
     if (addUrlBtn) addUrlBtn.addEventListener('click', addImageUrlModal);
     if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
-    if (unlockBtn) unlockBtn.addEventListener('click', checkGalleryPassword);
-    if (artUsername) {
-    artUsername.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') artPassword.focus();
-    });
-    }
-    if (artPassword) {
-    artPassword.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkGalleryPassword();
-    });
-    }
     }
     function initCommissions() {
     const uploadCommissionBtn = document.getElementById('uploadCommissionBtn');
     const addCommissionUrlBtn = document.getElementById('addCommissionUrlBtn');
     const clearCommissionsBtn = document.getElementById('clearCommissionsBtn');
-    const unlockCommissionsBtn = document.getElementById('unlockCommissionsBtn');
-    const commissionUsername = document.getElementById('commissionUsername');
-    const commissionPassword = document.getElementById('commissionPassword');
     const commissionImageUpload = document.getElementById('commissionImageUpload');
     if (uploadCommissionBtn) uploadCommissionBtn.addEventListener('click', () => commissionImageUpload.click());
     if (commissionImageUpload) commissionImageUpload.addEventListener('change', handleCommissionImageUpload);
     if (addCommissionUrlBtn) addCommissionUrlBtn.addEventListener('click', addCommissionUrlModal);
     if (clearCommissionsBtn) clearCommissionsBtn.addEventListener('click', clearCommissions);
-    if (unlockCommissionsBtn) unlockCommissionsBtn.addEventListener('click', checkCommissionsPassword);
-    if (commissionUsername) {
-    commissionUsername.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') commissionPassword.focus();
-    });
-    }
-    if (commissionPassword) {
-    commissionPassword.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkCommissionsPassword();
-    });
-    }
     }
     async function handleImageUpload(event) {
     if (currentUser.role !== 'owner') {
@@ -561,76 +526,6 @@ const CONFIG = (() => {
     renderCommissions();
     document.getElementById('editModal').classList.remove('active');
     await saveAllData();
-    }
-    async function checkGalleryPassword() {
-    const username = document.getElementById('artUsername').value.trim();
-    const password = document.getElementById('artPassword').value;
-    if (!CONFIG.API_BASE_URL || !username || !password) {
-    await showAlert('❌ Enter username and password.', 'Missing Credentials');
-    return;
-    }
-    try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && data.token && data.role) {
-    setAuthToken(data.token);
-    currentUser = { username: data.username, role: data.role, isLoggedIn: true };
-    updateUIForRole();
-    unlockGallery();
-    await loadAllData();
-    } else {
-    await showAlert(data.error || '❌ Access denied! Wrong credentials, rat.', '🐀 Access Denied');
-    document.getElementById('artPassword').value = '';
-    }
-    } catch (e) {
-    console.error('Login error:', e);
-    await showAlert('❌ Could not reach API.', 'Connection Error');
-    }
-    }
-    async function checkCommissionsPassword() {
-    const username = document.getElementById('commissionUsername').value.trim();
-    const password = document.getElementById('commissionPassword').value;
-    if (!CONFIG.API_BASE_URL || !username || !password) {
-    await showAlert('❌ Enter username and password.', 'Missing Credentials');
-    return;
-    }
-    try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && data.token && data.role) {
-    setAuthToken(data.token);
-    currentUser = { username: data.username, role: data.role, isLoggedIn: true };
-    updateUIForRole();
-    unlockCommissions();
-    await loadAllData();
-    } else {
-    await showAlert(data.error || '❌ Access denied! Wrong credentials.', 'ðŸŽ¨ Access Denied');
-    document.getElementById('commissionPassword').value = '';
-    }
-    } catch (e) {
-    console.error('Login error:', e);
-    await showAlert('❌ Could not reach API.', 'Connection Error');
-    }
-    }
-    function unlockGallery() {
-    const passwordOverlay = document.getElementById('passwordOverlay');
-    const galleryContent = document.querySelector('.gallery-content');
-    if (passwordOverlay) passwordOverlay.classList.add('unlocked');
-    if (galleryContent) galleryContent.classList.add('unlocked');
-    }
-    function unlockCommissions() {
-    const passwordOverlay = document.getElementById('commissionsPasswordOverlay');
-    const commissionsContent = document.getElementById('commissionsContent');
-    if (passwordOverlay) passwordOverlay.classList.add('unlocked');
-    if (commissionsContent) commissionsContent.classList.add('unlocked');
     }
     function renderGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
@@ -855,12 +750,9 @@ const CONFIG = (() => {
     }
     }
     function openBotModal(botData = null, index = null) {
-    // Only owners can edit bots
     if (currentUser.role !== 'owner') {
     return;
     }
-    // Get bot data from cache if index is provided but botData is null
-    // This prevents XSS by avoiding JSON.stringify in HTML attributes
     if (index !== null && !botData) {
     botData = dataCache.bots[index];
     }
@@ -1011,12 +903,9 @@ const CONFIG = (() => {
     }
     }
     function openProjectModal(projectData = null, index = null) {
-    // Only owners can edit projects
     if (currentUser.role !== 'owner') {
     return;
     }
-    // Get project data from cache if index is provided but projectData is null
-    // This prevents XSS by avoiding JSON.stringify in HTML attributes
     if (index !== null && !projectData) {
     projectData = dataCache.projects[index];
     }

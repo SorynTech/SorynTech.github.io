@@ -344,20 +344,7 @@
         </div>
     </section>
     <section id="art" class="section">
-        <div class="password-overlay" id="passwordOverlay">
-            <div class="password-card">
-                <h2>🐀 Rat's Art Vault</h2>
-                <p>Enter credentials to view the collection</p>
-                <input type="text" id="artUsername" placeholder="Username">
-                <input type="password" id="artPassword" placeholder="Password">
-                <button id="unlockBtn">Unlock Vault 🔓</button>
-                <div class="guest-credentials">
-                    <p class="credentials-label">Guest Access:</p>
-                    <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
-                </div>
-            </div>
-        </div>
-        <div class="content-wrapper gallery-content">
+        <div class="content-wrapper">
             <h2 class="section-title">🎨 Art Gallery</h2>
             <div class="gallery-controls">
                 <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
@@ -366,28 +353,20 @@
                 <button class="clear-btn owner-only" id="clearGalleryBtn" style="display: none;">🗑️ Clear Gallery</button>
             </div>
             <div class="gallery-grid" id="galleryGrid">
-                <div class="gallery-placeholder">
-                    <i data-feather="image" style="width: 80px; height: 80px;"></i>
-                    <p>The rat's collection awaits...</p>
+                <div class="gallery-placeholder" style="padding: 3rem; text-align: center;">
+                    <i data-feather="lock" style="width: 60px; height: 60px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-primary);">Login Required</h3>
+                    <p style="color: var(--text-secondary); font-size: 1rem;">To view the art gallery, please login with the guest credentials</p>
+                    <div class="guest-credentials" style="max-width: 300px; margin: 1.5rem auto 0;">
+                        <p class="credentials-label">Guest Access:</p>
+                        <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
     <section id="commissions" class="section">
-        <div class="password-overlay" id="commissionsPasswordOverlay">
-            <div class="password-card">
-                <h2>🎨 Commission Gallery Access</h2>
-                <p>Enter credentials to view commissioned artwork</p>
-                <input type="text" id="commissionUsername" placeholder="Username">
-                <input type="password" id="commissionPassword" placeholder="Password">
-                <button id="unlockCommissionsBtn">Unlock Gallery 🔓</button>
-                <div class="guest-credentials" id="commissionsGuestCreds">
-                    <p class="credentials-label">Guest Access:</p>
-                    <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
-                </div>
-            </div>
-        </div>
-        <div class="content-wrapper gallery-content" id="commissionsContent">
+        <div class="content-wrapper">
             <h2 class="section-title">🎨 Commission Gallery</h2>
             <div class="gallery-controls">
                 <input type="file" id="commissionImageUpload" accept="image/*" multiple style="display: none;">
@@ -396,9 +375,14 @@
                 <button class="clear-btn owner-only" id="clearCommissionsBtn" style="display: none;">🗑️ Clear Gallery</button>
             </div>
             <div class="gallery-grid" id="commissionsGrid">
-                <div class="gallery-placeholder">
-                    <i data-feather="image"></i>
-                    <p>Commissioned artwork will appear here...</p>
+                <div class="gallery-placeholder" style="padding: 3rem; text-align: center;">
+                    <i data-feather="lock" style="width: 60px; height: 60px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-primary);">Login Required</h3>
+                    <p style="color: var(--text-secondary); font-size: 1rem;">To view commissioned artwork, please login with the guest credentials</p>
+                    <div class="guest-credentials" style="max-width: 300px; margin: 1.5rem auto 0;">
+                        <p class="credentials-label">Guest Access:</p>
+                        <p class="credentials-value">Username: Guest<br>Password: Rat_Guest</p>
+                    </div>
                 </div>
             </div>
         </div>
