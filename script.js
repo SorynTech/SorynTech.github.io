@@ -286,7 +286,6 @@ const CONFIG = (() => {
     isLoggedIn: true
     };
     updateUIForRole();
-    }
     } else {
     setAuthToken(null);
     }
