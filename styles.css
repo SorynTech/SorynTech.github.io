@@ -2130,12 +2130,12 @@ line-height: 1.6;
 .stat-value {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #8B4513;
+    color: #ffffff;
 }
 
 .stat-label {
     font-size: 0.85rem;
-    color: #586069;
+    color: #b2bec3;
     margin-top: 5px;
 }
 

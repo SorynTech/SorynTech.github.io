@@ -1289,45 +1289,37 @@ async function fetchGitHubContributions(username) {
 
 function parseRealContributions(data) {
     const accountCreatedAt = data.createdAt ? new Date(data.createdAt) : GITHUB_CONFIG.accountCreatedAt;
+    const cutoffDate = new Date('2025-11-01T00:00:00');
     const now = new Date();
 
-    const weeks = (data.weeks || []).map(week => ({
-        contributionDays: week.contributionDays.map(day => ({
-            date: day.date,
-            contributionCount: day.contributionCount
+    const weeks = (data.weeks || [])
+        .map(week => ({
+            contributionDays: week.contributionDays
+                .filter(day => new Date(day.date) >= cutoffDate)
+                .map(day => ({
+                    date: day.date,
+                    contributionCount: day.contributionCount
+                }))
         }))
-    }));
+        .filter(week => week.contributionDays.length > 0);
 
-    const totalContributions = data.totalContributions ?? weeks.reduce(
+    const totalContributions = weeks.reduce(
         (sum, w) => sum + w.contributionDays.reduce((s, d) => s + d.contributionCount, 0), 0
     );
-
-    const accountAgeDays = Math.floor((now - accountCreatedAt) / (1000 * 60 * 60 * 24));
-    const accountAgeYears = Math.floor(accountAgeDays / 365);
-    const accountAgeMonths = Math.floor((accountAgeDays % 365) / 30);
 
     return {
         totalContributions,
         weeks,
         accountCreatedAt,
-        isDemo: false,
-        accountAge: {
-            days: accountAgeDays,
-            display: `${accountAgeYears}y ${accountAgeMonths}m`
-        }
+        isDemo: false
     };
 }
 
 function createDemoGraph(accountCreatedAt, isDemo = true) {
     const now = new Date();
+    const cutoffDate = new Date('2025-11-01T00:00:00');
     const weeks = [];
-    
-    const startDate = new Date(now);
-    startDate.setDate(startDate.getDate() - (52 * 7));
-    
-    if (startDate < accountCreatedAt) {
-        startDate.setTime(accountCreatedAt.getTime());
-    }
+    const startDate = new Date(Math.max(cutoffDate.getTime(), accountCreatedAt.getTime()));
     
     let currentDate = new Date(startDate);
     let totalContributions = 0;
@@ -1336,20 +1328,18 @@ function createDemoGraph(accountCreatedAt, isDemo = true) {
         const week = { contributionDays: [] };
         
         for (let i = 0; i < 7 && currentDate <= now; i++) {
-            if (currentDate >= accountCreatedAt) {
-                const dayOfWeek = currentDate.getDay();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                
-                const baseActivity = isWeekend ? Math.random() * 3 : Math.random() * 8;
-                const count = Math.floor(baseActivity);
-                
-                totalContributions += count;
-                
-                week.contributionDays.push({
-                    date: currentDate.toISOString().split('T')[0],
-                    contributionCount: count
-                });
-            }
+            const dayOfWeek = currentDate.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            
+            const baseActivity = isWeekend ? Math.random() * 3 : Math.random() * 8;
+            const count = Math.floor(baseActivity);
+            
+            totalContributions += count;
+            
+            week.contributionDays.push({
+                date: currentDate.toISOString().split('T')[0],
+                contributionCount: count
+            });
             
             currentDate.setDate(currentDate.getDate() + 1);
         }
@@ -1359,19 +1349,11 @@ function createDemoGraph(accountCreatedAt, isDemo = true) {
         }
     }
     
-    const accountAgeDays = Math.floor((now - accountCreatedAt) / (1000 * 60 * 60 * 24));
-    const accountAgeYears = Math.floor(accountAgeDays / 365);
-    const accountAgeMonths = Math.floor((accountAgeDays % 365) / 30);
-    
     return {
         totalContributions,
         weeks,
         accountCreatedAt,
-        isDemo: isDemo,
-        accountAge: {
-            days: accountAgeDays,
-            display: `${accountAgeYears}y ${accountAgeMonths}m`
-        }
+        isDemo: isDemo
     };
 }
 
@@ -1477,15 +1459,6 @@ function renderGitHubGraph(calendar) {
     const activeDays = calendar.weeks.reduce((sum, week) => 
         sum + week.contributionDays.filter(day => day.contributionCount > 0).length, 0);
     const avgPerDay = (calendar.totalContributions / totalDays).toFixed(1);
-    let accountInfo = '';
-    if (calendar.accountAge) {
-        accountInfo = `
-        <div class="stat-item">
-            <div class="stat-value">${calendar.accountAge.display}</div>
-            <div class="stat-label">Account Age</div>
-        </div>
-        `;
-    }
     
     stats.innerHTML = `
         <div class="stat-item">
@@ -1500,7 +1473,6 @@ function renderGitHubGraph(calendar) {
             <div class="stat-value">${avgPerDay}</div>
             <div class="stat-label">Avg per Day</div>
         </div>
-        ${accountInfo}
     `;
     container.appendChild(graphWrapper);
     container.appendChild(legend);
