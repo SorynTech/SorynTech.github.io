@@ -1258,7 +1258,6 @@ async function fetchGitHubContributions(username) {
             return createDemoGraph(GITHUB_CONFIG.accountCreatedAt, true);
         }
 
-        // Try the real GraphQL contributions endpoint first
         const response = await fetch(
             `${CONFIG.API_BASE_URL}/api/github/contributions?username=${encodeURIComponent(username)}`
         );
@@ -1270,7 +1269,6 @@ async function fetchGitHubContributions(username) {
             }
         }
 
-        // If contributions endpoint failed, try the user endpoint for account age at least
         console.warn('GitHub graph: contributions endpoint failed, falling back to demo data');
         const userResp = await fetch(
             `${CONFIG.API_BASE_URL}/api/github/user?username=${encodeURIComponent(username)}`
@@ -1289,16 +1287,10 @@ async function fetchGitHubContributions(username) {
     }
 }
 
-/**
- * Parse the real contribution data returned by the Worker's GraphQL proxy
- * into the shape expected by renderGitHubGraph.
- */
 function parseRealContributions(data) {
     const accountCreatedAt = data.createdAt ? new Date(data.createdAt) : GITHUB_CONFIG.accountCreatedAt;
     const now = new Date();
 
-    // data.weeks already has the right shape from GitHub's API:
-    // [ { contributionDays: [ { date, contributionCount } ] } ]
     const weeks = (data.weeks || []).map(week => ({
         contributionDays: week.contributionDays.map(day => ({
             date: day.date,
@@ -1326,20 +1318,13 @@ function parseRealContributions(data) {
     };
 }
 
-/**
- * Generate random demo contribution data as a fallback.
- * @param {Date} accountCreatedAt
- * @param {boolean} isDemo  marks the result so the renderer can show a "Demo" badge
- */
 function createDemoGraph(accountCreatedAt, isDemo = true) {
     const now = new Date();
     const weeks = [];
     
-    // Show last 52 weeks (1 year) of activity
     const startDate = new Date(now);
     startDate.setDate(startDate.getDate() - (52 * 7));
     
-    // Ensure we start from account creation if it's more recent
     if (startDate < accountCreatedAt) {
         startDate.setTime(accountCreatedAt.getTime());
     }
@@ -1351,13 +1336,10 @@ function createDemoGraph(accountCreatedAt, isDemo = true) {
         const week = { contributionDays: [] };
         
         for (let i = 0; i < 7 && currentDate <= now; i++) {
-            // Only add days after account creation
             if (currentDate >= accountCreatedAt) {
-                // Generate realistic-looking contribution pattern
                 const dayOfWeek = currentDate.getDay();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                 
-                // More activity on weekdays, less on weekends
                 const baseActivity = isWeekend ? Math.random() * 3 : Math.random() * 8;
                 const count = Math.floor(baseActivity);
                 
@@ -1377,7 +1359,6 @@ function createDemoGraph(accountCreatedAt, isDemo = true) {
         }
     }
     
-    // Calculate account age once for reuse
     const accountAgeDays = Math.floor((now - accountCreatedAt) / (1000 * 60 * 60 * 24));
     const accountAgeYears = Math.floor(accountAgeDays / 365);
     const accountAgeMonths = Math.floor((accountAgeDays % 365) / 30);
@@ -1420,6 +1401,9 @@ function renderGitHubGraph(calendar) {
         container.innerHTML = '<p style="color: #586069; text-align: center;">API not configured</p>';
         return;
     }
+
+    container.innerHTML = '';
+
     if (calendar.isDemo) {
         const demoBanner = document.createElement('div');
         demoBanner.style.cssText = 'text-align:center;padding:0.4rem 0.8rem;margin-bottom:0.75rem;' +
@@ -1429,16 +1413,13 @@ function renderGitHubGraph(calendar) {
         container.appendChild(demoBanner);
     }
 
-    // Create tooltip element
     const tooltip = document.createElement('div');
     tooltip.className = 'graph-tooltip';
     document.body.appendChild(tooltip);
     
-    // Create graph container
     const graphWrapper = document.createElement('div');
     graphWrapper.className = 'contribution-graph';
     
-    // Render contribution squares
     calendar.weeks.forEach(week => {
         const weekDiv = document.createElement('div');
         weekDiv.className = 'contribution-week';
@@ -1476,7 +1457,6 @@ function renderGitHubGraph(calendar) {
         graphWrapper.appendChild(weekDiv);
     });
     
-    // Create legend
     const legend = document.createElement('div');
     legend.className = 'graph-legend';
     legend.innerHTML = `
@@ -1522,7 +1502,6 @@ function renderGitHubGraph(calendar) {
         </div>
         ${accountInfo}
     `;
-    container.innerHTML = '';
     container.appendChild(graphWrapper);
     container.appendChild(legend);
     container.appendChild(stats);
