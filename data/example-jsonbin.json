@@ -1,0 +1,63 @@
+{
+  "bots": [
+    {
+      "icon": "🤖",
+      "name": "Example Discord Bot",
+      "description": "A helpful Discord bot that does amazing things for your server",
+      "servers": "1.2K",
+      "users": "50K",
+      "inviteLink": "https://discord.com/invite/example",
+      "githubRepo": "https://github.com/username/bot-repo",
+      "botFolder": "./bots/example-bot/"
+    }
+  ],
+  "projects": [
+    {
+      "icon": "💻",
+      "name": "Portfolio Website",
+      "description": "A modern responsive portfolio website built with HTML, CSS, and JavaScript",
+      "githubRepo": "https://github.com/username/portfolio",
+      "liveDemo": "https://example.com",
+      "projectFolder": "./projects/portfolio/"
+    },
+    {
+      "icon": "🎮",
+      "name": "Game Engine",
+      "description": "A custom 2D game engine written in Python with pygame",
+      "githubRepo": "https://github.com/username/game-engine",
+      "liveDemo": "",
+      "projectFolder": ""
+    }
+  ],
+  "profile": {
+    "name": "SorynTech",
+    "role": "Backend Developer",
+    "image": "profile.jpg",
+    "socials": {
+      "twitter": "https://x.com/username",
+      "instagram": "https://www.instagram.com/username/",
+      "github": "https://github.com/username",
+      "discord": "https://Discord.gg/users/123456789",
+      "kofi": "https://Ko-fi.com/username"
+    }
+  },
+  "gallery": [
+    {
+      "url": "https://i.ibb.co/example1/image1.png",
+      "title": "Digital Art 1",
+      "description": "A beautiful digital artwork"
+    },
+    {
+      "url": "https://i.ibb.co/example2/image2.png",
+      "title": "Commission Work",
+      "description": "Custom commission for a client"
+    }
+  ],
+  "commissions": [
+    {
+      "url": "https://i.ibb.co/example3/commission1.png",
+      "title": "Character Design",
+      "description": "Character design commission"
+    }
+  ]
+}

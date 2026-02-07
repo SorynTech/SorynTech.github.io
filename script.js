@@ -20,13 +20,15 @@ const CONFIG = (() => {
     bots: [],
     profile: null,
     gallery: [],
-    commissions: []
+    commissions: [],
+    projects: []
     };
     document.addEventListener('DOMContentLoaded', async function() {
     initNavigation();
     initAuth();
     initProfileEditing();
     initBotsSection();
+    initProjectsSection();
     initGallery();
     initCommissions();
     await checkAuthState();
@@ -131,8 +133,10 @@ const CONFIG = (() => {
     dataCache.profile = data.profile || null;
     dataCache.gallery = data.gallery || [];
     dataCache.commissions = data.commissions || [];
+    dataCache.projects = data.projects || [];
     if (dataCache.profile) applyProfileData(dataCache.profile);
     renderBots();
+    renderProjects();
     renderGallery();
     renderCommissions();
     } else {
@@ -140,7 +144,9 @@ const CONFIG = (() => {
     dataCache.profile = null;
     dataCache.gallery = [];
     dataCache.commissions = [];
+    dataCache.projects = [];
     renderBots();
+    renderProjects();
     renderGallery();
     renderCommissions();
     }
@@ -154,7 +160,8 @@ const CONFIG = (() => {
     bots: dataCache.bots,
     profile: dataCache.profile,
     gallery: dataCache.gallery,
-    commissions: dataCache.commissions
+    commissions: dataCache.commissions,
+    projects: dataCache.projects
     };
     if (currentUser.role === 'commission') {
     return await saveCommissionsOnly();
@@ -257,10 +264,6 @@ const CONFIG = (() => {
     function login(role, username) {
     currentUser = { username, role, isLoggedIn: true };
     updateUIForRole();
-    unlockGallery();
-    if (role === 'owner' || role === 'commission') {
-    unlockCommissions();
-    }
     }
     function logout() {
     currentUser = { username: null, role: 'guest', isLoggedIn: false };
@@ -283,9 +286,6 @@ const CONFIG = (() => {
     isLoggedIn: true
     };
     updateUIForRole();
-    unlockGallery();
-    if (data.role === 'owner' || data.role === 'commission') {
-    unlockCommissions();
     }
     } else {
     setAuthToken(null);
@@ -342,49 +342,21 @@ const CONFIG = (() => {
     const uploadBtn = document.getElementById('uploadBtn');
     const addUrlBtn = document.getElementById('addUrlBtn');
     const clearGalleryBtn = document.getElementById('clearGalleryBtn');
-    const unlockBtn = document.getElementById('unlockBtn');
-    const artUsername = document.getElementById('artUsername');
-    const artPassword = document.getElementById('artPassword');
     const imageUpload = document.getElementById('imageUpload');
     if (uploadBtn) uploadBtn.addEventListener('click', () => imageUpload.click());
     if (imageUpload) imageUpload.addEventListener('change', handleImageUpload);
     if (addUrlBtn) addUrlBtn.addEventListener('click', addImageUrlModal);
     if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
-    if (unlockBtn) unlockBtn.addEventListener('click', checkGalleryPassword);
-    if (artUsername) {
-    artUsername.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') artPassword.focus();
-    });
-    }
-    if (artPassword) {
-    artPassword.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkGalleryPassword();
-    });
-    }
     }
     function initCommissions() {
     const uploadCommissionBtn = document.getElementById('uploadCommissionBtn');
     const addCommissionUrlBtn = document.getElementById('addCommissionUrlBtn');
     const clearCommissionsBtn = document.getElementById('clearCommissionsBtn');
-    const unlockCommissionsBtn = document.getElementById('unlockCommissionsBtn');
-    const commissionUsername = document.getElementById('commissionUsername');
-    const commissionPassword = document.getElementById('commissionPassword');
     const commissionImageUpload = document.getElementById('commissionImageUpload');
     if (uploadCommissionBtn) uploadCommissionBtn.addEventListener('click', () => commissionImageUpload.click());
     if (commissionImageUpload) commissionImageUpload.addEventListener('change', handleCommissionImageUpload);
     if (addCommissionUrlBtn) addCommissionUrlBtn.addEventListener('click', addCommissionUrlModal);
     if (clearCommissionsBtn) clearCommissionsBtn.addEventListener('click', clearCommissions);
-    if (unlockCommissionsBtn) unlockCommissionsBtn.addEventListener('click', checkCommissionsPassword);
-    if (commissionUsername) {
-    commissionUsername.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') commissionPassword.focus();
-    });
-    }
-    if (commissionPassword) {
-    commissionPassword.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkCommissionsPassword();
-    });
-    }
     }
     async function handleImageUpload(event) {
     if (currentUser.role !== 'owner') {
@@ -554,76 +526,6 @@ const CONFIG = (() => {
     renderCommissions();
     document.getElementById('editModal').classList.remove('active');
     await saveAllData();
-    }
-    async function checkGalleryPassword() {
-    const username = document.getElementById('artUsername').value.trim();
-    const password = document.getElementById('artPassword').value;
-    if (!CONFIG.API_BASE_URL || !username || !password) {
-    await showAlert('❌ Enter username and password.', 'Missing Credentials');
-    return;
-    }
-    try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && data.token && data.role) {
-    setAuthToken(data.token);
-    currentUser = { username: data.username, role: data.role, isLoggedIn: true };
-    updateUIForRole();
-    unlockGallery();
-    await loadAllData();
-    } else {
-    await showAlert(data.error || '❌ Access denied! Wrong credentials, rat.', '🐀 Access Denied');
-    document.getElementById('artPassword').value = '';
-    }
-    } catch (e) {
-    console.error('Login error:', e);
-    await showAlert('❌ Could not reach API.', 'Connection Error');
-    }
-    }
-    async function checkCommissionsPassword() {
-    const username = document.getElementById('commissionUsername').value.trim();
-    const password = document.getElementById('commissionPassword').value;
-    if (!CONFIG.API_BASE_URL || !username || !password) {
-    await showAlert('❌ Enter username and password.', 'Missing Credentials');
-    return;
-    }
-    try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && data.token && data.role) {
-    setAuthToken(data.token);
-    currentUser = { username: data.username, role: data.role, isLoggedIn: true };
-    updateUIForRole();
-    unlockCommissions();
-    await loadAllData();
-    } else {
-    await showAlert(data.error || '❌ Access denied! Wrong credentials.', 'ðŸŽ¨ Access Denied');
-    document.getElementById('commissionPassword').value = '';
-    }
-    } catch (e) {
-    console.error('Login error:', e);
-    await showAlert('❌ Could not reach API.', 'Connection Error');
-    }
-    }
-    function unlockGallery() {
-    const passwordOverlay = document.getElementById('passwordOverlay');
-    const galleryContent = document.querySelector('.gallery-content');
-    if (passwordOverlay) passwordOverlay.classList.add('unlocked');
-    if (galleryContent) galleryContent.classList.add('unlocked');
-    }
-    function unlockCommissions() {
-    const passwordOverlay = document.getElementById('commissionsPasswordOverlay');
-    const commissionsContent = document.getElementById('commissionsContent');
-    if (passwordOverlay) passwordOverlay.classList.add('unlocked');
-    if (commissionsContent) commissionsContent.classList.add('unlocked');
     }
     function renderGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
@@ -848,8 +750,11 @@ const CONFIG = (() => {
     }
     }
     function openBotModal(botData = null, index = null) {
-    if (currentUser.role !== 'owner' && botData) {
+    if (currentUser.role !== 'owner') {
     return;
+    }
+    if (index !== null && !botData) {
+    botData = dataCache.bots[index];
     }
     const modal = document.getElementById('editModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -951,7 +856,7 @@ const CONFIG = (() => {
     botsGrid.innerHTML = dataCache.bots.map((bot, index) => {
     const hasLinks = bot.inviteLink || bot.githubRepo || bot.botFolder;
     return `
-    <div class="bot-card" ${isOwner ? `onclick="openBotModal(${JSON.stringify(bot).replace(/"/g, '&quot;')}, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
+    <div class="bot-card" ${isOwner ? `data-bot-index="${index}" onclick="openBotModal(null, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
     <div class="bot-icon">${bot.icon}</div>
     <h3 class="bot-name">${bot.name}</h3>
     <p class="bot-description">${bot.description}</p>
@@ -978,6 +883,143 @@ const CONFIG = (() => {
     ` : ''}
     ${bot.botFolder ? `
     <a href="${bot.botFolder}" class="bot-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
+    📁 Files
+    </a>
+    ` : ''}
+    </div>
+    ` : ''}
+    </div>
+    `;
+    }).join('');
+    }
+    function initProjectsSection() {
+    const addProjectBtn = document.getElementById('addProjectBtn');
+    if (addProjectBtn) {
+    addProjectBtn.addEventListener('click', () => {
+    if (currentUser.role === 'owner') {
+    openProjectModal();
+    }
+    });
+    }
+    }
+    function openProjectModal(projectData = null, index = null) {
+    if (currentUser.role !== 'owner') {
+    return;
+    }
+    if (index !== null && !projectData) {
+    projectData = dataCache.projects[index];
+    }
+    const modal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    modal.classList.add('active');
+    modalTitle.textContent = projectData ? '🐀 Edit Project' : '🐀 Add Project';
+    const project = projectData || {
+    icon: '💻',
+    name: '',
+    description: '',
+    githubRepo: '',
+    liveDemo: '',
+    projectFolder: ''
+    };
+    modalBody.innerHTML = `
+    <label>Project Icon (emoji)</label>
+    <input type="text" id="projectIcon" value="${project.icon}" placeholder="💻">
+    <label>Project Name</label>
+    <input type="text" id="projectName" value="${project.name}" placeholder="My Awesome Project">
+    <label>Description</label>
+    <textarea id="projectDescription" rows="3" placeholder="What does your project do?">${project.description}</textarea>
+    <label>GitHub Repository (optional)</label>
+    <input type="text" id="projectGithubRepo" value="${project.githubRepo}" placeholder="https://github.com/sorynTech/my-project">
+    <label>Live Demo Link (optional)</label>
+    <input type="text" id="projectLiveDemo" value="${project.liveDemo}" placeholder="https://my-project.com">
+    <label>Project Folder Path (optional)</label>
+    <input type="text" id="projectFolder" value="${project.projectFolder}" placeholder="./projects/my-project/">
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
+    If you store project files in the repo (e.g., /projects/my-project/)
+    </p>
+    <button onclick="saveProject(${index})">Save Project 🐀</button>
+    ${projectData ? `<button onclick="deleteProject(${index})" style="background: var(--accent-secondary); margin-top: 0.5rem;">Delete 🐀</button>` : ''}
+    `;
+    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
+    modal.onclick = (e) => {
+    if (e.target === modal) modal.classList.remove('active');
+    };
+    }
+    async function saveProject(index = null) {
+    if (currentUser.role !== 'owner') {
+    await showAlert('❌ Only the owner can save projects!', 'Permission Denied');
+    return;
+    }
+    const projectData = {
+    icon: document.getElementById('projectIcon').value,
+    name: document.getElementById('projectName').value,
+    description: document.getElementById('projectDescription').value,
+    githubRepo: document.getElementById('projectGithubRepo').value,
+    liveDemo: document.getElementById('projectLiveDemo').value,
+    projectFolder: document.getElementById('projectFolder').value
+    };
+    if (index !== null) {
+    dataCache.projects[index] = projectData;
+    } else {
+    dataCache.projects.push(projectData);
+    }
+    renderProjects();
+    document.getElementById('editModal').classList.remove('active');
+    await saveAllData();
+    }
+    async function deleteProject(index) {
+    if (currentUser.role !== 'owner') {
+    await showAlert('❌ Only the owner can delete projects!', 'Permission Denied');
+    return;
+    }
+    if (await showConfirm('🐀 Delete this project?', 'Delete Project')) {
+    dataCache.projects.splice(index, 1);
+    renderProjects();
+    document.getElementById('editModal').classList.remove('active');
+    await saveAllData();
+    }
+    }
+    function renderProjects() {
+    const projectsGrid = document.getElementById('projectsGrid');
+    if (dataCache.projects.length === 0) {
+    projectsGrid.innerHTML = `
+    <div class="project-card">
+    <div class="project-icon">💻</div>
+    <h3 class="project-name">Example Project</h3>
+    <p class="project-description">A cool coding project that does amazing things. Login as owner to add your own!</p>
+    <div class="project-links">
+    <a href="#" class="project-link-btn">🔗 Demo</a>
+    </div>
+    </div>
+    `;
+    return;
+    }
+    const isOwner = currentUser.role === 'owner';
+    projectsGrid.innerHTML = dataCache.projects.map((project, index) => {
+    const hasLinks = project.githubRepo || project.liveDemo || project.projectFolder;
+    return `
+    <div class="project-card" ${isOwner ? `data-project-index="${index}" onclick="openProjectModal(null, ${index})"` : ''} style="${isOwner ? 'cursor: pointer;' : ''}">
+    <div class="project-icon">${project.icon}</div>
+    <h3 class="project-name">${project.name}</h3>
+    <p class="project-description">${project.description}</p>
+    ${hasLinks ? `
+    <div class="project-links">
+    ${project.githubRepo ? `
+    <a href="${project.githubRepo}" class="project-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+    </svg>
+    GitHub
+    </a>
+    ` : ''}
+    ${project.liveDemo ? `
+    <a href="${project.liveDemo}" class="project-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
+    🔗 Live Demo
+    </a>
+    ` : ''}
+    ${project.projectFolder ? `
+    <a href="${project.projectFolder}" class="project-link-btn" onclick="event.stopPropagation()" target="_blank" rel="noopener noreferrer">
     📁 Files
     </a>
     ` : ''}
