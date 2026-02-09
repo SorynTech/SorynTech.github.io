@@ -1597,8 +1597,8 @@ body::before {
 .tech-item-macos img {
     filter: brightness(0) saturate(100%) invert(100%);
 }
-.tech-item-zorin img {
-    filter: brightness(0) saturate(100%) invert(60%) sepia(48%) saturate(3228%) hue-rotate(170deg) brightness(93%) contrast(103%);
+.tech-item-pycharm img {
+    filter: brightness(0) saturate(100%) invert(80%) sepia(32%) saturate(878%) hue-rotate(91deg) brightness(88%) contrast(83%);
 }
 .tech-item-cloudflare img {
     filter: brightness(0) saturate(100%) invert(63%) sepia(29%) saturate(5993%) hue-rotate(350deg) brightness(102%) contrast(91%);
@@ -1624,6 +1624,10 @@ body::before {
 .tech-item-obs img {
     filter: brightness(0) saturate(100%) invert(100%);
 }
+.tech-item-discord img {
+filter: brightness(0) saturate(100%) invert(44%) sepia(96%) saturate(2279%) hue-rotate(226deg) brightness(99%) contrast(94%);
+}
+
 
 .privacy-card {
     max-width: 720px;
