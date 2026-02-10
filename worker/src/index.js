@@ -3,6 +3,7 @@ const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
 const IMGBB_UPLOAD = 'https://api.imgbb.com/1/upload';
 const JWT_ISSUER = 'soryntech-api';
 const JWT_AUDIENCE = 'soryntech-app';
+const SITE_URL = 'https://soryntech.me';
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -12,7 +13,7 @@ export default {
     }
     const origin = request.headers.get('Origin') || '';
     if (!isAllowedOrigin(origin, env)) {
-      return jsonResponse({ error: 'Forbidden' }, 403, env, origin);
+      return handle403(request, env, origin);
     }
     try {
       if (url.pathname === '/api/health') {
@@ -74,6 +75,35 @@ function isAllowedOrigin(origin, env) {
     }
     return originHost === allowedHost;
   });
+}
+function handle403(request, env, origin) {
+  const accept = request.headers.get('Accept') || '';
+  const isBrowser = accept.includes('text/html');
+  
+  if (isBrowser) {
+    // Serve a redirect to the custom 403 page
+    return new Response(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Access Denied</title>
+    <meta http-equiv="refresh" content="0; url=${SITE_URL}/403.html">
+</head>
+<body>
+    <p>Redirecting to error page...</p>
+</body>
+</html>`, {
+      status: 403,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache',
+      }
+    });
+  }
+  
+  // Return JSON for API calls
+  return jsonResponse({ error: 'Forbidden' }, 403, env, origin);
 }
 function corsResponse(status, env) {
   const allowed = env.ALLOWED_ORIGINS || 'https://soryntech.github.io';
@@ -221,7 +251,7 @@ async function handleDataPut(request, env, origin) {
     return await handleCommissionUpdate(request, env, origin);
   }
   if (auth.role !== 'owner') {
-    return jsonResponse({ error: 'Forbidden' }, 403, env, origin);
+    return handle403(request, env, origin);
   }
   let body;
   try {
@@ -297,7 +327,7 @@ async function handleCommissionUpdate(request, env, origin) {
 async function handleUpload(request, env, origin) {
   const auth = await getAuth(request, env);
   if (!auth || (auth.role !== 'owner' && auth.role !== 'commission')) {
-    return jsonResponse({ error: 'Forbidden' }, 403, env, origin);
+    return handle403(request, env, origin);
   }
   const apiKey = env.IMGBB_API_KEY;
   if (!apiKey) {
