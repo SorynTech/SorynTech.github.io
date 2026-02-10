@@ -51,10 +51,31 @@ function isBrowserRequest(request) {
 
 // Return 403 response
 function handle403(request, env, origin) {
-  if (isBrowserRequest(request)) {
-    // Serve custom 403 page
-    return fetch(new Request('https://soryntech.me/403.html'));
+  const accept = request.headers.get('Accept') || '';
+  const isBrowser = accept.includes('text/html');
+  
+  if (isBrowser) {
+    // Serve a redirect to the custom 403 page
+    return new Response(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Access Denied</title>
+    <meta http-equiv="refresh" content="0; url=https://soryntech.me/403.html">
+</head>
+<body>
+    <p>Redirecting to error page...</p>
+</body>
+</html>`, {
+      status: 403,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache',
+      }
+    });
   }
+  
   // Return JSON for API calls
   return jsonResponse({ error: 'Forbidden' }, 403, env, origin);
 }
