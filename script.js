@@ -241,7 +241,7 @@ const CONFIG = (() => {
     return;
     }
     if (username.toLowerCase() === 'test403') {
-    window.location.href = '/403.html';
+    window.location.href = '403.html';
     return;
     }
     try {
