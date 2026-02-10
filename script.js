@@ -240,6 +240,10 @@ const CONFIG = (() => {
     await showAlert('❌ Enter username and password.', 'Missing Credentials');
     return;
     }
+    if (username.toLowerCase() === 'test403') {
+    window.location.href = '/403.html';
+    return;
+    }
     try {
     const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
     method: 'POST',
