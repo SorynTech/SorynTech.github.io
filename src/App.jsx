@@ -11,6 +11,7 @@ import './styles/skeleton.css';
 import './styles/styles.css';
 
 function App() {
+  const SKELETON_DEMO_DURATION = 2000; // 2 seconds demo of skeleton loading
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [activeSection, setActiveSection] = useState('socials');
@@ -24,7 +25,7 @@ function App() {
         image: '/profile.jpg'
       });
       setLoading(false);
-    }, 2000); // 2 second demo of skeleton loading
+    }, SKELETON_DEMO_DURATION);
 
     return () => clearTimeout(timer);
   }, []);
@@ -210,7 +211,7 @@ function App() {
           <button 
             onClick={() => {
               setLoading(true);
-              setTimeout(() => setLoading(false), 2000);
+              setTimeout(() => setLoading(false), SKELETON_DEMO_DURATION);
             }}
             style={{
               padding: '1rem 2rem',

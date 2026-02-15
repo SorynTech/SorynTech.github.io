@@ -35,10 +35,15 @@ jobs:
       
       - name: Copy static assets to dist
         run: |
-          cp -r profile.jpg favicon.ico robots.txt CNAME .well-known dist/ 2>/dev/null || true
-          cp -r images dist/ 2>/dev/null || true
-          cp -r data dist/ 2>/dev/null || true
-          echo "✅ Static assets copied to dist"
+          echo "📦 Copying static assets to dist..."
+          cp profile.jpg dist/ && echo "✓ Copied profile.jpg" || echo "⚠ Warning: profile.jpg not found"
+          cp favicon.ico dist/ && echo "✓ Copied favicon.ico" || echo "⚠ Warning: favicon.ico not found"
+          if [ -d images ]; then cp -r images dist/ && echo "✓ Copied images/"; else echo "⚠ Warning: images/ not found"; fi
+          if [ -d data ]; then cp -r data dist/ && echo "✓ Copied data/"; else echo "⚠ Warning: data/ not found"; fi
+          if [ -f robots.txt ]; then cp robots.txt dist/ && echo "✓ Copied robots.txt"; fi
+          if [ -f CNAME ]; then cp CNAME dist/ && echo "✓ Copied CNAME"; fi
+          if [ -d .well-known ]; then cp -r .well-known dist/ && echo "✓ Copied .well-known/"; fi
+          echo "✅ Static assets copy completed"
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
