@@ -1,0 +1,259 @@
+/* Skeleton Loading Animations */
+@keyframes skeletonPulse {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(45, 52, 70, 0.8) 25%,
+        rgba(125, 211, 252, 0.15) 37%,
+        rgba(45, 52, 70, 0.8) 63%
+    );
+    background-size: 200px 100%;
+    animation: skeletonPulse 1.4s ease-in-out infinite;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+    width: 80%;
+}
+
+.skeleton-text-short {
+    width: 40%;
+}
+
+.skeleton-text-medium {
+    width: 60%;
+}
+
+.skeleton-title {
+    height: 2em;
+    width: 50%;
+    margin: 0 auto 1.5rem;
+}
+
+.skeleton-circle {
+    border-radius: 50%;
+}
+
+/* Skeleton Lanyard Card */
+.skeleton-lanyard-card {
+    width: 280px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.skeleton-lanyard-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+
+.skeleton-lanyard-name {
+    height: 1.8em;
+    width: 160px;
+}
+
+.skeleton-lanyard-role {
+    height: 1em;
+    width: 120px;
+}
+
+.skeleton-lanyard-barcode {
+    display: flex;
+    gap: 3px;
+    margin-top: 0.5rem;
+}
+
+.skeleton-barcode-line {
+    width: 4px;
+    height: 30px;
+    border-radius: 2px;
+}
+
+/* Skeleton Social Links */
+.skeleton-social-link {
+    width: 140px;
+    height: 50px;
+    border-radius: 12px;
+}
+
+.skeleton-social-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Skeleton Tech Items */
+.skeleton-tech-item {
+    width: 100px;
+    height: 90px;
+    border-radius: 12px;
+}
+
+.skeleton-tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+/* Skeleton Friend Card */
+.skeleton-friend-card {
+    height: 200px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Skeleton Game Account Card */
+.skeleton-game-card {
+    width: 220px;
+    height: 180px;
+    border-radius: 16px;
+}
+
+.skeleton-game-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+/* Skeleton Section Content */
+.skeleton-section {
+    padding: 2rem;
+}
+
+.skeleton-section-title {
+    height: 2.5em;
+    width: 250px;
+    margin: 0 auto 2rem;
+    border-radius: 8px;
+}
+
+/* Skeleton Bot/Project Card */
+.skeleton-card {
+    height: 250px;
+    border-radius: 16px;
+    width: 100%;
+}
+
+.skeleton-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Skeleton Gallery Item */
+.skeleton-gallery-item {
+    height: 250px;
+    border-radius: 16px;
+}
+
+.skeleton-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Skeleton Privacy Card */
+.skeleton-privacy-card {
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.skeleton-privacy-block {
+    height: 80px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+/* Skeleton Nav */
+.skeleton-nav-link {
+    width: 80px;
+    height: 1.2em;
+    border-radius: 4px;
+}
+
+/* Skeleton GitHub Graph */
+.skeleton-github-graph {
+    height: 150px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+}
+
+/* Skeleton Footer */
+.skeleton-footer {
+    height: 60px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Fade-in transition when content loads */
+.skeleton-fade-in {
+    animation: skeletonFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes skeletonFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive skeleton adjustments */
+@media (max-width: 768px) {
+    .skeleton-social-grid {
+        gap: 0.75rem;
+    }
+
+    .skeleton-social-link {
+        width: 110px;
+        height: 44px;
+    }
+
+    .skeleton-tech-item {
+        width: 80px;
+        height: 75px;
+    }
+
+    .skeleton-game-card {
+        width: 100%;
+        max-width: 280px;
+        height: 160px;
+    }
+
+    .skeleton-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
