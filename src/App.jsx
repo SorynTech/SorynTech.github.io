@@ -8,7 +8,7 @@ import {
   SkeletonLanyard 
 } from './components/Skeleton';
 import './styles/skeleton.css';
-import '../styles.css';
+import './styles/styles.css';
 
 function App() {
   const [loading, setLoading] = useState(true);
