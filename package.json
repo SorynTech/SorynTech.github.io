@@ -2,12 +2,37 @@
   "name": "soryntech-github-io",
   "private": true,
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "deploy:worker": "wrangler deploy"
   },
   "dependencies": {
-    "jose": "^5.2.0"
+    "jose": "^5.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.4",
+    "vite": "^7.3.1",
     "wrangler": "^4.0.0"
-  }
+  },
+  "version": "1.0.0",
+  "description": "This package contains security updates for your portfolio website:",
+  "main": "script.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SorynTech/SorynTech.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SorynTech/SorynTech.github.io/issues"
+  },
+  "homepage": "https://github.com/SorynTech/SorynTech.github.io#readme"
 }
