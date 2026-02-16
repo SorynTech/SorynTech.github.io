@@ -35,6 +35,8 @@ const CODING_TECH = [
   { className: 'tech-item-supabase', icon: 'supabase', label: 'Supabase' },
   { className: 'tech-item-discord', icon: 'discord', label: 'Discord API' },
   { className: 'tech-item-render', icon: 'render', label: 'Render', useSimpleIcons: true },
+  {className: 'tech-item-react', icon: 'react', label: 'React', useSimpleIcons: true},
+  {className: 'tech-item-typescript', icon: 'typescript', label: 'TypeScript', useSimpleIcons: true},
 ];
 
 const EDITOR_TECH = [
