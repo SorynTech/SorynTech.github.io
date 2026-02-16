@@ -20,6 +20,7 @@ const SOCIAL_LINKS = [
   { href: 'https://www.tiktok.com/@zippydrawz', className: 'social-link-tiktok', icon: 'tiktok', label: 'TikTok' },
   { href: 'https://gitlab.com/SorynTech', className: 'social-link-gitlab', icon: 'gitlab', label: 'GitLab' },
   { href: 'https://tinyurl.com/2x8vvnw9', className: 'social-link-linkedin', icon: 'linkedin', label: 'Linkedin' },
+  {href: 'https://twitch.tv/ZippyDrawz', className: 'social-link-twitch', icon: 'twitch', label: 'Twitch'},
 ];
 
 const CODING_TECH = [
@@ -43,6 +44,7 @@ const CODING_TECH = [
 const EDITOR_TECH = [
   { className: 'tech-item-pycharm', icon: 'pycharm', label: 'PyCharm', useSimpleIcons: true },
   { className: 'tech-item-vscode', icon: 'visualstudiocode', label: 'VS Code Insiders' },
+  {className: 'tech-item-webstorm', icon: 'webstorm', label: 'Jetbrains Webstorm', useSimpleIcons: true},
 ];
 
 const DESIGN_TECH = [
@@ -50,6 +52,8 @@ const DESIGN_TECH = [
   { className: 'tech-item-illustrator', icon: 'adobeillustrator', label: 'Illustrator' },
   { className: 'tech-item-krita', icon: 'krita', label: 'Krita' },
   { className: 'tech-item-gimp', icon: 'gimp', label: 'GIMP' },
+  {className: 'tech-item-canva', icon: 'canva', label: 'Canva', useSimpleIcons: true},
+  {className: 'tech-item-IbisPaint', icon: 'ibispaint', label: 'IbisPaint', useSimpleIcons: true},
 ];
 
 const VIDEO_TECH = [
