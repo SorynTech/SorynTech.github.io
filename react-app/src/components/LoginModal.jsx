@@ -23,6 +23,9 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
           Enter your credentials to access the nest
         </p>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.85rem', fontStyle: 'italic' }}>
+          This login is just to stop AI scrapers
+        </p>
         <div>
           <label>Username</label>
           <input

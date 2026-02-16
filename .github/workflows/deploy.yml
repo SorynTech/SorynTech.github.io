@@ -1,4 +1,4 @@
-name: Deploy with env.js
+name: Deploy React App
 on:
   push:
     branches: [ main ]
@@ -21,21 +21,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Create env.js from secrets
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build React app
+        run: npm run build
+      
+      - name: Prepare deployment directory
         run: |
-          cat > env.js << 'EOF'
-          window.ENV = {
-            SORYN_USER: "${{ secrets.SORYN_USER }}",
-            SORYN_PASS: "${{ secrets.SORYN_PASS }}",
-            GUEST_USER: "${{ secrets.GUEST_USER }}",
-            GUEST_PASS: "${{ secrets.GUEST_PASS }}",
-            JSONBIN_API_KEY: "${{ secrets.JSONBIN_API_KEY }}",
-            JSONBIN_BIN_ID: "${{ secrets.JSONBIN_BIN_ID }}",
-            IMGBB_API_KEY: "${{ secrets.IMGBB_API_KEY }}"
-          };
-          EOF
-          echo "✅ env.js created successfully"
-          cat env.js
+          mkdir -p deploy
+          # Copy React build output as the primary site
+          cp -r react-build/* deploy/
+          # Copy static assets needed by both React and non-React versions
+          cp -f styles.css deploy/
+          cp -f profile.jpg deploy/
+          cp -f favicon.ico deploy/
+          cp -f robots.txt deploy/
+          cp -f CNAME deploy/
+          cp -f 403.html deploy/
+          # Copy non-React version and its script for reference/fallback
+          cp -f non-react-index.html deploy/
+          cp -f before-react-script.js deploy/
+          # Copy other assets
+          cp -rf images deploy/ 2>/dev/null || true
+          cp -rf data deploy/ 2>/dev/null || true
+          cp -rf .well-known deploy/ 2>/dev/null || true
+          echo "✅ Deployment directory prepared"
+          ls -la deploy/
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -43,7 +61,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'deploy'
       
       - name: Deploy to GitHub Pages
         id: deployment
