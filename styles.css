@@ -1627,7 +1627,12 @@ body::before {
 .tech-item-discord img {
 filter: brightness(0) saturate(100%) invert(44%) sepia(96%) saturate(2279%) hue-rotate(226deg) brightness(99%) contrast(94%);
 }
-
+.tech-item.typescript img {
+filter: brightness(0) saturate(100%) invert(92%) sepia(15%) saturate(3329%) hue-rotate(343deg) brightness(111%) contrast(94%);
+}
+.tech-item-react img {
+filter: brightness(0) saturate(100%) invert(100%);
+}
 
 .privacy-card {
     max-width: 720px;
@@ -2032,7 +2037,7 @@ line-height: 1.6;
     filter: brightness(0) saturate(100%) invert(79%) sepia(55%) saturate(3771%) hue-rotate(140deg) brightness(102%) contrast(98%) !important;
     transform: scale(1.1);
     transition: all 0.3s ease;
-}}
+}
 
 .github-graph-container {
     margin-bottom: 0.3125rem;
