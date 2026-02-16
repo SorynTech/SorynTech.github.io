@@ -57,6 +57,13 @@ const VIDEO_TECH = [
   { className: 'tech-item-obs', icon: 'obsstudio', label: 'OBS Studio' },
 ];
 
+const BROWSER_TECH = [
+  { className: 'tech-item-arc', icon: 'arc', label: 'Arc', useSimpleIcons: true },
+  { className: 'tech-item-firefox', icon: 'firefoxbrowser', label: 'Firefox' },
+  { className: 'tech-item-chrome', icon: 'googlechrome', label: 'Chrome' },
+  { className: 'tech-item-safari', icon: 'safari', label: 'Safari' },
+];
+
 const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'Mineoblocks' },
@@ -187,6 +194,14 @@ export default function SocialsSection({ isLoaded, showNotification }) {
               <h4 className="tech-category-title">🎬 Video</h4>
               <div className="tech-stack-grid">
                 {VIDEO_TECH.map((item) => (
+                  <TechItem key={item.label} item={item} />
+                ))}
+              </div>
+            </div>
+            <div className="tech-category">
+              <h4 className="tech-category-title">🌐 Browsers</h4>
+              <div className="tech-stack-grid">
+                {BROWSER_TECH.map((item) => (
                   <TechItem key={item.label} item={item} />
                 ))}
               </div>
