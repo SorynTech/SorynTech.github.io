@@ -1,1 +1,5 @@
 .vscode/extensions.json
+node_modules
+react-build
+.env
+.env.local

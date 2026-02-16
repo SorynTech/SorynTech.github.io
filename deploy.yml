@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy React App
 
 on:
   push:
@@ -13,27 +13,44 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - name: Inject secrets into HTML
-        env:
-          SORYN_USER: ${{ secrets.SORYN_USER }}
-          SORYN_PASS: ${{ secrets.SORYN_PASS }}
-          GUEST_USER: ${{ secrets.GUEST_USER }}
-          GUEST_PASS: ${{ secrets.GUEST_PASS }}
-          JSONBIN_API_KEY: ${{ secrets.JSONBIN_API_KEY }}
-          JSONBIN_BIN_ID: ${{ secrets.JSONBIN_BIN_ID }}
-          IMGBB_API_KEY: ${{ secrets.IMGBB_API_KEY }}
-        run: python .github/scripts/inject_secrets.py
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build React app
+        run: npm run build
+      
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p deploy
+          cp -r react-build/* deploy/
+          cp -f styles.css deploy/
+          cp -f profile.jpg deploy/
+          cp -f favicon.ico deploy/
+          cp -f robots.txt deploy/
+          cp -f CNAME deploy/
+          cp -f 403.html deploy/
+          cp -f non-react-index.html deploy/
+          cp -f before-react-script.js deploy/
+          cp -rf images deploy/ 2>/dev/null || true
+          cp -rf data deploy/ 2>/dev/null || true
+          cp -rf .well-known deploy/ 2>/dev/null || true
       
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
       
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'deploy'
       
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4

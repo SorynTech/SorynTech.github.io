@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replace {{PLACEHOLDER}} in index.html with values from environment variables.
+"""Replace {{PLACEHOLDER}} in non-react-index.html with values from environment variables.
 Secrets are read from os.environ so no shell/sed interpretation; newlines preserved.
 """
 import os
@@ -14,7 +14,7 @@ PLACEHOLDERS = [
     "IMGBB_API_KEY",
 ]
 
-HTML_PATH = "index.html"
+HTML_PATH = "non-react-index.html"
 
 
 def main() -> None:
