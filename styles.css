@@ -1687,7 +1687,7 @@ body::before {
 .tech-item:hover span {
     color: var(--accent-primary);
 }
-
+/* Custom filters for specific tech icons to better match the theme */
 .tech-item-python img {
     filter: brightness(0) saturate(100%) invert(46%) sepia(26%) saturate(1167%) hue-rotate(165deg) brightness(85%) contrast(86%);
 }
@@ -1726,6 +1726,9 @@ body::before {
 }
 .tech-item-pycharm img {
     filter: brightness(0) saturate(100%) invert(80%) sepia(32%) saturate(878%) hue-rotate(91deg) brightness(88%) contrast(83%);
+}
+.tech-item-webstorm img {
+    filter: brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(2000%) hue-rotate(165deg) brightness(100%) contrast(95%);
 }
 .tech-item-cloudflare img {
     filter: brightness(0) saturate(100%) invert(63%) sepia(29%) saturate(5993%) hue-rotate(350deg) brightness(102%) contrast(91%);
@@ -2110,6 +2113,7 @@ line-height: 1.6;
     height: 24px;
     flex-shrink: 0;
 }
+/* Custom filters for specific social media icons to better match the theme */
 .social-link-twitter img {
     filter: brightness(0) saturate(100%) invert(100%);
 }
@@ -2121,6 +2125,9 @@ line-height: 1.6;
 }
 .social-link-discord img {
     filter: brightness(0) saturate(100%) invert(44%) sepia(96%) saturate(2279%) hue-rotate(226deg) brightness(99%) contrast(94%);
+}
+.social-link-twitch img {
+    filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(5000%) hue-rotate(252deg) brightness(100%) contrast(101%);
 }
 .social-link-youtube img {
     filter: brightness(0) saturate(100%) invert(13%) sepia(99%) saturate(7471%) hue-rotate(3deg) brightness(108%) contrast(114%);
