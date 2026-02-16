@@ -8,6 +8,7 @@ import {
   GameAccountsSkeleton,
 } from './Skeletons';
 import { copyToClipboard } from '../hooks';
+import GitHubGraph from './GitHubGraph';
 
 const SOCIAL_LINKS = [
   { href: 'https://Ko-fi.com/soryntech', className: 'social-link-kofi', icon: 'kofi', label: 'Ko-fi' },
@@ -118,14 +119,7 @@ export default function SocialsSection({ isLoaded, showNotification }) {
           </div>
         </div>
         <div className="social-links-container">
-          <div className="github-graph-container">
-            <h3 style={{ fontFamily: "'Righteous', cursive", fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-              <span className="rat-emoji">🐀</span> GitHub Activity <span className="rat-emoji">🐀</span>
-            </h3>
-            <div id="github-contribution-graph" className="github-graph">
-              <div className="loading-spinner">Loading GitHub contributions...</div>
-            </div>
-          </div>
+          <GitHubGraph />
 
           <h3 style={{ fontFamily: "'Righteous', cursive", fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>
             <span className="rat-emoji">🐀</span> My Socials <span className="rat-emoji">🐀</span>

@@ -12,6 +12,7 @@ import BotsSection, {
   CommissionsSection,
 } from './components/ContentSections';
 import PrivacySection from './components/PrivacySection';
+import ExternalDenSection from './components/ExternalDenSection';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -66,6 +67,9 @@ export default function App() {
       )}
       {activeSection === 'commissions' && (
         <CommissionsSection isLoaded={isLoaded} isActive user={user} />
+      )}
+      {activeSection === 'external-den' && (
+        <ExternalDenSection isLoaded={isLoaded} isActive />
       )}
       {activeSection === 'privacy' && (
         <PrivacySection isLoaded={isLoaded} isActive />

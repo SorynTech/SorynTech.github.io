@@ -7,7 +7,8 @@ const NAV_ITEMS = [
   { id: 'projects', label: 'Projects' },
   { id: 'art', label: 'Art Gallery' },
   { id: 'commissions', label: '🎨 Commissions' },
-  { id: 'privacy', label: '🐀 The Rat\'s Privacy Policy' },
+  { id: 'privacy', label: '🔒 Privacy Policy' },
+  { id: 'external-den', label: '🐀 External Den (Discord Server)' },
 ];
 
 export default function Navigation({ activeSection, onSectionChange, user, onLoginClick, isLoaded }) {
