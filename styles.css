@@ -1627,11 +1627,11 @@ body::before {
 .tech-item-discord img {
 filter: brightness(0) saturate(100%) invert(44%) sepia(96%) saturate(2279%) hue-rotate(226deg) brightness(99%) contrast(94%);
 }
-.tech-item.typescript img {
-filter: brightness(0) saturate(100%) invert(92%) sepia(15%) saturate(3329%) hue-rotate(343deg) brightness(111%) contrast(94%);
+.tech-item-typescript img {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(52%) saturate(2108%) hue-rotate(190deg) brightness(90%) contrast(86%);
 }
 .tech-item-react img {
-filter: brightness(0) saturate(100%) invert(100%);
+    filter: brightness(0) saturate(100%) invert(78%) sepia(60%) saturate(459%) hue-rotate(166deg) brightness(101%) contrast(97%);
 }
 
 .privacy-card {
