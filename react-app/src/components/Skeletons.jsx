@@ -4,16 +4,10 @@ export function NavSkeleton() {
   return (
     <nav className="nav">
       <div className="nav-container">
+        <div className="skeleton" style={{ width: '36px', height: '36px', borderRadius: '8px' }} />
         <div className="nav-brand">
           <div className="skeleton skeleton-text" style={{ width: '150px', height: '1.5em' }} />
         </div>
-        <ul className="nav-menu">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <li key={i}>
-              <div className="skeleton skeleton-nav-link" />
-            </li>
-          ))}
-        </ul>
         <div className="skeleton" style={{ width: '80px', height: '36px', borderRadius: '20px' }} />
       </div>
     </nav>
