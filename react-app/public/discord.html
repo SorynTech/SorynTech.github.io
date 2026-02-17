@@ -6,11 +6,190 @@
     <title>Redirecting to Discord...</title>
     <meta http-equiv="refresh" content="0; url=https://discord.gg/HdHpZNFVK4">
     <link rel="canonical" href="https://discord.gg/HdHpZNFVK4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a1d2e;
+            --bg-card: #2d3446;
+            --accent-primary: #7dd3fc;
+            --accent-secondary: #a855f7;
+            --text-primary: #dfe6e9;
+            --text-secondary: #b2bec3;
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(192, 132, 252, 0.03) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .cheese-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .cheese-piece {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .cheese-piece:nth-child(1) { 
+            top: 10%; 
+            left: 5%; 
+            animation-delay: 0s; 
+        }
+        .cheese-piece:nth-child(2) { 
+            top: 20%; 
+            right: 10%; 
+            animation-delay: 5s; 
+        }
+        .cheese-piece:nth-child(3) { 
+            bottom: 15%; 
+            left: 15%; 
+            animation-delay: 10s; 
+        }
+        .cheese-piece:nth-child(4) { 
+            bottom: 25%; 
+            right: 8%; 
+            animation-delay: 15s; 
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            50% { transform: translateY(0) rotate(-5deg); }
+            75% { transform: translateY(20px) rotate(5deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-card);
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .discord-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(125, 211, 252, 0.2);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border: 2px solid var(--accent-primary);
+            border-radius: 12px;
+            display: inline-block;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        a:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(125, 211, 252, 0.5);
+            transform: translateY(-2px);
+        }
+    </style>
     <script>
         window.location.replace("https://discord.gg/HdHpZNFVK4");
     </script>
 </head>
 <body>
-    <p>Redirecting to Discord server... If you are not redirected, <a href="https://discord.gg/HdHpZNFVK4">click here</a>.</p>
+    <div class="cheese-bg">
+        <div class="cheese-piece">🧀</div>
+        <div class="cheese-piece">🧀</div>
+        <div class="cheese-piece">🧀</div>
+        <div class="cheese-piece">🧀</div>
+    </div>
+    <div class="container">
+        <div class="discord-icon">💬</div>
+        <h1>Redirecting to Discord...</h1>
+        <div class="spinner"></div>
+        <p>Taking you to our Discord server</p>
+        <a href="https://discord.gg/HdHpZNFVK4">Click here if not redirected</a>
+    </div>
 </body>
 </html>
