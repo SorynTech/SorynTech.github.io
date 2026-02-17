@@ -18,7 +18,7 @@ function LoginPlaceholder({ message }) {
   );
 }
 
-export default function BotsSection({ isLoaded, isActive, user }) {
+export default function BotsSection({ isLoaded, isActive, user, bots = [] }) {
   if (!isLoaded) {
     return (
       <section id="bots" className={`section${isActive ? ' active' : ''}`}>
@@ -32,7 +32,26 @@ export default function BotsSection({ isLoaded, isActive, user }) {
       <div className="content-wrapper skeleton-fade-in">
         <h2 className="section-title">🐀 Discord Bots</h2>
         <div className="bots-grid" id="botsGrid">
-          <LoginPlaceholder message="To see bots, please login with the guest credentials" />
+          {user.isLoggedIn ? (
+            bots.length > 0 ? (
+              bots.map((bot, index) => (
+                <div key={bot.id || index} className="bot-card">
+                  {bot.avatar && <img src={bot.avatar} alt={bot.name} className="bot-avatar" />}
+                  <h3 className="bot-name">{bot.name}</h3>
+                  {bot.description && <p className="bot-description">{bot.description}</p>}
+                  {bot.invite && (
+                    <a href={bot.invite} className="bot-invite-link" target="_blank" rel="noopener noreferrer">
+                      Invite Bot
+                    </a>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No bots to display yet.</p>
+            )
+          ) : (
+            <LoginPlaceholder message="To see bots, please login with the guest credentials" />
+          )}
         </div>
         {user.role === 'owner' && (
           <button className="add-btn owner-only" id="addBotBtn">🐀 Add Bot</button>
@@ -42,7 +61,7 @@ export default function BotsSection({ isLoaded, isActive, user }) {
   );
 }
 
-export function ProjectsSection({ isLoaded, isActive, user }) {
+export function ProjectsSection({ isLoaded, isActive, user, projects = [] }) {
   if (!isLoaded) {
     return (
       <section id="projects" className={`section${isActive ? ' active' : ''}`}>
@@ -56,7 +75,25 @@ export function ProjectsSection({ isLoaded, isActive, user }) {
       <div className="content-wrapper skeleton-fade-in">
         <h2 className="section-title">🐀 Coding Projects</h2>
         <div className="projects-grid" id="projectsGrid">
-          <LoginPlaceholder message="To see projects, please login with the guest credentials" />
+          {user.isLoggedIn ? (
+            projects.length > 0 ? (
+              projects.map((project, index) => (
+                <div key={project.id || index} className="project-card">
+                  <h3 className="project-name">{project.name}</h3>
+                  {project.description && <p className="project-description">{project.description}</p>}
+                  {project.url && (
+                    <a href={project.url} className="project-link" target="_blank" rel="noopener noreferrer">
+                      View Project
+                    </a>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No projects to display yet.</p>
+            )
+          ) : (
+            <LoginPlaceholder message="To see projects, please login with the guest credentials" />
+          )}
         </div>
         {user.role === 'owner' && (
           <button className="add-btn owner-only" id="addProjectBtn">🐀 Add Project</button>
@@ -66,7 +103,7 @@ export function ProjectsSection({ isLoaded, isActive, user }) {
   );
 }
 
-export function ArtSection({ isLoaded, isActive, user }) {
+export function ArtSection({ isLoaded, isActive, user, gallery = [] }) {
   if (!isLoaded) {
     return (
       <section id="art" className={`section${isActive ? ' active' : ''}`}>
@@ -90,14 +127,27 @@ export function ArtSection({ isLoaded, isActive, user }) {
           )}
         </div>
         <div className="gallery-grid" id="galleryGrid">
-          <LoginPlaceholder message="To view the art gallery, please login with the guest credentials" />
+          {user.isLoggedIn ? (
+            gallery.length > 0 ? (
+              gallery.map((item, index) => (
+                <div key={item.id || index} className="gallery-item">
+                  <img src={item.url || item.src} alt={item.title || `Art ${index + 1}`} className="gallery-image" />
+                  {item.title && <p className="gallery-title">{item.title}</p>}
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No artwork to display yet.</p>
+            )
+          ) : (
+            <LoginPlaceholder message="To view the art gallery, please login with the guest credentials" />
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-export function CommissionsSection({ isLoaded, isActive, user }) {
+export function CommissionsSection({ isLoaded, isActive, user, commissions = [] }) {
   if (!isLoaded) {
     return (
       <section id="commissions" className={`section${isActive ? ' active' : ''}`}>
@@ -123,7 +173,20 @@ export function CommissionsSection({ isLoaded, isActive, user }) {
           )}
         </div>
         <div className="gallery-grid" id="commissionsGrid">
-          <LoginPlaceholder message="To view commissioned artwork, please login with the guest credentials" />
+          {user.isLoggedIn ? (
+            commissions.length > 0 ? (
+              commissions.map((item, index) => (
+                <div key={item.id || index} className="gallery-item">
+                  <img src={item.url || item.src} alt={item.title || `Commission ${index + 1}`} className="gallery-image" />
+                  {item.title && <p className="gallery-title">{item.title}</p>}
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No commissioned artwork to display yet.</p>
+            )
+          ) : (
+            <LoginPlaceholder message="To view commissioned artwork, please login with the guest credentials" />
+          )}
         </div>
       </div>
     </section>
