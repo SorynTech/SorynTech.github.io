@@ -52,8 +52,8 @@ const DESIGN_TECH = [
   { className: 'tech-item-illustrator', icon: 'adobeillustrator', label: 'Illustrator' },
   { className: 'tech-item-krita', icon: 'krita', label: 'Krita' },
   { className: 'tech-item-gimp', icon: 'gimp', label: 'GIMP' },
-  {className: 'tech-item-canva', icon: 'canva', label: 'Canva', useSimpleIcons: true},
-  {className: 'tech-item-IbisPaint', icon: 'ibispaint', label: 'IbisPaint', useSimpleIcons: true},
+  {className: 'tech-item-canva', label: 'Canva', customUrl: getIconUrlWithFallback('canva')},
+  {className: 'tech-item-IbisPaint', label: 'IbisPaint', customUrl: getIconUrlWithFallback('ibispaint')},
 ];
 
 const VIDEO_TECH = [
@@ -70,9 +70,11 @@ const BROWSER_TECH = [
 
 const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
-  { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'Mineoblocks' },
+  { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
   { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'SorynTech', altUsername: 'Korai Fangtail' },
+  {icon: 'battlenet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126', useSimpleIcons: true},
+  {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216', useSimpleIcons: true},
 ];
 
 function getIconUrl(icon, useSimpleIcons = false) {
@@ -80,10 +82,16 @@ function getIconUrl(icon, useSimpleIcons = false) {
   return `https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${icon}.svg`;
 }
 
+function getIconUrlWithFallback(icon, useSimpleIcons = false) {
+  const url = getIconUrl(icon, useSimpleIcons);
+  return `${url}?fallback=${encodeURIComponent(`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${icon}/${icon}-original.svg`)}`;
+}
+
 function TechItem({ item }) {
+  const src = item.customUrl || getIconUrl(item.icon, item.useSimpleIcons);
   return (
     <div className={`tech-item ${item.className}`}>
-      <img src={getIconUrl(item.icon, item.useSimpleIcons)} alt={item.label} />
+      <img src={src} alt={item.label} />
       <span>{item.label}</span>
     </div>
   );

@@ -2177,6 +2177,16 @@ line-height: 1.6;
             invert(17%) sepia(20%) saturate(1200%)
             hue-rotate(175deg) brightness(90%) contrast(110%);
   }
+  .game-icon-battle {
+    filter: brightness(0) saturate(100%)
+            invert(45%) sepia(90%) saturate(1500%)
+            hue-rotate(195deg) brightness(105%) contrast(105%);
+  }
+  .game-icon-xbox {
+    filter: brightness(0) saturate(100%)
+            invert(55%) sepia(78%) saturate(500%)
+            hue-rotate(80deg) brightness(95%) contrast(105%);
+  }
 .game-account-card:hover .game-icon img {
     filter: brightness(0) saturate(100%) invert(79%) sepia(55%) saturate(3771%) hue-rotate(140deg) brightness(102%) contrast(98%) !important;
     transform: scale(1.1);
