@@ -5,12 +5,12 @@ const CONFIG = Object.freeze({
 });
 
 function getAuthToken() {
-  return sessionStorage.getItem('authToken');
+  return localStorage.getItem('authToken');
 }
 
 function setAuthToken(token) {
-  if (token) sessionStorage.setItem('authToken', token);
-  else sessionStorage.removeItem('authToken');
+  if (token) localStorage.setItem('authToken', token);
+  else localStorage.removeItem('authToken');
 }
 
 export function useAuth() {
