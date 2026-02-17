@@ -52,8 +52,8 @@ const DESIGN_TECH = [
   { className: 'tech-item-illustrator', icon: 'adobeillustrator', label: 'Illustrator' },
   { className: 'tech-item-krita', icon: 'krita', label: 'Krita' },
   { className: 'tech-item-gimp', icon: 'gimp', label: 'GIMP' },
-  {className: 'tech-item-canva', icon: 'canva', label: 'Canva', useSimpleIcons: true, fallback: 'canva'},
-  {className: 'tech-item-IbisPaint', icon: 'ibispaintx', label: 'IbisPaint', useSimpleIcons: true, fallback: 'ibispaintx'},
+  {className: 'tech-item-canva', label: 'Canva', customUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/canva/canva-original.svg'},
+  {className: 'tech-item-IbisPaint', label: 'IbisPaint', customUrl: 'https://api.iconify.design/arcticons/ibispaint-x.svg?color=white'},
 ];
 
 const VIDEO_TECH = [
@@ -73,8 +73,8 @@ const GAME_ACCOUNTS = [
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
   { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'SorynTech', altUsername: 'Korai Fangtail' },
-  {icon: 'battlenet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126', useSimpleIcons: true},
-  {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216', useSimpleIcons: true},
+  {icon: 'battledotnet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126'},
+  {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216'},
 ];
 
 function getIconUrl(icon, useSimpleIcons = false) {
@@ -94,7 +94,7 @@ function handleIconFallback(e, fallbackIcon) {
 }
 
 function TechItem({ item }) {
-  const src = getIconUrl(item.icon, item.useSimpleIcons);
+  const src = item.customUrl || getIconUrl(item.icon, item.useSimpleIcons);
   return (
     <div className={`tech-item ${item.className}`}>
       <img
