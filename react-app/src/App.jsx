@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../../styles.css';
 import './skeleton.css';
 import useDelayedLoad from './useDelayedLoad';
-import { useAuth, useNotification } from './hooks';
+import { useAuth, useNotification, useDataLoader } from './hooks';
 import Navigation from './components/Navigation';
 import LoginModal from './components/LoginModal';
 import SocialsSection from './components/SocialsSection';
@@ -19,6 +19,7 @@ export default function App() {
   const isLoaded = useDelayedLoad(500);
   const { user, login, logout } = useAuth();
   const { notification, showNotification } = useNotification();
+  const data = useDataLoader(user);
   const [activeSection, setActiveSection] = useState('socials');
   const [loginOpen, setLoginOpen] = useState(false);
 
@@ -57,16 +58,16 @@ export default function App() {
         <SocialsSection isLoaded={isLoaded} showNotification={showNotification} />
       )}
       {activeSection === 'bots' && (
-        <BotsSection isLoaded={isLoaded} isActive user={user} />
+        <BotsSection isLoaded={isLoaded} isActive user={user} bots={data.bots} />
       )}
       {activeSection === 'projects' && (
-        <ProjectsSection isLoaded={isLoaded} isActive user={user} />
+        <ProjectsSection isLoaded={isLoaded} isActive user={user} projects={data.projects} />
       )}
       {activeSection === 'art' && (
-        <ArtSection isLoaded={isLoaded} isActive user={user} />
+        <ArtSection isLoaded={isLoaded} isActive user={user} gallery={data.gallery} />
       )}
       {activeSection === 'commissions' && (
-        <CommissionsSection isLoaded={isLoaded} isActive user={user} />
+        <CommissionsSection isLoaded={isLoaded} isActive user={user} commissions={data.commissions} />
       )}
       {activeSection === 'external-den' && (
         <ExternalDenSection isLoaded={isLoaded} isActive />
