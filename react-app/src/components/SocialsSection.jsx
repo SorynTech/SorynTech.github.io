@@ -52,8 +52,8 @@ const DESIGN_TECH = [
   { className: 'tech-item-illustrator', icon: 'adobeillustrator', label: 'Illustrator' },
   { className: 'tech-item-krita', icon: 'krita', label: 'Krita' },
   { className: 'tech-item-gimp', icon: 'gimp', label: 'GIMP' },
-  {className: 'tech-item-canva', icon: 'canva', label: 'Canva', useSimpleIcons: true},
-  {className: 'tech-item-IbisPaint', icon: 'ibispaint', label: 'IbisPaint', useSimpleIcons: true},
+  {className: 'tech-item-canva', icon: 'canva', label: 'Canva', useSimpleIcons: true, fallback: 'canva'},
+  {className: 'tech-item-IbisPaint', icon: 'ibispaintx', label: 'IbisPaint', useSimpleIcons: true, fallback: 'ibispaintx'},
 ];
 
 const VIDEO_TECH = [
@@ -70,20 +70,38 @@ const BROWSER_TECH = [
 
 const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
-  { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'Mineoblocks' },
+  { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
   { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'SorynTech', altUsername: 'Korai Fangtail' },
+  {icon: 'battlenet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126', useSimpleIcons: true},
+  {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216', useSimpleIcons: true},
 ];
 
 function getIconUrl(icon, useSimpleIcons = false) {
-  if (useSimpleIcons) return `https://simpleicons.org/icons/${icon}.svg`;
+  if (useSimpleIcons) return `https://cdn.simpleicons.org/${icon}/white`;
   return `https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${icon}.svg`;
 }
 
+function getDevIconUrl(icon) {
+  return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${icon}/${icon}-original.svg`;
+}
+
+function handleIconFallback(e, fallbackIcon) {
+  const fallbackUrl = getDevIconUrl(fallbackIcon);
+  if (e.target.src !== fallbackUrl) {
+    e.target.src = fallbackUrl;
+  }
+}
+
 function TechItem({ item }) {
+  const src = getIconUrl(item.icon, item.useSimpleIcons);
   return (
     <div className={`tech-item ${item.className}`}>
-      <img src={getIconUrl(item.icon, item.useSimpleIcons)} alt={item.label} />
+      <img
+        src={src}
+        alt={item.label}
+        onError={item.fallback ? (e) => handleIconFallback(e, item.fallback) : undefined}
+      />
       <span>{item.label}</span>
     </div>
   );
@@ -220,14 +238,14 @@ export default function SocialsSection({ isLoaded, showNotification }) {
               Click any username to copy to clipboard!
             </p>
             <div className="game-accounts-grid">
-              {GAME_ACCOUNTS.map(({ icon, iconClass, platform, subtitle, username, altUsername }) => (
+              {GAME_ACCOUNTS.map(({ icon, iconClass, platform, subtitle, username, altUsername, useSimpleIcons }) => (
                 <div
                   key={platform}
                   className="game-account-card"
                   onClick={() => copyToClipboard(username, platform, showNotification)}
                 >
                   <div className="game-icon">
-                    <img src={getIconUrl(icon)} alt={platform} className={iconClass} />
+                    <img src={getIconUrl(icon, useSimpleIcons)} alt={platform} className={iconClass} />
                   </div>
                   <h4 className="game-platform">{platform}</h4>
                   <p className="game-subtitle">{subtitle}</p>
