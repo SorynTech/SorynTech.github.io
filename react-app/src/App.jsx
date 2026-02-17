@@ -19,7 +19,7 @@ export default function App() {
   const isLoaded = useDelayedLoad(500);
   const { user, login, logout } = useAuth();
   const { notification, showNotification } = useNotification();
-  const data = useDataLoader(user);
+  const { data, saveData, uploadImage, reloadData } = useDataLoader(user);
   const [activeSection, setActiveSection] = useState('socials');
   const [loginOpen, setLoginOpen] = useState(false);
 
@@ -58,16 +58,16 @@ export default function App() {
         <SocialsSection isLoaded={isLoaded} showNotification={showNotification} />
       )}
       {activeSection === 'bots' && (
-        <BotsSection isLoaded={isLoaded} isActive user={user} bots={data.bots} />
+        <BotsSection isLoaded={isLoaded} isActive user={user} bots={data.bots} data={data} saveData={saveData} showNotification={showNotification} />
       )}
       {activeSection === 'projects' && (
-        <ProjectsSection isLoaded={isLoaded} isActive user={user} projects={data.projects} />
+        <ProjectsSection isLoaded={isLoaded} isActive user={user} projects={data.projects} data={data} saveData={saveData} showNotification={showNotification} />
       )}
       {activeSection === 'art' && (
-        <ArtSection isLoaded={isLoaded} isActive user={user} gallery={data.gallery} />
+        <ArtSection isLoaded={isLoaded} isActive user={user} gallery={data.gallery} data={data} saveData={saveData} uploadImage={uploadImage} showNotification={showNotification} />
       )}
       {activeSection === 'commissions' && (
-        <CommissionsSection isLoaded={isLoaded} isActive user={user} commissions={data.commissions} />
+        <CommissionsSection isLoaded={isLoaded} isActive user={user} commissions={data.commissions} data={data} saveData={saveData} uploadImage={uploadImage} showNotification={showNotification} />
       )}
       {activeSection === 'external-den' && (
         <ExternalDenSection isLoaded={isLoaded} isActive />

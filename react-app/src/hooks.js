@@ -108,13 +108,56 @@ export function useDataLoader(user) {
     }
   }, []);
 
+  const saveData = useCallback(async (updatedData) => {
+    const token = getAuthToken();
+    if (!token) return false;
+    try {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/data`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+      if (response.ok) {
+        setData(updatedData);
+        return true;
+      }
+    } catch {
+      /* ignore */
+    }
+    return false;
+  }, []);
+
+  const uploadImage = useCallback(async (file) => {
+    const token = getAuthToken();
+    if (!token) return null;
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (response.ok) {
+        const result = await response.json();
+        return result.url;
+      }
+    } catch {
+      /* ignore */
+    }
+    return null;
+  }, []);
+
   useEffect(() => {
     if (user.isLoggedIn) {
       loadData();
     }
   }, [user.isLoggedIn, loadData]);
 
-  return data;
+  return { data, setData, saveData, uploadImage, reloadData: loadData };
 }
 
 export function useNotification() {
