@@ -23,11 +23,15 @@ function ImageExpandModal({ isOpen, onClose, image }) {
   if (!isOpen || !image) return null;
   return (
     <div className="modal" style={{ display: 'flex' }} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="image-expand-content" style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+      <div className="image-expand-content" style={{ position: 'relative' }}>
         <span className="close-btn" onClick={onClose}>&times;</span>
-        <img src={image.url || image.src} alt={image.title || 'Expanded'} style={{ maxWidth: '100%', maxHeight: '85vh', borderRadius: '12px' }} />
-        {image.title && <p style={{ textAlign: 'center', color: 'var(--text-primary)', marginTop: '0.5rem', fontSize: '1.1rem' }}>{image.title}</p>}
-        {image.description && <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{image.description}</p>}
+        <img src={image.url || image.src} alt={image.title || 'Expanded'} />
+        {(image.title || image.description) && (
+          <div className="image-expand-info">
+            {image.title && <h3>{image.title}</h3>}
+            {image.description && <p>{image.description}</p>}
+          </div>
+        )}
       </div>
     </div>
   );
