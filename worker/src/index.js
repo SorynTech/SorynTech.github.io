@@ -1,5 +1,4 @@
 import { SignJWT, jwtVerify } from 'jose';
-const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
 const IMGBB_UPLOAD = 'https://api.imgbb.com/1/upload';
 const JWT_ISSUER = 'soryntech-api';
 const JWT_AUDIENCE = 'soryntech-app';
@@ -217,30 +216,195 @@ async function handleAuthMe(request, env, origin) {
   }
   return jsonResponse({ username: auth.username, role: auth.role }, 200, env, origin);
 }
+async function supabaseFetch(env, path) {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': env.SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+    },
+  });
+  if (!res.ok) return null;
+  return await res.json();
+}
+async function supabaseUpsert(env, table, rows) {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      'apikey': env.SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=representation',
+    },
+    body: JSON.stringify(rows),
+  });
+  if (!res.ok) return null;
+  return await res.json();
+}
+async function supabaseDelete(env, table, filter) {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/${table}?${filter}`, {
+    method: 'DELETE',
+    headers: {
+      'apikey': env.SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+    },
+  });
+  return res.ok;
+}
+function profileToFrontend(row) {
+  if (!row) return null;
+  return {
+    name: row.name,
+    role: row.role,
+    image: row.image,
+    socials: {
+      twitter: row.twitter,
+      instagram: row.instagram,
+      github: row.github,
+      discord: row.discord,
+      kofi: row.kofi,
+    },
+  };
+}
+function botToFrontend(row) {
+  return {
+    icon: row.icon,
+    name: row.name,
+    description: row.description,
+    servers: row.servers,
+    users: row.users,
+    inviteLink: row.invite_link,
+    githubRepo: row.github_repo,
+    botFolder: row.bot_folder,
+  };
+}
+function galleryToFrontend(row) {
+  return { src: row.src, title: row.title, description: row.description, timestamp: row.timestamp };
+}
+function commissionToFrontend(row) {
+  return { src: row.src, title: row.title, description: row.description, timestamp: row.timestamp };
+}
+function projectToFrontend(row) {
+  return {
+    icon: row.icon,
+    name: row.name,
+    description: row.description,
+    githubRepo: row.github_repo,
+    liveDemo: row.live_demo,
+    projectFolder: row.project_folder,
+  };
+}
+async function supabaseGetAll(env) {
+  const [profileRows, botRows, galleryRows, commissionRows, projectRows] = await Promise.all([
+    supabaseFetch(env, 'profile?select=*&id=eq.1'),
+    supabaseFetch(env, 'bots?select=*&order=id'),
+    supabaseFetch(env, 'gallery?select=*&order=id'),
+    supabaseFetch(env, 'commissions?select=*&order=id'),
+    supabaseFetch(env, 'projects?select=*&order=id'),
+  ]);
+  if (!profileRows || !botRows || !galleryRows || !commissionRows || !projectRows) return null;
+  return {
+    profile: profileRows.length > 0 ? profileToFrontend(profileRows[0]) : null,
+    bots: botRows.map(botToFrontend),
+    gallery: galleryRows.map(galleryToFrontend),
+    commissions: commissionRows.map(commissionToFrontend),
+    projects: projectRows.map(projectToFrontend),
+  };
+}
+async function supabasePutAll(env, data) {
+  // Update profile
+  if (data.profile) {
+    const p = data.profile;
+    const profileRow = {
+      id: 1,
+      name: p.name || '',
+      role: p.role || '',
+      image: p.image || '',
+      twitter: p.socials?.twitter || '',
+      instagram: p.socials?.instagram || '',
+      github: p.socials?.github || '',
+      discord: p.socials?.discord || '',
+      kofi: p.socials?.kofi || '',
+    };
+    const result = await supabaseUpsert(env, 'profile', profileRow);
+    if (!result) return null;
+  }
+  // Sync bots: delete all then insert
+  if (data.bots) {
+    await supabaseDelete(env, 'bots', 'id=gt.0');
+    if (data.bots.length > 0) {
+      const botRows = data.bots.map((b) => ({
+        icon: b.icon || '',
+        name: b.name || '',
+        description: b.description || '',
+        servers: b.servers || '',
+        users: b.users || '',
+        invite_link: b.inviteLink || '',
+        github_repo: b.githubRepo || '',
+        bot_folder: b.botFolder || '',
+      }));
+      const result = await supabaseUpsert(env, 'bots', botRows);
+      if (!result) return null;
+    }
+  }
+  // Sync gallery
+  if (data.gallery) {
+    await supabaseDelete(env, 'gallery', 'id=gt.0');
+    if (data.gallery.length > 0) {
+      const rows = data.gallery.map((g) => ({
+        src: g.src || '',
+        title: g.title || '',
+        description: g.description || '',
+        timestamp: g.timestamp || Date.now(),
+      }));
+      const result = await supabaseUpsert(env, 'gallery', rows);
+      if (!result) return null;
+    }
+  }
+  // Sync commissions
+  if (data.commissions) {
+    await supabaseDelete(env, 'commissions', 'id=gt.0');
+    if (data.commissions.length > 0) {
+      const rows = data.commissions.map((c) => ({
+        src: c.src || '',
+        title: c.title || '',
+        description: c.description || '',
+        timestamp: c.timestamp || Date.now(),
+      }));
+      const result = await supabaseUpsert(env, 'commissions', rows);
+      if (!result) return null;
+    }
+  }
+  // Sync projects
+  if (data.projects) {
+    await supabaseDelete(env, 'projects', 'id=gt.0');
+    if (data.projects.length > 0) {
+      const rows = data.projects.map((p) => ({
+        icon: p.icon || '',
+        name: p.name || '',
+        description: p.description || '',
+        github_repo: p.githubRepo || '',
+        live_demo: p.liveDemo || '',
+        project_folder: p.projectFolder || '',
+      }));
+      const result = await supabaseUpsert(env, 'projects', rows);
+      if (!result) return null;
+    }
+  }
+  return await supabaseGetAll(env);
+}
 async function handleDataGet(request, env, origin) {
   const auth = await getAuth(request, env);
   if (!auth) {
     return jsonResponse({ error: 'Unauthorized' }, 401, env, origin);
   }
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
-  if (!binId || !apiKey) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return jsonResponse({ error: 'Server configuration error' }, 500, env, origin);
   }
-  const res = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { 'X-Master-Key': apiKey },
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    return jsonResponse(
-      { error: 'Upstream error', status: res.status },
-      res.status >= 500 ? 502 : res.status,
-      env,
-      origin
-    );
+  const data = await supabaseGetAll(env);
+  if (data === null) {
+    return jsonResponse({ error: 'Failed to read data' }, 502, env, origin);
   }
-  const data = await res.json();
-  return jsonResponse(data.record ?? data, 200, env, origin);
+  return jsonResponse(data, 200, env, origin);
 }
 async function handleDataPut(request, env, origin) {
   const auth = await getAuth(request, env);
@@ -262,44 +426,23 @@ async function handleDataPut(request, env, origin) {
   if (!body || typeof body !== 'object') {
     return jsonResponse({ error: 'Invalid body' }, 400, env, origin);
   }
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
-  if (!binId || !apiKey) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return jsonResponse({ error: 'Server configuration error' }, 500, env, origin);
   }
-  const res = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': apiKey,
-    },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    return jsonResponse(
-      { error: 'Upstream error', status: res.status },
-      res.status >= 500 ? 502 : res.status,
-      env,
-      origin
-    );
+  const result = await supabasePut(env, body);
+  if (result === null) {
+    return jsonResponse({ error: 'Failed to save data' }, 502, env, origin);
   }
-  const data = await res.json().catch(() => ({}));
-  return jsonResponse(data.record ?? data ?? { ok: true }, 200, env, origin);
+  return jsonResponse(result ?? { ok: true }, 200, env, origin);
 }
 async function handleCommissionUpdate(request, env, origin) {
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
-  if (!binId || !apiKey) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return jsonResponse({ error: 'Server configuration error' }, 500, env, origin);
   }
-  const getRes = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { 'X-Master-Key': apiKey },
-  });
-  if (!getRes.ok) {
+  const record = await supabaseGet(env);
+  if (record === null) {
     return jsonResponse({ error: 'Failed to read data' }, 502, env, origin);
   }
-  const currentData = await getRes.json();
-  const record = currentData.record ?? currentData;
   let newData;
   try {
     newData = await request.json();
@@ -310,19 +453,11 @@ async function handleCommissionUpdate(request, env, origin) {
     return jsonResponse({ error: 'Invalid commission data' }, 400, env, origin);
   }
   record.commissions = newData.commissions;
-  const putRes = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': apiKey,
-    },
-    body: JSON.stringify(record),
-  });
-  if (!putRes.ok) {
+  const result = await supabasePut(env, record);
+  if (result === null) {
     return jsonResponse({ error: 'Failed to save' }, 502, env, origin);
   }
-  const data = await putRes.json().catch(() => ({}));
-  return jsonResponse(data.record ?? data ?? { ok: true }, 200, env, origin);
+  return jsonResponse(result ?? { ok: true }, 200, env, origin);
 }
 async function handleUpload(request, env, origin) {
   const auth = await getAuth(request, env);

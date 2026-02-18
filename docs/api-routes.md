@@ -29,8 +29,8 @@ Get a token by calling `/api/auth/login` with valid credentials.
 | GET | `/api/credentials` | ❌ No | - | Get guest credentials |
 | POST | `/api/auth/login` | ❌ No | - | Login and get JWT token |
 | GET | `/api/auth/me` | ✅ Yes | Any | Verify token and get user info |
-| GET | `/api/data` | ✅ Yes | Any | Get all data from JSONBin |
-| PUT | `/api/data` | ✅ Yes | Owner/Commission | Update data in JSONBin |
+| GET | `/api/data` | ✅ Yes | Any | Get all data from Supabase |
+| PUT | `/api/data` | ✅ Yes | Owner/Commission | Update data in Supabase |
 | POST | `/api/upload` | ✅ Yes | Owner/Commission | Upload image to ImgBB |
 | GET | `/api/github/user` | ❌ No | - | Get GitHub user profile |
 | GET | `/api/github/contributions` | ❌ No | - | Get GitHub contribution calendar |
@@ -177,7 +177,7 @@ Origin: https://soryntech.me
 GET /api/data
 ```
 
-**Description**: Retrieve all data from JSONBin storage.
+**Description**: Retrieve all data from Supabase storage.
 
 **Authentication**: Required (any role)
 
@@ -202,7 +202,7 @@ Origin: https://soryntech.me
 - `401 Unauthorized`: Missing or invalid token
 - `403 Forbidden`: Invalid origin
 - `500 Internal Server Error`: Configuration error
-- `502 Bad Gateway`: JSONBin error
+- `502 Bad Gateway`: Supabase error
 
 ---
 
@@ -212,7 +212,7 @@ Origin: https://soryntech.me
 PUT /api/data
 ```
 
-**Description**: Update data in JSONBin storage.
+**Description**: Update data in Supabase storage.
 
 **Authentication**: Required (Owner role for full update, Commission role for commission data only)
 
@@ -262,7 +262,7 @@ Origin: https://soryntech.me
 - `401 Unauthorized`: Missing or invalid token
 - `403 Forbidden`: Insufficient permissions or invalid origin
 - `500 Internal Server Error`: Configuration error
-- `502 Bad Gateway`: JSONBin error
+- `502 Bad Gateway`: Supabase error
 
 **Notes**:
 - Owner can update entire data object

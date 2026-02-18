@@ -33,8 +33,12 @@ const CONFIG = (() => {
     initCommissions();
     await checkAuthState();
     if (currentUser.isLoggedIn) await loadAllData();
+    // Poll for fresh data every 15 minutes
+    setInterval(async () => {
+    if (currentUser.isLoggedIn) await loadAllData();
+    }, 15 * 60 * 1000);
     });
-    async function loadFromJSONBin() {
+    async function loadFromSupabase() {
     if (!CONFIG.API_BASE_URL) {
     showNotification('❌ API URL not configured (data-api-url)', 'warning');
     return null;
@@ -61,7 +65,7 @@ const CONFIG = (() => {
     return null;
     }
     }
-    async function saveToJSONBin(data) {
+    async function saveToSupabase(data) {
     if (!CONFIG.API_BASE_URL) {
     showNotification('❌ API URL not configured', 'error');
     return false;
@@ -127,7 +131,7 @@ const CONFIG = (() => {
     }
     async function loadAllData() {
     try {
-    const data = await loadFromJSONBin();
+    const data = await loadFromSupabase();
     if (data) {
     dataCache.bots = data.bots || [];
     dataCache.profile = data.profile || null;
@@ -166,13 +170,13 @@ const CONFIG = (() => {
     if (currentUser.role === 'commission') {
     return await saveCommissionsOnly();
     }
-    return await saveToJSONBin(data);
+    return await saveToSupabase(data);
     }
     async function saveCommissionsOnly() {
     const data = {
     commissions: dataCache.commissions
     };
-    return await saveToJSONBin(data);
+    return await saveToSupabase(data);
     }
     function applyProfileData(data) {
     if (data.name) document.getElementById('lanyardName').textContent = data.name;

@@ -3,3 +3,4 @@ node_modules
 react-build
 .env
 .env.local
+jsonbin.json
