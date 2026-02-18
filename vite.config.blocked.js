@@ -5,6 +5,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   root: 'blocked-app',
+  base: '/blocked/',
   build: {
     outDir: path.resolve(__dirname, 'blocked-build'),
     emptyOutDir: true,

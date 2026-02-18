@@ -40,6 +40,7 @@ jobs:
           cp -f non-react-index.html deploy/
           cp -f before-react-script.js deploy/
           cp -rf blocked-build deploy/blocked 2>/dev/null || true
+          cp -f blocked-build/index.html deploy/Blocked.html 2>/dev/null || true
           cp -rf images deploy/ 2>/dev/null || true
           cp -rf data deploy/ 2>/dev/null || true
           cp -rf .well-known deploy/ 2>/dev/null || true
