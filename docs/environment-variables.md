@@ -53,22 +53,32 @@ wrangler secret put GUEST_PASSWORD
 wrangler secret put COMM_PASS
 ```
 
-### JSONBIN_API_KEY
-**Purpose**: API key for JSONBin.io data storage  
+### SUPABASE_URL
+**Purpose**: Supabase project URL for data storage  
 **Type**: Secret (required)  
-**Get Key**: https://jsonbin.io/api-keys  
+**Format**: `https://<project-ref>.supabase.co`  
+**Get URL**: https://supabase.com/dashboard → Settings → API  
 **How to Set**:
 ```bash
-wrangler secret put JSONBIN_API_KEY
+wrangler secret put SUPABASE_URL
 ```
 
-### JSONBIN_BIN_ID
-**Purpose**: ID of the JSONBin storage bin  
+### SUPABASE_ANON_KEY
+**Purpose**: Supabase anon/public API key  
 **Type**: Secret (required)  
-**Format**: String like `65f8a2b3c9d4e12345678901`  
+**Get Key**: https://supabase.com/dashboard → Settings → API  
 **How to Set**:
 ```bash
-wrangler secret put JSONBIN_BIN_ID
+wrangler secret put SUPABASE_ANON_KEY
+```
+
+### SUPABASE_SERVICE_ROLE_KEY
+**Purpose**: Supabase service role key (full database access, bypasses RLS)  
+**Type**: Secret (required)  
+**Get Key**: https://supabase.com/dashboard → Settings → API  
+**How to Set**:
+```bash
+wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 ```
 
 ### IMGBB_API_KEY
@@ -143,8 +153,9 @@ wrangler secret put JWT_SECRET
 wrangler secret put OWNER_PASSWORD
 wrangler secret put GUEST_PASSWORD
 wrangler secret put COMM_PASS
-wrangler secret put JSONBIN_API_KEY
-wrangler secret put JSONBIN_BIN_ID
+wrangler secret put SUPABASE_URL
+wrangler secret put SUPABASE_ANON_KEY
+wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 wrangler secret put IMGBB_API_KEY
 wrangler secret put GITHUB_API_KEY
 ```
@@ -166,8 +177,9 @@ JWT_SECRET=your-secret-here
 OWNER_PASSWORD=your-password-here
 GUEST_PASSWORD=your-password-here
 COMM_PASS=your-password-here
-JSONBIN_API_KEY=your-key-here
-JSONBIN_BIN_ID=your-bin-id-here
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 IMGBB_API_KEY=your-key-here
 GITHUB_API_KEY=your-token-here
 ```
@@ -307,6 +319,6 @@ wrangler deploy --config wrangler.production.toml
 
 - [Cloudflare Workers Environment Variables](https://developers.cloudflare.com/workers/configuration/environment-variables/)
 - [Wrangler Secret Management](https://developers.cloudflare.com/workers/wrangler/commands/#secret)
-- [JSONBin API Documentation](https://jsonbin.io/api-reference)
+- [Supabase REST API](https://supabase.com/docs/guides/api)
 - [ImgBB API Documentation](https://api.imgbb.com/)
 - [GitHub API Authentication](https://docs.github.com/en/authentication)

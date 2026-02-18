@@ -157,6 +157,16 @@ export function useDataLoader(user) {
     }
   }, [user.isLoggedIn, loadData]);
 
+  // Poll for fresh data every 15 minutes (10-20 min range)
+  useEffect(() => {
+    if (!user.isLoggedIn) return;
+    const POLL_INTERVAL = 15 * 60 * 1000; // 15 minutes
+    const intervalId = setInterval(() => {
+      loadData();
+    }, POLL_INTERVAL);
+    return () => clearInterval(intervalId);
+  }, [user.isLoggedIn, loadData]);
+
   return { data, setData, saveData, uploadImage, reloadData: loadData };
 }
 

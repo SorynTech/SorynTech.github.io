@@ -68,8 +68,9 @@ wrangler secret put JWT_SECRET
 wrangler secret put OWNER_PASSWORD
 wrangler secret put GUEST_PASSWORD
 wrangler secret put COMM_PASS
-wrangler secret put JSONBIN_API_KEY
-wrangler secret put JSONBIN_BIN_ID
+wrangler secret put SUPABASE_URL
+wrangler secret put SUPABASE_ANON_KEY
+wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 wrangler secret put IMGBB_API_KEY
 wrangler secret put GITHUB_API_KEY
 ```

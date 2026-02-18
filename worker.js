@@ -1312,7 +1312,6 @@ var SignJWT = class extends ProduceJWT {
 };
 
 // worker/src/index.js
-var JSONBIN_BASE = "https://api.jsonbin.io/v3";
 var IMGBB_UPLOAD = "https://api.imgbb.com/1/upload";
 var JWT_ISSUER = "soryntech-api";
 var JWT_AUDIENCE = "soryntech-app";
@@ -1502,30 +1501,49 @@ async function handleAuthMe(request, env, origin) {
   return jsonResponse({ username: auth.username, role: auth.role }, 200, env, origin);
 }
 __name(handleAuthMe, "handleAuthMe");
+async function supabaseGet(env) {
+  const url = `${env.SUPABASE_URL}/rest/v1/site_data?select=data&id=eq.1`;
+  const res = await fetch(url, {
+    headers: {
+      "apikey": env.SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+    }
+  });
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows.length > 0 ? rows[0].data : null;
+}
+__name(supabaseGet, "supabaseGet");
+async function supabasePut(env, data) {
+  const url = `${env.SUPABASE_URL}/rest/v1/site_data?id=eq.1`;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      "apikey": env.SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=representation"
+    },
+    body: JSON.stringify({ data })
+  });
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows.length > 0 ? rows[0].data : data;
+}
+__name(supabasePut, "supabasePut");
 async function handleDataGet(request, env, origin) {
   const auth = await getAuth(request, env);
   if (!auth) {
     return jsonResponse({ error: "Unauthorized" }, 401, env, origin);
   }
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
-  if (!binId || !apiKey) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return jsonResponse({ error: "Server configuration error" }, 500, env, origin);
   }
-  const res = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { "X-Master-Key": apiKey }
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    return jsonResponse(
-      { error: "Upstream error", status: res.status },
-      res.status >= 500 ? 502 : res.status,
-      env,
-      origin
-    );
+  const data = await supabaseGet(env);
+  if (data === null) {
+    return jsonResponse({ error: "Failed to read data" }, 502, env, origin);
   }
-  const data = await res.json();
-  return jsonResponse(data.record ?? data, 200, env, origin);
+  return jsonResponse(data, 200, env, origin);
 }
 __name(handleDataGet, "handleDataGet");
 async function handleDataPut(request, env, origin) {
@@ -1548,45 +1566,24 @@ async function handleDataPut(request, env, origin) {
   if (!body || typeof body !== "object") {
     return jsonResponse({ error: "Invalid body" }, 400, env, origin);
   }
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
-  if (!binId || !apiKey) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return jsonResponse({ error: "Server configuration error" }, 500, env, origin);
   }
-  const res = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Master-Key": apiKey
-    },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) {
-    return jsonResponse(
-      { error: "Upstream error", status: res.status },
-      res.status >= 500 ? 502 : res.status,
-      env,
-      origin
-    );
+  const result = await supabasePut(env, body);
+  if (result === null) {
+    return jsonResponse({ error: "Failed to save data" }, 502, env, origin);
   }
-  const data = await res.json().catch(() => ({}));
-  return jsonResponse(data.record ?? data ?? { ok: true }, 200, env, origin);
+  return jsonResponse(result ?? { ok: true }, 200, env, origin);
 }
 __name(handleDataPut, "handleDataPut");
 async function handleCommissionUpdate(request, env, origin) {
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
-  if (!binId || !apiKey) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return jsonResponse({ error: "Server configuration error" }, 500, env, origin);
   }
-  const getRes = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { "X-Master-Key": apiKey }
-  });
-  if (!getRes.ok) {
+  const record = await supabaseGet(env);
+  if (record === null) {
     return jsonResponse({ error: "Failed to read data" }, 502, env, origin);
   }
-  const currentData = await getRes.json();
-  const record = currentData.record ?? currentData;
   let newData;
   try {
     newData = await request.json();
@@ -1597,19 +1594,11 @@ async function handleCommissionUpdate(request, env, origin) {
     return jsonResponse({ error: "Invalid commission data" }, 400, env, origin);
   }
   record.commissions = newData.commissions;
-  const putRes = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Master-Key": apiKey
-    },
-    body: JSON.stringify(record)
-  });
-  if (!putRes.ok) {
+  const result = await supabasePut(env, record);
+  if (result === null) {
     return jsonResponse({ error: "Failed to save" }, 502, env, origin);
   }
-  const data = await putRes.json().catch(() => ({}));
-  return jsonResponse(data.record ?? data ?? { ok: true }, 200, env, origin);
+  return jsonResponse(result ?? { ok: true }, 200, env, origin);
 }
 __name(handleCommissionUpdate, "handleCommissionUpdate");
 async function handleUpload(request, env, origin) {

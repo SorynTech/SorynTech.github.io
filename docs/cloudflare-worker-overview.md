@@ -22,7 +22,7 @@ The SorynTech website uses a Cloudflare Worker as its backend API. This serverle
 │  soryntech-api      │
 └────────┬────────────┘
          │
-         ├─────► JSONBin (Data Storage)
+         ├─────► Supabase (Data Storage)
          ├─────► ImgBB (Image Uploads)
          └─────► GitHub API (Contributions)
 ```
@@ -42,7 +42,7 @@ The SorynTech website uses a Cloudflare Worker as its backend API. This serverle
 - **Credential support** for authenticated requests
 
 ### 📊 Data Management
-- **JSONBin integration** for persistent data storage
+- **Supabase integration** for persistent data storage
 - **Read/Write operations** with role-based permissions
 - **Commission-specific updates** for limited access users
 - **Atomic data operations** to prevent race conditions
@@ -70,7 +70,7 @@ The SorynTech website uses a Cloudflare Worker as its backend API. This serverle
 - **Runtime**: Cloudflare Workers (V8 isolates)
 - **JavaScript**: ES6+ with module imports
 - **Authentication**: JWT (JSON Web Tokens) via `jose` library
-- **APIs**: JSONBin, ImgBB, GitHub REST & GraphQL
+- **APIs**: Supabase, ImgBB, GitHub REST & GraphQL
 - **Deployment**: Wrangler CLI
 
 ## Performance
