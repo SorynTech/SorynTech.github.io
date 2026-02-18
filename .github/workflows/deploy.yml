@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
       
       - name: Install dependencies
         run: npm install
@@ -52,6 +51,9 @@ jobs:
           cp -rf images deploy/ 2>/dev/null || true
           cp -rf data deploy/ 2>/dev/null || true
           cp -rf .well-known deploy/ 2>/dev/null || true
+          # Copy blocked app as self-contained page
+          mkdir -p deploy/blocked
+          cp -f blocked-build/index.html deploy/blocked/index.html 2>/dev/null || true
           echo "✅ Deployment directory prepared"
           ls -la deploy/
       
