@@ -12,3 +12,6 @@ compatibility_date = "2024-01-01"
 [vars]
 # Optional: set ALLOWED_ORIGINS as a var if you prefer (e.g. "https://soryntech.github.io")
 ALLOWED_ORIGINS = "https://soryntech.me"
+
+[triggers]
+crons = ["*/10 * * * *", "1-59/10 * * * *"]
