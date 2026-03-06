@@ -29,7 +29,7 @@ const CODING_TECH = [
   { className: 'tech-item-html5', icon: 'html5', label: 'HTML' },
   { className: 'tech-item-css3', icon: 'css3', label: 'CSS' },
   { className: 'tech-item-githubcopilot', icon: 'githubcopilot', label: 'GitHub Copilot' },
-  { className: 'tech-item-github', icon: 'github', label: 'GitHub' },
+  { className: 'tech-item-github', icon: 'refinedgithub', label: 'GitHub' },
   { className: 'tech-item-git', icon: 'git', label: 'Git' },
   { className: 'tech-item-windows', icon: 'windows10', label: 'Windows' },
   { className: 'tech-item-macos', icon: 'apple', label: 'macOS' },
@@ -66,13 +66,14 @@ const BROWSER_TECH = [
   { className: 'tech-item-firefox', icon: 'firefoxbrowser', label: 'Firefox' },
   { className: 'tech-item-chrome', icon: 'googlechrome', label: 'Chrome' },
   { className: 'tech-item-safari', icon: 'safari', label: 'Safari' },
+  {classname: 'tech-item-edge',icon:'microsoftedge',label:'Microsoft Edge', getDevIconUrl:true}
 ];
 
 const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
-  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'https://steampowered.com/users/soryntehrat' },
+  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'https://steamcommunity.com/id/SorynTehRat' },
   { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'soryntech.me' },
   {icon: 'battledotnet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126'},
   {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216'},
