@@ -29,7 +29,7 @@ const CODING_TECH = [
   { className: 'tech-item-html5', icon: 'html5', label: 'HTML' },
   { className: 'tech-item-css3', icon: 'css3', label: 'CSS' },
   { className: 'tech-item-githubcopilot', icon: 'githubcopilot', label: 'GitHub Copilot' },
-  { className: 'tech-item-github', icon: 'refinedgithub', label: 'GitHub' },
+  { className: 'tech-item-github', icon: 'refinedgithub', label: 'GitHub' , useSimpleIcons:true},
   { className: 'tech-item-git', icon: 'git', label: 'Git' },
   { className: 'tech-item-windows', icon: 'windows10', label: 'Windows' },
   { className: 'tech-item-macos', icon: 'apple', label: 'macOS' },
