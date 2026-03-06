@@ -13,7 +13,7 @@ import GitHubGraph from './GitHubGraph';
 const SOCIAL_LINKS = [
   { href: 'https://Ko-fi.com/soryntech', className: 'social-link-kofi', icon: 'kofi', label: 'Ko-fi' },
   { href: 'https://github.com/sorynTech', className: 'social-link-github', icon: 'github', label: 'GitHub' },
-  { href: 'https://Discord.gg/users/447812883158532106', className: 'social-link-discord', icon: 'discord', label: 'Discord' },
+  { href: 'https://discord.com/users/447812883158532106', className: 'social-link-discord', icon: 'discord', label: 'Discord' },
   { href: 'https://x.com/soryntech_me', className: 'social-link-twitter', icon: 'x', label: 'Twitter/X' },
   { href: 'https://www.instagram.com/zippydrawz.offical__/', className: 'social-link-instagram', icon: 'instagram', label: 'Instagram' },
   { href: 'https://www.youtube.com/@AstroFerretEN', className: 'social-link-youtube', icon: 'youtube', label: 'YouTube' },
