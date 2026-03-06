@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { id: 'projects', label: 'Projects' },
   { id: 'art', label: 'Art Gallery' },
   { id: 'commissions', label: '🎨 Commissions' },
+  { id: 'external-den', label: '🐀 External Den' },
   { id: 'privacy', label: '🔒 Privacy Policy' },
 ];
 

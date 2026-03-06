@@ -21,18 +21,32 @@ export default function ExternalDenSection({ isLoaded, isActive }) {
               <h3>Discord Den</h3>
             </div>
             <p className="privacy-intro">
-              Come hang out in the rat&apos;s Discord server!
+              Come hang out with the rat on Discord!
             </p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <a
+                href="https://discord.com/users/447812883158532106"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="/images/discord_profile.png"
+                  alt="Soryn's Discord Profile"
+                  style={{ maxWidth: '320px', width: '100%', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}
+                />
+              </a>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <iframe
-                src="https://discord.com/widget?id=1431308132717432975&theme=dark"
-                width="350"
-                height="500"
-                allowTransparency="true"
-                frameBorder="0"
-                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-                title="Discord Server Widget"
-              />
+              <a
+                href="https://discord.com/users/447812883158532106"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tech-item tech-item-discord"
+                aria-label="Connect with me on Discord"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 2rem', textDecoration: 'none', fontSize: '1.1rem' }}
+              >
+                💬 Connect on Discord
+              </a>
             </div>
           </div>
         </div>
