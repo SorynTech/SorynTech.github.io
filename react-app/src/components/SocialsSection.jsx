@@ -14,7 +14,7 @@ const SOCIAL_LINKS = [
   { href: 'https://Ko-fi.com/soryntech', className: 'social-link-kofi', icon: 'kofi', label: 'Ko-fi' },
   { href: 'https://github.com/sorynTech', className: 'social-link-github', icon: 'github', label: 'GitHub' },
   { href: 'https://Discord.gg/users/447812883158532106', className: 'social-link-discord', icon: 'discord', label: 'Discord' },
-  { href: 'https://x.com/ZippyDrawz_', className: 'social-link-twitter', icon: 'x', label: 'Twitter/X' },
+  { href: 'https://x.com/soryntech_me', className: 'social-link-twitter', icon: 'x', label: 'Twitter/X' },
   { href: 'https://www.instagram.com/zippydrawz.offical__/', className: 'social-link-instagram', icon: 'instagram', label: 'Instagram' },
   { href: 'https://www.youtube.com/@AstroFerretEN', className: 'social-link-youtube', icon: 'youtube', label: 'YouTube' },
   { href: 'https://www.tiktok.com/@zippydrawz', className: 'social-link-tiktok', icon: 'tiktok', label: 'TikTok' },
@@ -72,7 +72,7 @@ const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
-  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'SorynTech', altUsername: 'Korai Fangtail' },
+  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href:'steampowered.com/users/soryntehrat', altUsername: 'soryntech.me' },
   {icon: 'battledotnet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126'},
   {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216'},
 ];
