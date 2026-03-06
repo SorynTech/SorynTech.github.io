@@ -72,7 +72,8 @@ const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
-  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href:'steampowered.com/users/soryntehrat', altUsername: 'soryntech.me' },
+  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'https://steampowered.com/users/soryntehrat' },
+  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'soryntech.me' },
   {icon: 'battledotnet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126'},
   {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216'},
 ];
@@ -238,11 +239,11 @@ export default function SocialsSection({ isLoaded, showNotification }) {
               Click any username to copy to clipboard!
             </p>
             <div className="game-accounts-grid">
-              {GAME_ACCOUNTS.map(({ icon, iconClass, platform, subtitle, username, altUsername, useSimpleIcons }) => (
+              {GAME_ACCOUNTS.map(({ icon, iconClass, platform, subtitle, username, href, altUsername, useSimpleIcons }) => (
                 <div
-                  key={platform}
+                  key={`${platform}-${username}`}
                   className="game-account-card"
-                  onClick={() => copyToClipboard(username, platform, showNotification)}
+                  onClick={() => href ? window.open(href, '_blank', 'noopener,noreferrer') : copyToClipboard(username, platform, showNotification)}
                 >
                   <div className="game-icon">
                     <img src={getIconUrl(icon, useSimpleIcons)} alt={platform} className={iconClass} />
@@ -251,7 +252,7 @@ export default function SocialsSection({ isLoaded, showNotification }) {
                   <p className="game-subtitle">{subtitle}</p>
                   <div className="game-username">{username}</div>
                   {altUsername && <div className="game-username-alt">{altUsername}</div>}
-                  <div className="copy-indicator">Click to copy 📋</div>
+                  <div className="copy-indicator">{href ? 'Click to visit 🔗' : 'Click to copy 📋'}</div>
                 </div>
               ))}
             </div>
