@@ -41,11 +41,11 @@ export default function ExternalDenSection({ isLoaded, isActive }) {
                 href="https://discord.com/users/447812883158532106"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tech-item tech-item-discord"
-                aria-label="Connect with me on Discord"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 2rem', textDecoration: 'none', fontSize: '1.1rem' }}
+                className="tech-item discord-connect-btn"
+                aria-label="Connect with the Rat on Discord"
               >
-                💬 Connect on Discord
+                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" alt="Discord" />
+                Connect with the Rat on Discord
               </a>
             </div>
           </div>
