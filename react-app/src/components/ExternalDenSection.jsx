@@ -23,6 +23,19 @@ export default function ExternalDenSection({ isLoaded, isActive }) {
             <p className="privacy-intro">
               Come hang out with the rat on Discord!
             </p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <a
+                href="https://discord.com/users/447812883158532106"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="/images/discord_profile.png"
+                  alt="Soryn's Discord Profile"
+                  style={{ maxWidth: '320px', width: '100%', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}
+                />
+              </a>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <a
                 href="https://discord.com/users/447812883158532106"
