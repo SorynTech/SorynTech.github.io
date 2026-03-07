@@ -11,16 +11,16 @@ import { copyToClipboard } from '../hooks';
 import GitHubGraph from './GitHubGraph';
 
 const SOCIAL_LINKS = [
-  { href: 'https://Ko-fi.com/soryntech', className: 'social-link-kofi', icon: 'kofi', label: 'Ko-fi' },
-  { href: 'https://github.com/sorynTech', className: 'social-link-github', icon: 'github', label: 'GitHub' },
-  { href: 'https://discord.com/users/447812883158532106', className: 'social-link-discord', icon: 'discord', label: 'Discord' },
-  { href: 'https://x.com/soryntech_me', className: 'social-link-twitter', icon: 'x', label: 'Twitter/X' },
-  { href: 'https://www.instagram.com/zippydrawz.offical__/', className: 'social-link-instagram', icon: 'instagram', label: 'Instagram' },
-  { href: 'https://www.youtube.com/@AstroFerretEN', className: 'social-link-youtube', icon: 'youtube', label: 'YouTube' },
-  { href: 'https://www.tiktok.com/@zippydrawz', className: 'social-link-tiktok', icon: 'tiktok', label: 'TikTok' },
-  { href: 'https://gitlab.com/SorynTech', className: 'social-link-gitlab', icon: 'gitlab', label: 'GitLab' },
-  { href: 'https://tinyurl.com/2x8vvnw9', className: 'social-link-linkedin', icon: 'linkedin', label: 'Linkedin' },
-  {href: 'https://twitch.tv/ZippyDrawz', className: 'social-link-twitch', icon: 'twitch', label: 'Twitch'},
+  { href: 'https://kofi.soryntech.me',      className: 'social-link-kofi',      icon: 'kofi',      label: 'Ko-fi' },
+  { href: 'https://github.soryntech.me',    className: 'social-link-github',    icon: 'github',    label: 'GitHub' },
+  { href: 'https://discord.soryntech.me',   className: 'social-link-discord',   icon: 'discord',   label: 'Discord' },
+  { href: 'https://twitter.soryntech.me',   className: 'social-link-twitter',   icon: 'x',         label: 'Twitter/X' },
+  { href: 'https://instagram.soryntech.me', className: 'social-link-instagram', icon: 'instagram', label: 'Instagram' },
+  { href: 'https://youtube.soryntech.me',   className: 'social-link-youtube',   icon: 'youtube',   label: 'YouTube' },
+  { href: 'https://tiktok.soryntech.me',    className: 'social-link-tiktok',    icon: 'tiktok',    label: 'TikTok' },
+  { href: 'https://gitlab.soryntech.me',    className: 'social-link-gitlab',    icon: 'gitlab',    label: 'GitLab' },
+  { href: 'https://linkedin.soryntech.me',  className: 'social-link-linkedin',  icon: 'linkedin',  label: 'LinkedIn' },
+  { href: 'https://twitch.soryntech.me',    className: 'social-link-twitch',    icon: 'twitch',    label: 'Twitch' },
 ];
 
 const CODING_TECH = [
@@ -73,7 +73,7 @@ const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
-  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'https://steamcommunity.com/id/SorynTehRat' },
+  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'steam.soryntech.me' },
   { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'soryntech.me' },
   {icon: 'battledotnet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126'},
   {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216'},
