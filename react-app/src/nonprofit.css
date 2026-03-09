@@ -1,0 +1,352 @@
+/* nonprofit.css — Charity Livestream Page Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #1a1d2e;
+  color: #dfe6e9;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(192, 132, 252, 0.03) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+a {
+  color: #7dd3fc;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Animations */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(5deg); }
+  50% { transform: translateY(0) rotate(-5deg); }
+  75% { transform: translateY(20px) rotate(5deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Cheese background */
+
+.charity-cheese-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.charity-cheese-piece {
+  position: absolute;
+  font-size: 3rem;
+  opacity: 0.1;
+  animation: float 20s infinite ease-in-out;
+}
+
+.charity-cheese-piece:nth-child(1) {
+  top: 10%;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+.charity-cheese-piece:nth-child(2) {
+  top: 20%;
+  right: 10%;
+  animation-delay: 5s;
+}
+
+.charity-cheese-piece:nth-child(3) {
+  bottom: 15%;
+  left: 15%;
+  animation-delay: 10s;
+}
+
+.charity-cheese-piece:nth-child(4) {
+  bottom: 25%;
+  right: 8%;
+  animation-delay: 15s;
+}
+
+/* Layout */
+
+.charity-main {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Header */
+
+.charity-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.charity-back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(125, 211, 252, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  color: #7dd3fc;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.charity-back-link:hover {
+  text-decoration: none;
+  background: rgba(125, 211, 252, 0.2);
+}
+
+.charity-hero-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.charity-title {
+  font-family: 'Righteous', cursive;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  background: linear-gradient(135deg, #7dd3fc, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.charity-subtitle {
+  color: #b2bec3;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Card (shared section style) */
+
+.charity-card {
+  background: #2d3446;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.charity-card--center {
+  text-align: center;
+}
+
+/* Countdown */
+
+.charity-countdown-title {
+  font-family: 'Righteous', cursive;
+  font-size: 1.3rem;
+  margin-bottom: 1.25rem;
+  color: #dfe6e9;
+}
+
+.charity-countdown {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.charity-countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(125, 211, 252, 0.1);
+  border-radius: 12px;
+  min-width: 80px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+}
+
+.charity-countdown-value {
+  font-family: 'Righteous', cursive;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #7dd3fc, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.charity-countdown-label {
+  font-size: 0.75rem;
+  color: #b2bec3;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Badges */
+
+.charity-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  animation: pulse 2s infinite;
+}
+
+.charity-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  display: inline-block;
+}
+
+.charity-ended-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(125, 211, 252, 0.15);
+  color: #7dd3fc;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+}
+
+/* Stream section */
+
+.charity-stream-remaining {
+  color: #b2bec3;
+  font-size: 0.95rem;
+}
+
+.charity-stream-embed {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(125, 211, 252, 0.15);
+  overflow: hidden;
+}
+
+.charity-stream-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.charity-stream-placeholder {
+  padding: 2rem;
+  text-align: center;
+}
+
+.charity-stream-placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.charity-stream-placeholder-text {
+  color: #b2bec3;
+  margin-bottom: 0.5rem;
+}
+
+.charity-twitch-btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: #9146FF;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.charity-twitch-btn:hover {
+  text-decoration: none;
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Info section */
+
+.charity-info-title {
+  font-family: 'Righteous', cursive;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #7dd3fc, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.charity-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #b2bec3;
+  line-height: 1.7;
+}
+
+.charity-info-list strong {
+  color: #dfe6e9;
+}
+
+/* Footer */
+
+.charity-footer {
+  text-align: center;
+  padding: 1.5rem 0;
+  color: #636e72;
+  font-size: 0.85rem;
+}
+
+.charity-footer a {
+  text-decoration: none;
+}
+
+.charity-footer-link--home {
+  color: #7dd3fc;
+}
+
+.charity-footer-link--twitch {
+  color: #9146FF;
+}
