@@ -8,6 +8,12 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, 'react-build'),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'react-app/index.html'),
+        charity: path.resolve(__dirname, 'react-app/charity/index.html'),
+      },
+    },
   },
   server: {
     port: 3000,
