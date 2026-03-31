@@ -73,7 +73,7 @@ const GAME_ACCOUNTS = [
   { icon: 'riotgames', iconClass: 'game-icon-riot', platform: 'Riot Games', subtitle: 'League of Legends • Valorant', username: 'SorynTech#Fang' },
   { icon: 'roblox', iconClass: 'game-icon-roblox', platform: 'Roblox', subtitle: 'Platform', username: 'mineoblocks' },
   { icon: 'epicgames', iconClass: 'game-icon-epic', platform: 'Epic Games', subtitle: 'Rocket League • Fortnite', username: 'ZDS Sharky' },
-  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'steam.soryntech.me' },
+  { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'Soryn Teh Rat', href: 'https://steam.soryntech.me' },
   { icon: 'steam', iconClass: 'game-icon-steam', platform: 'Steam', subtitle: 'PC Gaming', username: 'soryntech.me' },
   {icon: 'battledotnet', iconClass: 'game-icon-battle', platform: 'Battle.net', subtitle: 'Overwatch', username: 'ZippyDrawz#2126'},
   {icon: 'xbox', iconClass: 'game-icon-xbox', platform: 'Xbox', subtitle: 'Console Gaming', username: 'FerretBoy#7539', altUsername: 'Demon#4216'},
