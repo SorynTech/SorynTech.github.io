@@ -1,0 +1,207 @@
+:root {
+    --bg-primary: #1a1d2e;
+    --bg-secondary: #252839;
+    --bg-card: #2d3446;
+    --accent-primary: #7dd3fc;
+    --accent-secondary: #a855f7;
+    --accent-tertiary: #c084fc;
+    --text-primary: #dfe6e9;
+    --text-secondary: #b2bec3;
+    --text-muted: #636e72;
+    --shadow-glow: 0 0 40px rgba(125, 211, 252, 0.3);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --purple-dark: #7c3aed;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(192, 132, 252, 0.03) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Floating Cheese Animation */
+.cheese-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.cheese-piece {
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.1;
+    animation: float 20s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-20px) rotate(5deg); }
+    50% { transform: translateY(0) rotate(-5deg); }
+    75% { transform: translateY(20px) rotate(5deg); }
+}
+
+.cheese-piece:nth-child(1) { animation-delay: 0s; }
+.cheese-piece:nth-child(2) { animation-delay: 5s; }
+.cheese-piece:nth-child(3) { animation-delay: 10s; }
+.cheese-piece:nth-child(4) { animation-delay: 15s; }
+
+/* Header */
+.header {
+    background: rgba(10, 14, 39, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    padding: 0.75rem 1.5rem;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    font-family: 'Righteous', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--purple-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rat-icon {
+    filter: drop-shadow(0 0 10px rgba(123, 237, 159, 0.5));
+    animation: ratBounce 2s infinite;
+}
+
+@keyframes ratBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.nav-link:hover {
+    color: var(--accent-primary);
+}
+
+.twitch-link {
+    background: #9146FF;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+}
+
+.twitch-link:hover {
+    color: white;
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Main Content - Twitch Embed */
+.main-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    background: black;
+}
+
+.twitch-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.twitch-video {
+    flex: 1;
+    height: 100%;
+}
+
+.twitch-chat {
+    width: 340px;
+    height: 100%;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.twitch-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+@media (max-width: 900px) {
+    .twitch-container {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    .twitch-video {
+        flex: none;
+        width: 100%;
+        aspect-ratio: 16/9;
+    }
+    .twitch-chat {
+        width: 100%;
+        height: 500px;
+        flex: 1;
+    }
+    body {
+        overflow: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .brand {
+        font-size: 1.2rem;
+    }
+    .nav-links {
+        gap: 0.75rem;
+    }
+}
