@@ -1322,6 +1322,12 @@ var index_default = {
     if (method === "OPTIONS") {
       return corsResponse(200, env);
     }
+    if (url.pathname === "/.well-known/atproto-did") {
+      return new Response("did:plc:mjdgi2ecapvnod4fci5w75nq", {
+        status: 200,
+        headers: { "Content-Type": "text/plain" }
+      });
+    }
     const origin = request.headers.get("Origin") || "";
     if (!isAllowedOrigin(origin, env)) {
       return jsonResponse({ error: "Forbidden" }, 403, env, origin);
