@@ -26,10 +26,23 @@ function ImageExpandModal({ isOpen, onClose, image }) {
       <div className="image-expand-content" style={{ position: 'relative' }}>
         <span className="close-btn" onClick={onClose}>&times;</span>
         <img src={image.url || image.src} alt={image.title || 'Expanded'} />
-        {(image.title || image.description) && (
+        {(image.title || image.description || image.artistName || image.artistLink) && (
           <div className="image-expand-info">
             {image.title && <h3>{image.title}</h3>}
             {image.description && <p>{image.description}</p>}
+            {(image.artistName || image.artistLink) && (
+              <div style={{ marginTop: '1rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                {image.artistName && <p><strong>🎨 Artist:</strong> {image.artistName}</p>}
+                {image.artistLink && (
+                  <p>
+                    <strong>🔗 Commissions:</strong>{' '}
+                    <a href={image.artistLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)' }}>
+                      View Artist's Commissions
+                    </a>
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -487,7 +500,7 @@ export function ArtSection({ isLoaded, isActive, user, gallery = [], data, saveD
 export function CommissionsSection({ isLoaded, isActive, user, commissions = [], data, saveData, uploadImage, showNotification }) {
   const fileInputRef = useRef(null);
   const [urlModalOpen, setUrlModalOpen] = useState(false);
-  const [urlForm, setUrlForm] = useState({ url: '', title: '', description: '' });
+  const [urlForm, setUrlForm] = useState({ url: '', title: '', description: '', artistName: '', artistLink: '' });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMsg, setConfirmMsg] = useState('');
@@ -532,7 +545,7 @@ export function CommissionsSection({ isLoaded, isActive, user, commissions = [],
   };
 
   const openUrlModal = () => {
-    setUrlForm({ url: '', title: '', description: '' });
+    setUrlForm({ url: '', title: '', description: '', artistName: '', artistLink: '' });
     setUrlModalOpen(true);
   };
 
@@ -542,6 +555,8 @@ export function CommissionsSection({ isLoaded, isActive, user, commissions = [],
       src: urlForm.url,
       title: urlForm.title || `Commission ${commissions.length + 1}`,
       description: urlForm.description,
+      artistName: urlForm.artistName,
+      artistLink: urlForm.artistLink,
       timestamp: Date.now(),
     };
     const updated = { ...data, commissions: [...commissions, newItem] };
@@ -640,6 +655,10 @@ export function CommissionsSection({ isLoaded, isActive, user, commissions = [],
         <input type="text" value={urlForm.title} onChange={(e) => setUrlForm({ ...urlForm, title: e.target.value })} placeholder="Commission Title" />
         <label>Image Description (optional)</label>
         <textarea rows="2" value={urlForm.description} onChange={(e) => setUrlForm({ ...urlForm, description: e.target.value })} placeholder="Client name, commission details..." />
+        <label>Artist Name (optional)</label>
+        <input type="text" value={urlForm.artistName} onChange={(e) => setUrlForm({ ...urlForm, artistName: e.target.value })} placeholder="Who drew this?" />
+        <label>Artist Commissions Link (optional)</label>
+        <input type="text" value={urlForm.artistLink} onChange={(e) => setUrlForm({ ...urlForm, artistLink: e.target.value })} placeholder="https://..." />
         <button onClick={handleSaveUrl}>Add to Gallery 🎨</button>
       </Modal>
 
